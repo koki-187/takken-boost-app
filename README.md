@@ -1,111 +1,112 @@
-# 宅建BOOST アプリ開発リポジリ
+# 危険物取扱者試験 乙4 合格支援アプリ（開発版）
 
-## プロジェクト概要
+本プロジェクトは、危険物取扱者 乙種第4類（乙4）の合格率向上を目的とした学習用フロントエンド Web アプリです。完全に静的（HTML/CSS/JS）で動作し、ローカルデータ（LocalStorage）を活用。必要に応じて RESTful Table API に拡張可能です。
 
-このリポジトリは、宅地建物取引士試験学習アプリ「宅建BOOST」の開発に関連するすべてのファイルを管理します。Google Driveの整理を経て、開発効率の向上とチーム連携のスムーズ化を目指し、以下の目的で構成されています。
+## 現在実装済みの主な機能
+- 受験日カウントダウン（本試験までの日数表示）
+- 学習ストリーク／簡易進捗（到達率）
+- 本試験形式の模試（35問・タイマー・即時採点・解説表示）
+  - 出題モード：標準 / 弱点補強 / 頻出強化 / 直前想定
+  - 本試験配分（固定）：法令 43% / 物化 29% / 性消 28%（35問に自動割付）
+  - 長期重複回避：recentIds により直近出題を最大210件保持し除外、枯渇時は自動リセット
+  - テーマ偏り抑制（テーマ上限 5、index.html で調整可）＋ フィッシャー–イェーツ シャッフル
+- 傾向可視化（カテゴリ/テーマ）
+  - 過去4年（2022年を含む。未満なら全体）を自動集計
+  - Chart.js による可視化（iOS/軽量時はフォールバックの静的表示）
+- フェーズ毎の勉強法、合格の秘訣
+- 使い方モーダル（2ページ構成）
+- PWA 対応（manifest.json + service worker）、アイコン統一
+  - favicon / Apple Touch Icon / manifest のアイコンを images/icon-desktop.png に統一
 
-1.  **効率的な開発環境の構築**: ManusやGENSPARKなどのAIツールを活用し、開発を加速します。
-2.  **容量の削減とファイルの整理**: 不要なファイルや重複データを排除し、必要なファイルのみを整理します。
-3.  **開発プロセスの明確化**: 統一されたフォルダ構造と命名規則により、開発をスムーズに進めます。
+## 主要ファイルと構成
+- index.html
+  - Tailwind CDN / Font Awesome / Google Fonts / Chart.js（iOS はフォールバック）
+  - window.Otsu4YearSources（年度データ定義）、window.Otsu4TrendWeights（43/29/28）を定義
+  - すべての画像アイコン参照を images/icon-desktop.png に統一
+- css/style.css
+  - モーダル、アニメ、reveal、進捗、iOS向け overscroll・スクロール安定化
+- js/utils.js（共通ユーティリティ）
+- js/data.js（データ取り込み・変換）
+  - convertYearJson / loadYearJson / preloadYears / getAllItems ほか
+  - data/otsu4_241_500.json.txt も自動取り込み
+  - data/trend_analysis.md があれば比率（法令/物化/性消）を上書き（現在は 43/29/28）
+- js/main.js（アプリ本体）
+  - init時に年度データを preload → ダッシュボード・模試セットアップ
+  - 35問選定、配分最適化、長期重複回避、テーマ偏り抑制、採点・履歴保存
+  - 傾向集計と可視化（iOSはフォールバック駆動）
+- js/ux.js（モーダル、IntersectionObserver、iOS向けスクロール抑制、ナビUI）
+- manifest.json（display: standalone、theme_color など）
+- images/
+  - icon-desktop.png（最終アプリアイコン）
+  - badges/…（レベルバッジ PNG/JPEG 実体）
+- data/
+  - hazardous_otsu4_2022/2023/2024/2025.json.txt（各60問想定、同梱済み）
+  - otsu4_241_500.json.txt（追加問題 241〜）
+  - trend_analysis.md（比率 43/29/28 を明記）
+  - badges.json / badges_conditions.json / badges-structure.json（称号定義＋獲得条件）
 
-## フォルダ構造
+## 画面エントリとURI
+- /index.html（メイン画面）
+  - セクションID: #countdown, #exam, #trends, #study, #tips, #badges
+  - インストールボタン: #installAppBtn（beforeinstallprompt 対応ブラウザで自動表示）
 
-本リポジリは、以下の論理的なフォルダ構造で構成されています。
+## データ仕様（読み込みの柔軟性）
+- 年度 JSON は次のいずれにも対応
+  - 配列そのもの、または {items:[...]}、{questions:[...]} 形式
+  - 各問: { id?, number|no|index?, q|question|text|title, choices|options|opts|A〜E, a|answer|correct, explain|explanation?, cat?, theme?, type?, weight?, year? }
+  - 正解は 'A'〜'E' / 1〜5 / choices中の文字列 → 自動で 0〜4 に正規化
+  - カテゴリ未指定時は問題テキストから（法令/物理・化学/性質・消火）を推定
 
--   **01_試験問題集/**: すべての試験問題データを格納します。
-    -   `questions_database.json`: 過去問300問の統合JSONデータ（最新版）
-    -   `過去問_RAW_TXT/`: 過去問原本テキスト（①～⑥.txtを保存。参照用アーカイブ）
--   **02_UI_デザイン/**: デザイン関連ファイル（画像、フォントなど）を格納します。
-    -   `logo_boost.png`: 「BOOST」ロゴ画像
-    -   `icon_app_512.png`: アプリ用アイコン画像（512x512）
-    -   `icon_app_192.png`: アプリアイコン画像（192x192）
--   **03_アプリ構築データ/**: ソースコード、設定ファイル、ビルド成果物などを格納します。
-    -   `takken_boost_frontend.zip`: フロントエンド（Reactアプリ）ソース一式のZIP
-    -   `takken_boost_api.zip`: バックエンド（Flask API）ソース一式のZIP
-    -   `index.html`: フロントエンド公開用の単一HTML（PWAビルド出力）
--   **04_ドキュメント/**: 開発ドキュメント、仕様書、ガイド類などを格納します。
-    -   `宅建BOOST_開発完了レポート.md`: プロジェクト開発完了報告書
-    -   `宅建BOOST_設計仕様書.md`: システム設計仕様書
-    -   `宅建BOOST_クイックスタートガイド.md`: 環境構築＆起動手順
-    -   `宅建BOOST_引き継ぎガイド.md`: 運用引き継ぎ用ガイド
-    -   `宅建BOOST_デプロイチェックリスト.md`: 最終デプロイ項目チェックリスト
-    -   `宅建BOOST_機能拡張報告書.md`: システム改善・機能拡張に関する作業報告
-    -   `宅建BOOST_システム状態レポート.md`: 稼働状況・統計等に関するレポート
--   **99_Archive/**: 不要または旧版データの保管場所です。
+## ローカル保存（LocalStorage）
+- examDate, scores, history, recentIds, streak, lastStudyDate
 
-## 開発手順
+## iOS/UX対策
+- IntersectionObserver の監視対象を main 配下に限定して安定化
+- html, body の overscroll-behavior、-webkit-overflow-scrolling
+- モーダル開時の touchmove preventDefault で背景スクロール抑止
+- iOS/軽量モードでは Chart.js をフォールバック（静的説明に置換）
 
-### 1. リポジリのクローン
+## PWA / アイコン
+- favicon / Apple Touch Icon / manifest の参照を images/icon-desktop.png に統一済み
+- manifest.json icons: 192, 512 を定義（512 は画質向上のため PNG の用意推奨）
+- 旧 app-icon 系は削除済み（混在回避）
 
-```bash
-git clone https://github.com/koki-187/takken-boost-app.git
-cd takken-boost-app
-```
+## 既知の不足・未実装
+- バッジ画像の一部が JPEG 実体で PNG 拡張子のため、厳密環境で読み込み失敗の可能性（回避策として onerror フォールバックを実装、ファイルの拡張子統一は次タスク）
+- バッジ自動付与ロジック（基礎版）は実装済み。詳細条件の最終調整は今後対応
+- 採点結果のモーダル表示（現在はトーストのみ）は未実装
+- チャート注釈/凡例の詳細改善（日本語ツールチップ等）は今後対応
+- 大量データ時の初回 preload とチャート描画のパフォーマンス計測・最適化
 
-### 2. 依存関係のインストール
+## 次の推奨ステップ
+1. バッジ画像の拡張子統一（.png→.jpg へリネーム、参照先も一括置換）し MIME 不一致を解消
+2. 採点結果モーダル（新規バッジ獲得時の詳細カード/共有ボタン）実装
+3. チャートの注釈・凡例の改善（日本語ラベル/注釈、ツールチップ整備）
+4. 勉強法/秘訣の表現をカード化・手順化して更に分かりやすく
+5. 本試験配分やテーマ上限の微調整値の最終確定（window.Otsu4TrendWeights / window.Otsu4ThemeLimit）
+6. 実機（iOS/Android/PC）で PWA インストールボタンの挙動確認（iOSはガイド表示）
 
-フロントエンド（React）とバックエンド（Flask）の依存関係をそれぞれインストールします。
+## プロジェクト情報
+- 名称: 危険物取扱者試験 乙4 合格支援アプリ
+- 目的: 合格率向上のための学習効率最大化
+- 主な技術: HTML5, Tailwind CSS (CDN), Chart.js (CDN), Vanilla JS (ES Modules)
+- データ: LocalStorage（開発中）→ 将来的に RESTful Table API で CRUD 拡張可
 
-#### フロントエンド (React)
+## 公開URL/エンドポイント
+- 公開: 未設定（Publish タブから公開可能）
+- PWA: sw.js を登録（現在は透過フェッチ、キャッシュは未実装）
+- 将来のデータAPI: tables/{table} 系（RESTful Table API）
 
-```bash
-# takken_boost_frontend.zip を展開後、該当ディレクトリに移動
-cd path/to/frontend/app
-npm install
-# または yarn install
-```
+## データモデル（案）
+- items: { id, q, choices[], a, cat, theme, type, weight, year? }
+- attempts: { id, date, items[], answers[], score_total, score_law, score_sci, score_prop }
+- user_stats: { id, streak, lastStudyDate, scores{law,sci,prop,trend[]} }
 
-#### バックエンド (Flask)
+## 変更履歴（抜粋）
+- アイコン最終確定：icon-desktop.png に統一（index/manifest/フッター/モーダル）
+- 出題配分の固定：window.Otsu4TrendWeights = { law:43, sci:29, prop:28 } を定義（trend_analysis.md も同値）
+- 年度データ取込：convertYearJson / preloadYears 実装、2023＋追加プール取り込み確認（320件）
+- iOS スクロール最下部の不具合対策：overscroll, touchmove 抑止, IntersectionObserver 限定
 
-```bash
-# takken_boost_api.zip を展開後、該当ディレクトリに移動
-cd path/to/backend/api
-pip install -r requirements.txt
-```
-
-### 3. 環境変数の設定
-
-`.env` ファイルを作成し、必要な環境変数を設定します。例:
-
-```
-# .env (例)
-FLASK_APP=app.py
-FLASK_ENV=development
-DATABASE_URL=sqlite:///./test.db
-```
-
-### 4. アプリケーションの実行
-
-#### フロントエンド
-
-```bash
-npm start
-# または yarn start
-```
-
-#### バックエンド
-
-```bash
-flask run
-```
-
-### 5. データの更新
-
-試験問題データ (`questions_database.json`) を更新する場合は、`01_試験問題集/` フォルダ内のファイルを直接編集するか、適切なスクリプトを使用して更新してください。
-
-### 6. コミットとプッシュ
-
-変更をコミットし、GitHubにプッシュします。
-
-```bash
-git add .
-git commit -m "feat: Add new feature or fix bug"
-git push origin master
-```
-
-## 注意事項
-
--   機密情報や個人情報はGitHubにアップロードしないでください。
--   `.gitignore` ファイルで指定されたファイルは追跡されません。
--   Google Drive上のファイルは整理済みですが、必要に応じてバックアップを確認してください。
-
+## デプロイ
+To deploy your website and make it live, please go to the Publish tab where you can publish your project with one click. The Publish tab will handle all deployment processes automatically and provide you with the live website URL.
