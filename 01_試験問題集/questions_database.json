@@ -1,0 +1,15 @@
+[
+  {
+    "id": "dummy-q1",
+    "question_text": "ダミーの質問1",
+    "options": [
+      "選択肢1",
+      "選択肢2",
+      "選択肢3",
+      "選択肢4"
+    ],
+    "correct_answer": 1,
+    "explanation": "ダミーの解説1"
+  }
+]
+

@@ -1,0 +1,66 @@
+
+.App {
+  text-align: center;
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.question-container {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  border-radius: 8px;
+}
+
+.question-text {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+.answers button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.answers button.selected {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.explanation {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #eee;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.quiz-results {
+  margin-top: 20px;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .question-container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .question-text {
+    font-size: 1em;
+  }
+
+  .answers button {
+    padding: 8px;
+    font-size: 0.9em;
+  }
+}
+
+
