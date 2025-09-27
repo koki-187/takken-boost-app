@@ -5,3 +5,69 @@
 **/過去問_RAW_TXT/
 
 
+
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+EhThumbs.db
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvsps
+*.njsproj
+*.sln
+*.bak
+
+# Build artifacts
+build/
+dist/
+*.log
+*.tmp
+*.temp
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# Zip files
+# *.zip (already covered by specific zip files)
+
+# Other temporary files
+*.swp
+*.swo
+*~
+
+# Google Drive specific files (if any are generated locally)
+.gdoc
+.gsheet
+.gslides
+
+# Application specific temporary files
+*.sqlite3
+*.db
+
+# Sensitive information (example, adjust as needed)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
