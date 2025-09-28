@@ -21,6 +21,15 @@ app.route('/api/ai', aiRoutes)
 
 // Serve static files
 app.use('/static/*', serveStatic({ root: './public' }))
+
+// Serve Service Worker
+app.get('/sw.js', serveStatic({ root: './public', path: '/sw.js' }))
+
+// Serve manifest.json
+app.get('/manifest.json', serveStatic({ root: './public', path: '/manifest.json' }))
+
+// Serve icons
+app.use('/icons/*', serveStatic({ root: './public' }))
 app.use('/manifest.json', serveStatic({ root: './public' }))
 app.use('/sw.js', serveStatic({ root: './public' }))
 app.use('/icons/*', serveStatic({ root: './public' }))
