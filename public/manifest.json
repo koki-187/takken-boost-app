@@ -1,0 +1,141 @@
+{
+  "name": "宅建BOOST - AI搭載宅建試験学習アプリ",
+  "short_name": "宅建BOOST",
+  "description": "AIを活用した次世代宅建試験学習プラットフォーム。402問の問題データベースと効率的な学習機能を提供",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#764ba2",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "ja",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "iarc_rating_id": "e84b3d3f-1f42-4e07-9e1a-4c54e8b8e2e5",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-1024x1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "ホーム画面"
+    },
+    {
+      "src": "/screenshots/study.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "学習画面"
+    },
+    {
+      "src": "/screenshots/stats.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "統計画面"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "カテゴリー学習",
+      "short_name": "学習",
+      "description": "カテゴリー別学習を開始",
+      "url": "/study/category",
+      "icons": [
+        {
+          "src": "/icons/shortcut-study.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "模擬試験",
+      "short_name": "試験",
+      "description": "模擬試験を開始",
+      "url": "/exam/mock",
+      "icons": [
+        {
+          "src": "/icons/shortcut-exam.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "AI分析",
+      "short_name": "AI",
+      "description": "AI学習分析を表示",
+      "url": "/ai/analysis",
+      "icons": [
+        {
+          "src": "/icons/shortcut-ai.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "features": [
+    "Cross Platform",
+    "Offline Capable",
+    "AI Powered",
+    "Push Notifications",
+    "Background Sync"
+  ]
+}

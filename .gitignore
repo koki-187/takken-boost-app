@@ -32,6 +32,9 @@ dist/
 *.tmp
 *.temp
 
+# Wrangler temporary files
+.wrangler/
+
 # Node.js
 node_modules/
 npm-debug.log*
