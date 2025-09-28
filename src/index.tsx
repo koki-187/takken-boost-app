@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import studyRoutes from './study-api-fixed'
 import authRoutes from './auth-api-fixed'
+import mockExamRoutes from './mock-exam-complete'
 
 export type Bindings = {
   DB: D1Database;
@@ -17,6 +18,7 @@ app.use('/api/*', cors())
 // Mount API routes
 app.route('/api/study', studyRoutes)
 app.route('/api/auth', authRoutes)
+app.route('/api/mock-exam', mockExamRoutes)
 
 // 完全版HTMLページ
 app.get('/', (c) => {

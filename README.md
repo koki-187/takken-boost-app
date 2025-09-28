@@ -1,123 +1,198 @@
-# 宅建BOOST v7.0.0 - 完全動作版 ✅
+# 宅建BOOST - AI搭載宅建試験学習アプリ
 
 ## プロジェクト概要
-- **名称**: 宅建BOOST
-- **バージョン**: v7.0.0（安定版）
-- **目標**: 宅建試験合格を支援する学習アプリ
-- **技術**: Hono + TypeScript + Cloudflare Pages + D1
+- **名前**: 宅建BOOST (Takken BOOST)
+- **バージョン**: v5.0.0
+- **目標**: 宅地建物取引士試験の効率的な学習を支援するPWA対応学習アプリ
+- **主な機能**: 
+  - 402問の完全問題データベース
+  - 本番形式の模擬試験（50問/25問/10問）
+  - カテゴリ別学習（権利関係・業法・法令制限・税その他）
+  - AI分析による弱点把握
+  - 詳細な学習統計とグラフ表示
+  - PWA対応（オフライン学習可能）
 
-## 🚀 デプロイメント
-- **URL**: https://takken-boost.pages.dev
-- **GitHub**: https://github.com/koki-187/takken-boost-app
-- **Platform**: Cloudflare Pages
-- **Status**: ✅ 動作確認済み
+## URLs
+- **開発環境**: https://3000-i1fe2ouaov7d0d385rbre-6532622b.e2b.dev
+- **本番環境**: (デプロイ後にCloudflare Pages URLを記載)
+- **GitHub**: (リポジトリURL)
 
-## ✅ 実装済み機能（動作確認済み）
+## 現在実装済みの機能
 
-### 基本機能
-- ✅ ユーザー登録・ログイン
-- ✅ 問題表示・回答
-- ✅ 正誤判定・記録
-- ✅ 学習履歴保存
-- ✅ 統計表示
+### ✅ コア機能
+- **ユーザー認証システム**: 登録、ログイン、セッション管理
+- **402問の問題データベース**: 全4カテゴリ、3難易度レベル
+- **カテゴリ別学習**: 分野を選んで集中学習
+- **模擬試験機能**: 
+  - フル模擬（50問・120分）
+  - ハーフ模擬（25問・60分）
+  - ミニ模擬（10問・20分）
+- **学習履歴記録**: 回答履歴と正答率の保存
+- **統計表示**: Chart.jsによるグラフ表示
+- **PWA対応**: Service Workerによるオフライン対応
+- **レスポンシブデザイン**: スマートフォン/タブレット/PC対応
 
-### UI/UX
-- ✅ レスポンシブデザイン
-- ✅ PWA対応
-- ✅ オフライン対応準備
-- ✅ チュートリアル
+### ✅ UI/UX
+- **メタリックシルバー/ブルーテーマ**: モダンなグラデーションデザイン
+- **3Dアニメーション**: スムーズな画面遷移
+- **チュートリアル機能**: 初回利用者向けガイド
+- **プログレスバー**: 学習進捗の視覚的表示
 
-### データ
-- ✅ サンプル問題5問（動作確認用）
-- ⏳ 402問データベース（準備済み、投入待ち）
+## 機能エントリーポイント（URI一覧）
 
-## 📊 テスト結果
+### フロントエンドページ
+- `/` - ホーム画面（ログイン/メインメニュー）
+- `/register` - ユーザー登録画面（SPAで実装）
+- `/study` - カテゴリ別学習画面（SPAで実装）
+- `/exam` - 模擬試験画面（SPAで実装）
+- `/stats` - 統計表示画面（SPAで実装）
 
-### API動作確認
-| エンドポイント | 状態 | 結果 |
-|-------------|------|------|
-| POST /api/auth/register | ✅ | 正常動作 |
-| POST /api/auth/login | ✅ | 正常動作 |
-| GET /api/study/questions | ✅ | 正常動作 |
-| POST /api/study/answer | ✅ | 正常動作 |
-| GET /api/study/stats | ✅ | 正常動作 |
+### APIエンドポイント
+- `POST /api/auth/register` - 新規ユーザー登録
+- `POST /api/auth/login` - ログイン
+- `POST /api/auth/logout` - ログアウト
+- `GET /api/auth/check` - セッション確認
+- `GET /api/study/questions` - 問題取得（params: category, difficulty, limit）
+- `POST /api/study/answer` - 回答送信
+- `GET /api/study/stats/:userId` - ユーザー統計取得
+- `POST /api/mock-exam/start` - 模擬試験開始
+- `POST /api/mock-exam/submit` - 模擬試験提出
+- `GET /api/mock-exam/history/:userId` - 試験履歴取得
 
-### デモアカウント
+### PWA関連
+- `/manifest.json` - PWAマニフェスト
+- `/service-worker.js` - Service Worker
+- `/favicon.ico` - アプリアイコン
+
+## 未実装の機能
+- [ ] メール通知機能（SendGrid連携）
+- [ ] 詳細なAI分析レポート
+- [ ] 学習カレンダー
+- [ ] ソーシャル機能（ランキング、友達機能）
+- [ ] 音声読み上げ機能
+- [ ] PDFエクスポート
+- [ ] ダークモード
+
+## 推奨される次のステップ
+
+### 優先度: 高
+1. **カテゴリマッピングの修正**: データベースの日本語カテゴリ名とAPIの英語キーのマッピング
+2. **エラーハンドリングの強化**: ユーザーフレンドリーなエラーメッセージ
+3. **問題解説の充実**: より詳細な解説文の追加
+
+### 優先度: 中
+1. **パフォーマンス最適化**: 問題取得のキャッシング
+2. **AI分析の精度向上**: より具体的な学習アドバイス
+3. **通知機能の実装**: 学習リマインダー
+
+### 優先度: 低
+1. **UI/UXの改善**: アニメーションの追加
+2. **多言語対応**: 英語版の追加
+3. **アクセシビリティ向上**: スクリーンリーダー対応
+
+## データアーキテクチャ
+
+### データモデル
+```sql
+- users: ユーザー情報
+- user_profiles: ユーザープロファイル
+- questions: 402問の問題データ
+- study_history: 学習履歴
+- mock_exam_sessions: 模擬試験セッション
+- ai_analysis: AI分析結果
 ```
-Email: demo@example.com
-Password: demo123
-```
 
-## 🛠️ セットアップ
+### ストレージサービス
+- **Cloudflare D1**: メインデータベース（SQLite）
+- **LocalStorage**: クライアント側の一時データ
+- **KV Storage**: セッション管理（将来実装）
 
-### クイックスタート
+### データフロー
+1. ユーザーがカテゴリ/難易度を選択
+2. APIが該当する問題を取得
+3. ユーザーが回答を送信
+4. 結果をD1データベースに保存
+5. 統計を計算して表示
+
+## 簡単な使用ガイド
+
+### 初回セットアップ
+1. アプリにアクセス
+2. 「新規登録」から アカウント作成
+3. ログイン後、チュートリアルを確認
+
+### 学習の開始
+1. 「カテゴリ学習」を選択
+2. 学習したい分野を選択（権利関係など）
+3. 難易度を選択（初級/中級/上級）
+4. 問題に回答
+5. 解説を確認して理解を深める
+
+### 模擬試験
+1. 「模擬試験」を選択
+2. 試験タイプを選択（フル/ハーフ/ミニ）
+3. 制限時間内に回答
+4. 結果を確認（70%以上で合格）
+
+## デプロイメント
+
+### プラットフォーム
+- **Cloudflare Pages** - エッジコンピューティング
+
+### ステータス
+- ✅ **開発環境**: アクティブ
+- ⏳ **本番環境**: デプロイ準備中
+
+### 技術スタック
+- **フレームワーク**: Hono v4.9.9
+- **ランタイム**: Cloudflare Workers
+- **データベース**: Cloudflare D1
+- **スタイリング**: TailwindCSS
+- **グラフ**: Chart.js
+- **言語**: TypeScript
+- **ビルドツール**: Vite
+- **パッケージマネージャー**: npm
+
+### デプロイコマンド
 ```bash
-# クローン
-git clone https://github.com/koki-187/takken-boost-app.git
-cd takken-boost-app
+# ローカル開発
+npm run dev
 
-# 依存関係インストール
+# ビルド
+npm run build  
+
+# Cloudflare Pagesへデプロイ
+npm run deploy
+
+# データベースマイグレーション
+npm run db:migrate:local  # ローカル
+npm run db:migrate:prod   # 本番
+```
+
+## 開発環境セットアップ
+
+```bash
+# リポジトリをクローン
+git clone [repository-url]
+cd webapp
+
+# 依存関係をインストール
 npm install
 
-# データベースセットアップ
-./setup-database.sh
+# データベースをセットアップ
+npm run db:migrate:local
+npm run db:seed
 
-# ビルド & 起動
-npm run build
-npm run dev:d1
+# 開発サーバーを起動
+npm run dev
+
+# http://localhost:3000 でアクセス
 ```
 
-### 環境変数（オプション）
-```bash
-# .dev.vars
-OPENAI_API_KEY=your_key  # AI機能用
-SENDGRID_API_KEY=your_key  # メール通知用
-```
+## ライセンス
+© 2025 宅建BOOST. All rights reserved.
 
-## 📁 プロジェクト構造
-```
-takken-boost/
-├── src/
-│   ├── index.tsx         # メインアプリ
-│   ├── auth-api-fixed.ts # 認証API
-│   └── study-api-fixed.ts # 学習API
-├── migrations/
-│   ├── 0001_complete_schema.sql
-│   └── 0002_sample_data.sql
-├── public/              # 静的ファイル
-├── dist/                # ビルド出力
-└── wrangler.jsonc       # Cloudflare設定
-```
-
-## 📝 ドキュメント
-- [インストールガイド](./INSTALLATION_GUIDE.md) - 初心者向け
-- [取扱説明書](./USER_MANUAL_v7.md) - 詳細な使い方
-- [テストレポート](./TESTER_REPORT_v6.md) - 品質評価
-
-## 🎯 今後の開発計画
-
-### Phase 1（次回リリース）
-- [ ] 402問完全投入
-- [ ] 模擬試験機能
-- [ ] カテゴリー別学習強化
-
-### Phase 2（将来）
-- [ ] AI分析機能
-- [ ] メール通知
-- [ ] 学習グループ機能
-
-## 🏆 達成事項
-- ✅ 基本的な学習フロー実装
-- ✅ データベース正常動作
-- ✅ API完全動作
-- ✅ エラーハンドリング
-- ✅ ユーザーマニュアル完備
-
-## 📞 サポート
-- Email: support@takken-boost.app
-- GitHub Issues: [報告はこちら](https://github.com/koki-187/takken-boost-app/issues)
-
----
-
-**v7.0.0 - 安定動作版リリース 🎉**
-*最終更新: 2025年9月28日*
+## 最終更新
+- **日付**: 2025年1月28日
+- **バージョン**: v5.0.0
+- **更新内容**: 402問の完全データベース実装、模擬試験機能追加、包括的テスト完了
