@@ -1,15 +1,23 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/cloudflare-workers'
+import studyRoutes from './study-api'
+import aiRoutes from './ai-analysis'
 
-type Bindings = {
+export type Bindings = {
   DB: D1Database;
+  NOTIFICATION_EMAIL?: string;
+  SENDGRID_API_KEY?: string;
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
 
 // Enable CORS for frontend-backend communication
 app.use('/api/*', cors())
+
+// Mount API routes
+app.route('/api/study', studyRoutes)
+app.route('/api/ai', aiRoutes)
 
 // Serve static files from public directory
 app.use('/static/*', serveStatic({ root: './public' }))

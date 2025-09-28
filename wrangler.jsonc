@@ -9,7 +9,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "takken-boost-db",
+      "database_name": "takken-boost-production",
       "database_id": "your-database-id-here"  // Will be set after creation
     }
   ]
