@@ -10,7 +10,7 @@
     {
       "binding": "DB",
       "database_name": "takken-boost-production",
-      "database_id": "your-database-id-here"  // Will be set after creation
+      "database_id": "19126b99-0449-45ea-967d-c80fc3413d23"
     }
   ]
 }
