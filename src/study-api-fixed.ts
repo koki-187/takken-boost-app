@@ -3,6 +3,25 @@ import type { Bindings } from './index'
 
 const studyRoutes = new Hono<{ Bindings: Bindings }>()
 
+// カテゴリマッピング（英語キー -> 日本語カテゴリ名）
+const CATEGORY_MAPPING: Record<string, string[]> = {
+  'rights': [
+    '民法総則', '物権', '債権総論', '債権各論', '相続', '借地借家法', '区分所有法'
+  ],
+  'businessLaw': [
+    '免許', '宅建士', '営業保証金・保証協会', '媒介契約・代理契約', 
+    '重要事項説明', '37条書面', '8つの制限', '報酬', '監督処分・罰則', '景品表示法'
+  ],
+  'restrictions': [
+    '都市計画法', '建築基準法', '国土利用計画法', '農地法', 
+    '宅地造成等規制法', '土地区画整理法'
+  ],
+  'taxOther': [
+    '不動産取得税', '固定資産税', '所得税', '贈与税', '印紙税', 
+    '登録免許税', '不動産鑑定評価', '地価公示法', '住宅金融支援機構', '不動産登記法'
+  ]
+}
+
 // Get questions
 studyRoutes.get('/questions', async (c) => {
   try {
@@ -12,9 +31,12 @@ studyRoutes.get('/questions', async (c) => {
     let query = 'SELECT * FROM questions WHERE 1=1'
     const params = []
 
-    if (category) {
-      query += ' AND category = ?'
-      params.push(category)
+    if (category && CATEGORY_MAPPING[category as string]) {
+      // 英語キーから日本語カテゴリ名のリストを取得
+      const japaneseCategories = CATEGORY_MAPPING[category as string]
+      const placeholders = japaneseCategories.map(() => '?').join(',')
+      query += ` AND category IN (${placeholders})`
+      params.push(...japaneseCategories)
     }
 
     if (difficulty) {
@@ -111,6 +133,49 @@ studyRoutes.get('/stats/:userId', async (c) => {
     return c.json({ 
       success: false, 
       error: error.message || '統計情報の取得に失敗しました' 
+    }, 500)
+  }
+})
+
+// Get categories with counts
+studyRoutes.get('/categories', async (c) => {
+  try {
+    const { DB } = c.env
+
+    const categories = await DB.prepare(`
+      SELECT category, COUNT(*) as count 
+      FROM questions 
+      GROUP BY category 
+      ORDER BY category
+    `).all()
+
+    // 英語キーにマッピング
+    const mappedCategories = Object.entries(CATEGORY_MAPPING).map(([key, japaneseNames]) => {
+      const totalCount = categories.results
+        ?.filter(cat => japaneseNames.includes(cat.category))
+        .reduce((sum, cat) => sum + cat.count, 0) || 0
+      
+      return {
+        key,
+        displayName: key === 'rights' ? '権利関係' :
+                     key === 'businessLaw' ? '宅建業法' :
+                     key === 'restrictions' ? '法令上の制限' :
+                     '税法・その他',
+        count: totalCount,
+        subcategories: japaneseNames
+      }
+    })
+
+    return c.json({
+      success: true,
+      categories: mappedCategories
+    })
+
+  } catch (error: any) {
+    console.error('Categories fetch error:', error)
+    return c.json({ 
+      success: false, 
+      error: error.message || 'カテゴリの取得に失敗しました' 
     }, 500)
   }
 })
