@@ -28,11 +28,11 @@ app.get('/sw.js', serveStatic({ root: './public', path: '/sw.js' }))
 // Serve manifest.json
 app.get('/manifest.json', serveStatic({ root: './public', path: '/manifest.json' }))
 
-// Serve icons
+// Serve icons and PWA files
 app.use('/icons/*', serveStatic({ root: './public' }))
-app.use('/manifest.json', serveStatic({ root: './public' }))
-app.use('/sw.js', serveStatic({ root: './public' }))
-app.use('/icons/*', serveStatic({ root: './public' }))
+app.get('/favicon.ico', serveStatic({ root: './public', path: '/favicon.ico' }))
+app.get('/favicon-16x16.png', serveStatic({ root: './public', path: '/favicon-16x16.png' }))
+app.get('/favicon-32x32.png', serveStatic({ root: './public', path: '/favicon-32x32.png' }))
 
 // メインページ - 美しいグラデーションデザイン
 app.get('/', (c) => {
@@ -57,10 +57,29 @@ app.get('/', (c) => {
     
     <!-- PWA Links -->
     <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/icons/icon-48x48.png">
+    
+    <!-- Apple Touch Icons for iOS -->
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+    <link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon-precomposed.png">
+    
+    <!-- Android/Chrome Icons -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#764ba2">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+    
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png">
+    
+    <!-- Safari Pinned Tab -->
+    <link rel="mask-icon" href="/icons/icon.svg" color="#764ba2">
     
     <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>

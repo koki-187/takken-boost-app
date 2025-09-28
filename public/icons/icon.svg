@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients for 3D effect -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8EEF2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D1D9DE;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00B4D8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0077B6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#03045E;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0096C7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#023E8A;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Shadow filters for 3D effect -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="2" dy="4" result="offsetblur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.2"/>
+      <feComposite in2="offsetblur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset dx="0" dy="1" />
+      <feGaussianBlur stdDeviation="2" result="offset-blur"/>
+      <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+      <feFlood flood-color="black" flood-opacity="0.2" result="color"/>
+      <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background rounded square -->
+  <rect x="20" y="20" width="472" height="472" rx="80" ry="80" 
+        fill="url(#bgGradient)" filter="url(#shadow)"/>
+  
+  <!-- Inner border for depth -->
+  <rect x="30" y="30" width="452" height="452" rx="70" ry="70" 
+        fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.8"/>
+  
+  <!-- Arrow curves -->
+  <g transform="translate(256, 200)">
+    <!-- Background arrow curve -->
+    <path d="M -120,40 Q -60,0 0,-20 T 120,-40" 
+          fill="none" stroke="#CAD2C5" stroke-width="25" 
+          stroke-linecap="round" opacity="0.5"/>
+    
+    <!-- Main arrow curve -->
+    <path d="M -130,20 Q -50,-20 20,-40 T 130,-60" 
+          fill="none" stroke="url(#arrowGradient)" stroke-width="30" 
+          stroke-linecap="round" filter="url(#innerShadow)"/>
+    
+    <!-- Arrow head -->
+    <g transform="translate(130, -60) rotate(35)">
+      <path d="M 0,0 L 40,-15 L 40,5 L 55,0 L 40,-5 L 40,15 Z" 
+            fill="url(#arrowGradient)" filter="url(#shadow)"/>
+    </g>
+  </g>
+  
+  <!-- Text: 宅建 -->
+  <g transform="translate(256, 320)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="72" 
+          font-weight="bold" text-anchor="middle" fill="url(#textGradient)" 
+          filter="url(#shadow)">宅建</text>
+  </g>
+  
+  <!-- Text: BOOST -->
+  <g transform="translate(256, 400)">
+    <text x="0" y="0" font-family="Arial Black, sans-serif" font-size="80" 
+          font-weight="900" text-anchor="middle" fill="url(#textGradient)" 
+          filter="url(#shadow)" letter-spacing="2">BOOST</text>
+  </g>
+  
+  <!-- Glossy overlay for 3D effect -->
+  <ellipse cx="256" cy="150" rx="180" ry="100" 
+           fill="url(#glossGradient)" opacity="0.2"/>
+  
+  <defs>
+    <linearGradient id="glossGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+</svg>
