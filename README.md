@@ -6,11 +6,11 @@
 - **特徴**: Three.js 3Dグラフィックス、Anime.jsアニメーション、パープルグラデーションデザイン、PWA完全対応
 
 ## 🌐 公開URL
-- **開発サーバー**: https://3000-i1fe2ouaov7d0d385rbre-6532622b.e2b.dev
-- **v8.0.0 (既存版)**: https://3000-i1fe2ouaov7d0d385rbre-6532622b.e2b.dev/
-- **v9.0.0 (新デザイン)**: https://3000-i1fe2ouaov7d0d385rbre-6532622b.e2b.dev/version/v9
-- **GitHub**: (未設定)
-- **Cloudflare Pages**: (未デプロイ)
+- **本番環境**: https://takken-boost.pages.dev
+- **v8.0.0 (既存版)**: https://takken-boost.pages.dev/
+- **v9.0.0 (新デザイン)**: https://takken-boost.pages.dev/version/v9
+- **GitHub**: https://github.com/koki-187/takken-boost-app
+- **Cloudflare Pages**: ✅ デプロイ完了 (2025年1月)
 
 ## ✨ v9.0.0の新機能
 1. **3Dインタラクティブロゴ**
