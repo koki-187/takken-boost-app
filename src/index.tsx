@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { serveStatic } from 'hono/cloudflare-workers'
 import studyRoutes from './study-api-fixed'
 import authRoutes from './auth-api-fixed'
 import mockExamRoutes from './mock-exam-complete'
@@ -16,13 +17,141 @@ const app = new Hono<{ Bindings: Bindings }>()
 // Enable CORS
 app.use('/api/*', cors())
 
+// Serve static files
+app.use('/static/*', serveStatic({ root: './public' }))
+
 // Mount API routes
 app.route('/api/study', studyRoutes)
 app.route('/api/auth', authRoutes)
 app.route('/api/mock-exam', mockExamRoutes)
 app.route('/api/notifications', emailRoutes)
 
-// 完全版HTMLページ
+// バージョン選択ルート
+app.get('/version/:version?', (c) => {
+  const version = c.req.param('version');
+  
+  // v9.0.0を返す場合
+  if (version === 'v9' || version === '9') {
+    return c.html(v9HTML);
+  }
+  
+  // デフォルトはv8.0.0を表示
+  return c.redirect('/');
+});
+
+// v9.0.0 HTMLコンテンツ（外部ファイルから読み込み）
+const v9HTML = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宅建BOOST v9.0.0 Ultimate Edition</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#764ba2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="宅建BOOST v9">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/styles-v9.css" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="particle-bg"></canvas>
+    
+    <div class="hero-section">
+        <div class="hero-content">
+            <div class="version-badge">v9.0.0 Ultimate Edition</div>
+            <canvas id="logo-3d" width="300" height="300"></canvas>
+            <h1 class="hero-title">宅建BOOST</h1>
+            <p class="hero-subtitle">次世代AI学習プラットフォーム - 402問完全収録</p>
+            
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-questions">402</div>
+                    <div class="stat-label">問題数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="categories-count">7</div>
+                    <div class="stat-label">カテゴリー</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="users-count">1000+</div>
+                    <div class="stat-label">ユーザー</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card" id="study-mode">
+                <div class="feature-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3 class="feature-title">学習モード</h3>
+                <p class="feature-description">402問の問題を効率的に学習。カテゴリー別・難易度別に対応</p>
+            </div>
+            
+            <div class="feature-card" id="mock-exam">
+                <div class="feature-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3 class="feature-title">模擬試験</h3>
+                <p class="feature-description">本番形式の50問試験で実力測定。詳細な解説付き</p>
+            </div>
+            
+            <div class="feature-card" id="progress">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">進捗管理</h3>
+                <p class="feature-description">学習進捗をリアルタイムで可視化。AI分析で弱点克服</p>
+            </div>
+            
+            <div class="feature-card" id="weak-points">
+                <div class="feature-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="feature-title">弱点分析</h3>
+                <p class="feature-description">AIが苦手分野を自動検出。最適な学習プランを提案</p>
+            </div>
+            
+            <div class="feature-card" id="notifications">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3 class="feature-title">通知設定</h3>
+                <p class="feature-description">学習リマインダーと進捗レポートをメールで配信</p>
+            </div>
+            
+            <div class="feature-card" id="tutorial">
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="feature-title">チュートリアル</h3>
+                <p class="feature-description">初めての方でも安心。使い方を丁寧に解説</p>
+            </div>
+        </div>
+        
+        <button id="install-button" style="display: none;">
+            <i class="fas fa-download"></i>
+            <span>アプリをインストール</span>
+        </button>
+    </div>
+    
+    <script src="/static/app-v9.js"></script>
+</body>
+</html>`;
+
+// 完全版HTMLページ（既存のv8.0.0）
 app.get('/', (c) => {
   return c.html(`
 <!DOCTYPE html>
