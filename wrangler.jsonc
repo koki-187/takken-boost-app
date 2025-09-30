@@ -5,12 +5,12 @@
   "pages_build_output_dir": "./dist",
   "compatibility_flags": ["nodejs_compat"],
   
-  // D1 Database configuration
+  // D1 Database configuration - using correct database ID
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "takken-boost-v5",
-      "database_id": "4cf23326-5faf-4b3a-bba1-f47c707197af"
+      "database_name": "takken-boost-production",
+      "database_id": "19126b99-0449-45ea-967d-c80fc3413d23"
     }
   ]
 }
