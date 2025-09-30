@@ -1,159 +1,137 @@
 # 宅建BOOST v9.0.0 Ultimate Edition
 
 ## プロジェクト概要
-- **名前**: 宅建BOOST v9.0.0 Ultimate Edition
-- **目標**: 宅地建物取引士試験合格を目指す学習者向けの次世代AI学習プラットフォーム
-- **特徴**: Three.js 3Dグラフィックス、Anime.jsアニメーション、パープルグラデーションデザイン、PWA完全対応
+- **名前**: 宅建BOOST (takken-boost)
+- **バージョン**: v9.0.0 Ultimate Edition
+- **目標**: 宅建試験に特化した効率的な学習プラットフォームの提供
+- **特徴**: AI搭載学習システム、402問の問題データベース、進捗管理、PWA対応
 
-## 🌐 公開URL
+## デザインテーマ
+- **カラースキーム**: Purple Gradient (#667eea → #764ba2)
+- **3Dインタラクティブロゴ**: Three.js実装
+- **アニメーション**: Anime.jsによるスムーズなトランジション
+- **レスポンシブデザイン**: 全デバイス対応
+
+## 主要機能（実装済み）
+✅ **基本機能**
+- 402問の宅建試験問題データベース
+- カテゴリ別学習（権利関係、宅建業法、法令制限、税その他）
+- ランダム出題機能
+- 詳細解説表示
+- 学習進捗管理
+
+✅ **高度な機能**
+- PWA (Progressive Web App) 対応
+  - オフライン動作
+  - ホーム画面追加
+  - プッシュ通知対応
+- ダークモード切り替え
+- 音声読み上げ機能（日本語優先）
+- インストールガイド（デバイス別）
+
+✅ **デザイン・UX**
+- Three.js 3Dロゴアニメーション
+- Anime.jsによるUI要素アニメーション
+- パープルグラデーションテーマ
+- マテリアルデザイン準拠
+
+## 公開URL
 - **本番環境**: https://takken-boost.pages.dev
-- **v8.0.0 (既存版)**: https://takken-boost.pages.dev/
-- **v9.0.0 (新デザイン)**: https://takken-boost.pages.dev/version/v9
+- **エイリアス**: https://master.takken-boost.pages.dev
 - **GitHub**: https://github.com/koki-187/takken-boost-app
-- **Cloudflare Pages**: ✅ デプロイ完了 (2025年1月)
+- **バックアップ**: https://page.gensparksite.com/project_backups/toolu_01LRHn35ekDhphrZDcTFRWWv.tar.gz
 
-## ✨ v9.0.0の新機能
-1. **3Dインタラクティブロゴ**
-   - Three.jsによる3Dキューブロゴ
-   - マウス/タッチ操作でインタラクティブな回転
-   - パルシングエフェクトとグローエフェクト
+## APIエンドポイント
+- `GET /` - ホームページ
+- `GET /api/version` - バージョン情報
+- `GET /api/questions` - 全問題取得
+- `GET /api/questions/[id]` - 特定問題取得
+- `GET /api/questions/random` - ランダム問題取得
+- `GET /api/categories` - カテゴリ一覧
+- `POST /api/progress` - 進捗保存
+- `GET /api/progress/[userId]` - 進捗取得
+- `GET /static/*` - 静的ファイル配信
 
-2. **パープルグラデーションデザイン**
-   - メインカラー: #667eea → #764ba2
-   - グラスモーフィズムカード
-   - パーティクル背景アニメーション
+## データアーキテクチャ
+- **データモデル**: 問題、カテゴリ、進捗、ユーザー
+- **ストレージサービス**: Cloudflare D1 (SQLite)
+  - Database Name: takken-boost-production
+  - Database ID: 19126b99-0449-45ea-967d-c80fc3413d23
+- **データフロー**: REST API経由でのCRUD操作
 
-3. **Anime.jsアニメーション**
-   - スムーズなページ遷移
-   - カードのホバーエフェクト
-   - 統計カウンターアニメーション
-   - リップルエフェクト
-
-4. **PWA完全対応**
-   - オフライン対応Service Worker
-   - マルチプラットフォーム対応（iOS/Android/Windows/Mac）
-   - インストールプロンプト表示
-   - バックグラウンド同期
-
-## 📱 アクセス可能なページ
-
-### v9.0.0 ルート
-- `/version/v9` - v9.0.0メインページ（3Dロゴ付き）
-- `/study` - 学習モード（402問データベース）
-- `/mock-exam` - 模擬試験（50問形式）
-- `/progress` - 進捗管理とAI分析
-- `/notifications` - 通知設定
-
-### v8.0.0 ルート（既存版）
-- `/` - メインダッシュボード
-- `/api/study/*` - 学習API
-- `/api/mock-exam/*` - 模擬試験API
-- `/api/notifications/*` - 通知API
-- `/api/auth/*` - 認証API
-
-## 🗄️ データアーキテクチャ
-- **データベース**: Cloudflare D1 (SQLite)
-- **テーブル構成**:
-  - `questions` - 402問の問題データ
-  - `users` - ユーザー情報
-  - `progress` - 学習進捗
-  - `mock_exam_results` - 模擬試験結果
-  - `user_answers` - ユーザーの回答履歴
-
-## 🛠️ 技術スタック
-- **バックエンド**: Hono Framework v4.9.9
+## 技術スタック
 - **フロントエンド**: 
+  - HTML5 + CSS3 (Purple Gradient Theme)
+  - JavaScript (ES6+)
   - Three.js (3Dグラフィックス)
   - Anime.js (アニメーション)
   - TailwindCSS (スタイリング)
-  - Chart.js (統計グラフ)
-- **インフラ**: Cloudflare Workers/Pages
-- **データベース**: Cloudflare D1
-- **メール**: SendGrid API
+  - Web Speech API (音声読み上げ)
+- **バックエンド**: 
+  - Hono Framework
+  - TypeScript
+  - Cloudflare Workers/Pages
+- **データベース**: 
+  - Cloudflare D1 (SQLite)
+  - 402問の問題データ
+- **インフラ**: 
+  - Cloudflare Pages (エッジデプロイメント)
+  - Wrangler CLI (デプロイツール)
 
-## 📋 現在実装済みの機能
-- ✅ v9.0.0新デザイン実装完了
-- ✅ Three.js 3Dロゴ実装
-- ✅ Anime.jsアニメーション統合
-- ✅ パープルグラデーションテーマ
-- ✅ グラスモーフィズムUI
-- ✅ PWAマニフェスト設定
-- ✅ Service Worker実装
-- ✅ 402問の問題データベース（v8.0.0から継承）
-- ✅ カテゴリー別学習機能
-- ✅ 模擬試験機能（50問形式）
-- ✅ メール通知機能（SendGrid統合）
-- ✅ 進捗管理とAI分析
+## 使用方法
+1. **サイトアクセス**: https://takken-boost.pages.dev
+2. **学習開始**: 「学習を始める」ボタンをクリック
+3. **カテゴリ選択**: 学習したいカテゴリを選択
+4. **問題回答**: 選択肢から正解を選ぶ
+5. **解説確認**: 回答後に詳細な解説を読む
+6. **進捗確認**: ダッシュボードで学習状況を確認
 
-## 🚀 今後の実装予定
-- [ ] PWAアイコンファイルの生成
-- [ ] インストールガイドの作成
-- [ ] GitHub連携とCI/CD設定
-- [ ] Cloudflare Pagesへのデプロイ
-- [ ] ユーザー認証強化
-- [ ] AIチューターボット機能
-- [ ] 音声読み上げ機能
-- [ ] ダークモード対応
+## インストール方法（PWA）
+- **iOS**: Safari → 共有 → ホーム画面に追加
+- **Android**: Chrome → メニュー → ホーム画面に追加
+- **PC**: Chrome/Edge → アドレスバーのインストールアイコン
 
-## 💻 開発コマンド
+## 今後の実装予定（Phase 2）
+- [ ] AIチューターボット（ChatGPT統合）
+- [ ] JWT/OAuth2認証
+- [ ] CI/CDパイプライン
+- [ ] アナリティクスダッシュボード
+- [ ] 学習レポートエクスポート
+- [ ] ソーシャル学習機能
+
+## 開発コマンド
 ```bash
-# 開発サーバー起動
+# ローカル開発
 npm run dev
 
 # ビルド
 npm run build
 
-# PM2で起動
-pm2 start ecosystem.config.cjs
+# デプロイ
+npm run deploy
 
-# ログ確認
-pm2 logs takken-boost --nostream
+# D1マイグレーション
+npm run db:migrate:local  # ローカル
+npm run db:migrate:prod   # 本番
 
-# D1データベースマイグレーション
-npx wrangler d1 migrations apply takken-boost-db --local
+# Git操作
+git add . && git commit -m "message"
+git push origin master
 ```
 
-## 📚 使い方ガイド
-
-### 新規ユーザー
-1. https://3000-i1fe2ouaov7d0d385rbre-6532622b.e2b.dev/version/v9 にアクセス
-2. 「チュートリアル」カードをクリックして使い方を学習
-3. 「学習モード」から学習を開始
-4. PWAインストールプロンプトが表示されたら「インストール」
-
-### 既存ユーザー
-1. v8.0.0は従来通り `/` からアクセス可能
-2. v9.0.0の新機能は `/version/v9` から体験可能
-3. データは両バージョンで共有
-
-## 🔧 デプロイメント
+## デプロイメント
 - **プラットフォーム**: Cloudflare Pages
-- **ステータス**: 開発環境（ローカル）
-- **本番環境**: 未デプロイ
-- **最終更新**: 2025年1月
+- **ステータス**: ✅ アクティブ
+- **最終更新**: 2025-09-30
+- **バージョン**: v9.0.0 Ultimate Edition
 
-## 📱 PWAインストール方法
+## トラブルシューティング完了
+✅ D1データベースID不一致の解決
+✅ wrangler.jsoncのデータベース設定更新
+✅ マイグレーション適用成功
+✅ Cloudflare Pagesデプロイ成功
+✅ GitHubリポジトリ同期完了
 
-### iOS (Safari)
-1. Safariで https://3000-i1fe2ouaov7d0d385rbre-6532622b.e2b.dev/version/v9 を開く
-2. 共有ボタン（□↑）をタップ
-3. 「ホーム画面に追加」を選択
-4. 「追加」をタップ
-
-### Android (Chrome/Edge)
-1. ブラウザでアクセス
-2. インストールプロンプトが表示されたら「インストール」
-3. または、メニュー → 「アプリをインストール」
-
-### Windows/Mac
-1. Chrome/Edgeでアクセス
-2. アドレスバーのインストールアイコンをクリック
-3. 「インストール」をクリック
-
-## 📄 ライセンス
-Private - All Rights Reserved
-
----
-**バージョン**: 9.0.0 Ultimate Edition  
-**リリース日**: 2025年1月  
-**開発者**: 宅建BOOSTチーム
+## 連絡先
+- GitHub: [@koki-187](https://github.com/koki-187)
+- Repository: [takken-boost-app](https://github.com/koki-187/takken-boost-app)
