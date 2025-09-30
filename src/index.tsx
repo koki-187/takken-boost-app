@@ -1242,6 +1242,45 @@ self.addEventListener('activate', (event) => {
   })
 })
 
+// API version endpoint
+app.get('/api/version', (c) => {
+  return c.json({ version: 'v9.0.0', status: 'active' })
+})
+
+// Service Worker for v9
+app.get('/sw-v9.js', (c) => {
+  const swContent = `
+// 宅建BOOST v9.0.0 Service Worker
+const CACHE_NAME = 'takken-boost-v9.0.0';
+const urlsToCache = [
+  '/',
+  '/version/v9',
+  '/manifest.json',
+  '/static/app-v9.js',
+  '/static/styles-v9.css'
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(urlsToCache))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => response || fetch(event.request))
+  );
+});
+  `;
+  
+  return new Response(swContent, {
+    headers: { 'Content-Type': 'application/javascript' }
+  })
+})
+
 // 静的ファイル
 app.get('/favicon.ico', (c) => c.body('', 200, {'Content-Type': 'image/x-icon'}))
 app.get('/icons/:filename', (c) => c.body('', 200, {'Content-Type': 'image/png'}))

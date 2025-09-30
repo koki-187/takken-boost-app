@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>PWA Icon Generator - 宅建BOOST</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .icon-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .icon-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        canvas {
+            display: block;
+            margin: 10px auto;
+            border: 1px solid #ddd;
+        }
+        button {
+            background: #007ACB;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0056A3;
+        }
+    </style>
+</head>
+<body>
+    <h1>宅建BOOST PWA Icon Generator</h1>
+    <button onclick="generateAllIcons()">全アイコン生成</button>
+    
+    <div id="icon-container" class="icon-container"></div>
+
+    <script>
+        const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512, 1024];
+        
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const bgGradient = ctx.createLinearGradient(0, size, 0, 0);
+            bgGradient.addColorStop(0, '#C0EFFF');
+            bgGradient.addColorStop(1, '#007ACB');
+            
+            // Draw rounded rectangle background
+            const radius = size * 0.12;
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(size - radius, 0);
+            ctx.quadraticCurveTo(size, 0, size, radius);
+            ctx.lineTo(size, size - radius);
+            ctx.quadraticCurveTo(size, size, size - radius, size);
+            ctx.lineTo(radius, size);
+            ctx.quadraticCurveTo(0, size, 0, size - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.fillStyle = bgGradient;
+            ctx.fill();
+            
+            // Inner white background
+            const padding = size * 0.04;
+            const innerRadius = radius - padding;
+            ctx.beginPath();
+            ctx.moveTo(padding + innerRadius, padding);
+            ctx.lineTo(size - padding - innerRadius, padding);
+            ctx.quadraticCurveTo(size - padding, padding, size - padding, padding + innerRadius);
+            ctx.lineTo(size - padding, size - padding - innerRadius);
+            ctx.quadraticCurveTo(size - padding, size - padding, size - padding - innerRadius, size - padding);
+            ctx.lineTo(padding + innerRadius, size - padding);
+            ctx.quadraticCurveTo(padding, size - padding, padding, size - padding - innerRadius);
+            ctx.lineTo(padding, padding + innerRadius);
+            ctx.quadraticCurveTo(padding, padding, padding + innerRadius, padding);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.fill();
+            
+            // Draw arrow
+            const centerX = size / 2;
+            const centerY = size * 0.35;
+            
+            // Arrow gradient
+            const arrowGradient = ctx.createLinearGradient(centerX - size * 0.3, 0, centerX + size * 0.3, 0);
+            arrowGradient.addColorStop(0, '#4A90E2');
+            arrowGradient.addColorStop(0.5, '#007ACB');
+            arrowGradient.addColorStop(1, '#0056A3');
+            
+            // Draw curved arrow
+            ctx.beginPath();
+            ctx.moveTo(centerX - size * 0.25, centerY + size * 0.1);
+            ctx.quadraticCurveTo(centerX, centerY - size * 0.05, centerX + size * 0.2, centerY - size * 0.1);
+            ctx.strokeStyle = arrowGradient;
+            ctx.lineWidth = size * 0.04;
+            ctx.stroke();
+            
+            // Arrow head
+            ctx.beginPath();
+            ctx.moveTo(centerX + size * 0.2, centerY - size * 0.1);
+            ctx.lineTo(centerX + size * 0.22, centerY - size * 0.05);
+            ctx.lineTo(centerX + size * 0.15, centerY - size * 0.08);
+            ctx.closePath();
+            ctx.fillStyle = arrowGradient;
+            ctx.fill();
+            
+            // Draw text
+            ctx.fillStyle = '#007ACB';
+            ctx.textAlign = 'center';
+            
+            // 宅建
+            const kanjiSize = size * 0.14;
+            ctx.font = `bold ${kanjiSize}px 'Noto Sans JP', 'Hiragino Sans', sans-serif`;
+            ctx.fillText('宅建', centerX, centerY + size * 0.25);
+            
+            // BOOST
+            const boostSize = size * 0.16;
+            ctx.font = `900 ${boostSize}px Arial, sans-serif`;
+            ctx.fillText('BOOST', centerX, centerY + size * 0.45);
+            
+            return canvas;
+        }
+        
+        function generateAllIcons() {
+            const container = document.getElementById('icon-container');
+            container.innerHTML = '';
+            
+            iconSizes.forEach(size => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'icon-item';
+                
+                const canvas = createIcon(size);
+                
+                const label = document.createElement('p');
+                label.textContent = `icon-${size}x${size}.png`;
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'Download';
+                downloadBtn.onclick = () => {
+                    canvas.toBlob(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `icon-${size}x${size}.png`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+                };
+                
+                itemDiv.appendChild(label);
+                itemDiv.appendChild(canvas);
+                itemDiv.appendChild(downloadBtn);
+                container.appendChild(itemDiv);
+            });
+        }
+        
+        // Auto-generate on load
+        window.onload = generateAllIcons;
+    </script>
+</body>
+</html>
