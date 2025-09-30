@@ -148,6 +148,8 @@ const v9HTML = `<!DOCTYPE html>
     </div>
     
     <script src="/static/app-v9.js"></script>
+    <script src="/static/darkmode.js"></script>
+    <script src="/static/text-to-speech.js"></script>
 </body>
 </html>`;
 

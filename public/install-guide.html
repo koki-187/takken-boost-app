@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宅建BOOST インストールガイド - 完全図解マニュアル</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .device-icon {
+            font-size: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .screenshot {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .animated-arrow {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- ヘッダー -->
+    <div class="gradient-bg text-white py-12">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold text-center mb-4">
+                <i class="fas fa-download mr-3"></i>
+                宅建BOOST インストールガイド
+            </h1>
+            <p class="text-center text-xl opacity-90">
+                Progressive Web App（PWA）として、あらゆるデバイスにインストール可能
+            </p>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- デバイス選択 -->
+        <div class="glass-card rounded-2xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
+                お使いのデバイスを選択してください
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button onclick="showInstructions('ios')" class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all text-center">
+                    <i class="fab fa-apple device-icon"></i>
+                    <p class="mt-3 font-semibold">iPhone/iPad</p>
+                    <p class="text-sm text-gray-600">iOS Safari</p>
+                </button>
+                <button onclick="showInstructions('android')" class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all text-center">
+                    <i class="fab fa-android device-icon"></i>
+                    <p class="mt-3 font-semibold">Android</p>
+                    <p class="text-sm text-gray-600">Chrome/Edge</p>
+                </button>
+                <button onclick="showInstructions('windows')" class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all text-center">
+                    <i class="fab fa-windows device-icon"></i>
+                    <p class="mt-3 font-semibold">Windows</p>
+                    <p class="text-sm text-gray-600">Chrome/Edge</p>
+                </button>
+                <button onclick="showInstructions('mac')" class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all text-center">
+                    <i class="fab fa-apple device-icon"></i>
+                    <p class="mt-3 font-semibold">Mac</p>
+                    <p class="text-sm text-gray-600">Safari/Chrome</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- iOS インストール手順 -->
+        <div id="ios-instructions" class="hidden glass-card rounded-2xl p-8 mb-8">
+            <h3 class="text-2xl font-bold mb-6 text-gray-800">
+                <i class="fab fa-apple mr-3"></i>iPhone/iPadへのインストール
+            </h3>
+            
+            <div class="space-y-8">
+                <!-- Step 1 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">Safariで宅建BOOSTを開く</h4>
+                        <p class="text-gray-600 mb-3">以下のURLをSafariで開いてください（Chrome等では不可）</p>
+                        <div class="bg-blue-50 p-3 rounded-lg mb-3">
+                            <code class="text-blue-800">https://takken-boost.pages.dev/version/v9</code>
+                            <button onclick="copyUrl()" class="ml-2 text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f5f5f5'/%3E%3Ctext x='200' y='100' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3E[Safari画面のスクリーンショット]%3C/text%3E%3C/svg%3E" alt="Safari画面" class="screenshot w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">共有ボタンをタップ</h4>
+                        <p class="text-gray-600 mb-3">画面下部の共有ボタン <i class="fas fa-share-square"></i> をタップします</p>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
+                            <p class="text-sm">💡 共有ボタンは画面下部の中央にあります</p>
+                        </div>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <div class="text-center">
+                                <i class="fas fa-share-square text-6xl text-blue-500 animated-arrow"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">「ホーム画面に追加」を選択</h4>
+                        <p class="text-gray-600 mb-3">メニューから「ホーム画面に追加」をタップ</p>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <div class="bg-white rounded-lg shadow p-4">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <i class="fas fa-plus-square text-2xl text-gray-600"></i>
+                                    <span>ホーム画面に追加</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">4</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">「追加」をタップ</h4>
+                        <p class="text-gray-600 mb-3">アプリ名を確認して右上の「追加」をタップ</p>
+                        <div class="bg-green-50 border-l-4 border-green-400 p-3">
+                            <p class="text-sm">✅ インストール完了！ホーム画面にアイコンが追加されます</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Android インストール手順 -->
+        <div id="android-instructions" class="hidden glass-card rounded-2xl p-8 mb-8">
+            <h3 class="text-2xl font-bold mb-6 text-gray-800">
+                <i class="fab fa-android mr-3"></i>Androidへのインストール
+            </h3>
+            
+            <div class="space-y-8">
+                <!-- Step 1 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">Chrome/Edgeで宅建BOOSTを開く</h4>
+                        <p class="text-gray-600 mb-3">以下のURLをChromeまたはEdgeで開いてください</p>
+                        <div class="bg-blue-50 p-3 rounded-lg mb-3">
+                            <code class="text-blue-800">https://takken-boost.pages.dev/version/v9</code>
+                            <button onclick="copyUrl()" class="ml-2 text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">インストールプロンプト</h4>
+                        <p class="text-gray-600 mb-3">画面下部に表示される「インストール」をタップ</p>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <div class="bg-blue-600 text-white p-4 rounded-lg text-center">
+                                <i class="fas fa-download mr-2"></i>
+                                アプリをインストール
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">※表示されない場合は手順3へ</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 (Alternative) -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">メニューから追加（代替手順）</h4>
+                        <p class="text-gray-600 mb-3">右上の︙メニュー → 「アプリをインストール」</p>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <div class="bg-white rounded-lg shadow p-4">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <i class="fas fa-mobile-alt text-2xl text-gray-600"></i>
+                                    <span>アプリをインストール</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Windows インストール手順 -->
+        <div id="windows-instructions" class="hidden glass-card rounded-2xl p-8 mb-8">
+            <h3 class="text-2xl font-bold mb-6 text-gray-800">
+                <i class="fab fa-windows mr-3"></i>Windowsへのインストール
+            </h3>
+            
+            <div class="space-y-8">
+                <!-- Step 1 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">Chrome/Edgeで宅建BOOSTを開く</h4>
+                        <p class="text-gray-600 mb-3">以下のURLをブラウザで開いてください</p>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <code class="text-blue-800">https://takken-boost.pages.dev/version/v9</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">アドレスバーのインストールアイコン</h4>
+                        <p class="text-gray-600 mb-3">アドレスバー右端の <i class="fas fa-plus-circle"></i> アイコンをクリック</p>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <div class="flex items-center justify-end bg-white rounded p-2">
+                                <i class="fas fa-plus-circle text-2xl text-blue-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex items-start space-x-4">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold mb-2">「インストール」をクリック</h4>
+                        <p class="text-gray-600 mb-3">ダイアログが表示されたら「インストール」をクリック</p>
+                        <div class="bg-green-50 border-l-4 border-green-400 p-3">
+                            <p class="text-sm">✅ デスクトップとスタートメニューに追加されます</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mac インストール手順 -->
+        <div id="mac-instructions" class="hidden glass-card rounded-2xl p-8 mb-8">
+            <h3 class="text-2xl font-bold mb-6 text-gray-800">
+                <i class="fab fa-apple mr-3"></i>Macへのインストール
+            </h3>
+            
+            <div class="space-y-8">
+                <!-- Safari の場合 -->
+                <div class="mb-6">
+                    <h4 class="text-xl font-semibold mb-4">Safari の場合</h4>
+                    <div class="flex items-start space-x-4 mb-4">
+                        <div class="step-number">1</div>
+                        <div class="flex-1">
+                            <p class="text-gray-600">ファイル → 「Dockに追加」を選択</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chrome の場合 -->
+                <div>
+                    <h4 class="text-xl font-semibold mb-4">Chrome/Edge の場合</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="step-number">1</div>
+                            <div class="flex-1">
+                                <p class="text-gray-600">アドレスバーのインストールアイコンをクリック</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="step-number">2</div>
+                            <div class="flex-1">
+                                <p class="text-gray-600">「インストール」をクリック</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 機能紹介 -->
+        <div class="glass-card rounded-2xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                <i class="fas fa-star mr-3 text-yellow-500"></i>
+                PWAインストールのメリット
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-wifi-slash text-2xl text-purple-600"></i>
+                    <div>
+                        <h4 class="font-semibold">オフライン対応</h4>
+                        <p class="text-sm text-gray-600">一度読み込んだコンテンツはオフラインでも利用可能</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-rocket text-2xl text-purple-600"></i>
+                    <div>
+                        <h4 class="font-semibold">高速起動</h4>
+                        <p class="text-sm text-gray-600">アプリとして起動するため、ブラウザより高速</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-bell text-2xl text-purple-600"></i>
+                    <div>
+                        <h4 class="font-semibold">プッシュ通知</h4>
+                        <p class="text-sm text-gray-600">学習リマインダーを通知で受け取れます</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-expand text-2xl text-purple-600"></i>
+                    <div>
+                        <h4 class="font-semibold">フルスクリーン</h4>
+                        <p class="text-sm text-gray-600">ブラウザUIなしで没入感のある学習体験</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- トラブルシューティング -->
+        <div class="glass-card rounded-2xl p-8">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                <i class="fas fa-question-circle mr-3"></i>
+                よくある質問・トラブルシューティング
+            </h2>
+            <div class="space-y-4">
+                <details class="bg-white p-4 rounded-lg">
+                    <summary class="font-semibold cursor-pointer">インストールボタンが表示されない</summary>
+                    <p class="mt-3 text-gray-600">
+                        ブラウザのキャッシュをクリアして、ページを再読み込みしてください。
+                        また、HTTPS接続であることを確認してください。
+                    </p>
+                </details>
+                <details class="bg-white p-4 rounded-lg">
+                    <summary class="font-semibold cursor-pointer">iOSでホーム画面に追加できない</summary>
+                    <p class="mt-3 text-gray-600">
+                        必ずSafariブラウザを使用してください。Chrome等の他のブラウザでは追加できません。
+                    </p>
+                </details>
+                <details class="bg-white p-4 rounded-lg">
+                    <summary class="font-semibold cursor-pointer">アンインストール方法は？</summary>
+                    <p class="mt-3 text-gray-600">
+                        通常のアプリと同様に、アイコンを長押しして削除するか、
+                        設定からアプリ一覧で削除できます。
+                    </p>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showInstructions(device) {
+            // すべての説明を非表示
+            document.querySelectorAll('[id$="-instructions"]').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // 選択されたデバイスの説明を表示
+            const element = document.getElementById(`${device}-instructions`);
+            if (element) {
+                element.classList.remove('hidden');
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function copyUrl() {
+            navigator.clipboard.writeText('https://takken-boost.pages.dev/version/v9');
+            alert('URLをコピーしました！');
+        }
+
+        // URLパラメータから自動表示
+        const params = new URLSearchParams(window.location.search);
+        const device = params.get('device');
+        if (device) {
+            showInstructions(device);
+        }
+    </script>
+</body>
+</html>

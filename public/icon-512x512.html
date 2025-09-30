@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>PWA Icons - 宅建BOOST</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #007ACB;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .icon-card {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .icon-card img {
+            width: 100%;
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        .icon-card h3 {
+            margin: 10px 0 5px;
+            color: #333;
+            font-size: 14px;
+        }
+        .icon-card p {
+            margin: 0;
+            color: #666;
+            font-size: 12px;
+        }
+        .generated-image {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .generated-image img {
+            max-width: 512px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        button {
+            background: #007ACB;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056A3;
+        }
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 宅建BOOST PWAアイコン管理</h1>
+        
+        <div class="generated-image">
+            <h2>生成されたメインアイコン（1024x1024）</h2>
+            <img src="https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/4d2de7de-fd14-45be-a163-05f0cefe3baf" alt="宅建BOOST Icon">
+            <br>
+            <button onclick="downloadIcon()">ダウンロード</button>
+        </div>
+
+        <h2>📱 PWAアイコンサイズ一覧</h2>
+        <div class="icon-grid" id="iconGrid">
+            <!-- アイコンがここに動的に追加される -->
+        </div>
+
+        <h2>💻 実装コード</h2>
+        <div class="code-block">
+            <code>&lt;link rel="icon" type="image/png" sizes="512x512" href="/icon-512x512.png"&gt;</code>
+        </div>
+
+        <h2>📝 manifest.json設定</h2>
+        <div class="code-block">
+            <pre><code>{
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}</code></pre>
+        </div>
+    </div>
+
+    <script>
+        const iconSizes = [
+            { size: 72, name: 'icon-72x72.png', usage: 'Android Chrome' },
+            { size: 96, name: 'icon-96x96.png', usage: 'Google TV' },
+            { size: 128, name: 'icon-128x128.png', usage: 'Chrome Web Store' },
+            { size: 144, name: 'icon-144x144.png', usage: 'Microsoft Windows' },
+            { size: 152, name: 'icon-152x152.png', usage: 'iPad iOS7+' },
+            { size: 192, name: 'icon-192x192.png', usage: 'Android Chrome' },
+            { size: 384, name: 'icon-384x384.png', usage: 'Android Chrome' },
+            { size: 512, name: 'icon-512x512.png', usage: 'PWA Splash Screen' }
+        ];
+
+        function createIconCard(iconInfo) {
+            const card = document.createElement('div');
+            card.className = 'icon-card';
+            card.innerHTML = `
+                <img src="https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/4d2de7de-fd14-45be-a163-05f0cefe3baf" 
+                     alt="${iconInfo.name}"
+                     style="width: ${Math.min(iconInfo.size, 150)}px; height: ${Math.min(iconInfo.size, 150)}px;">
+                <h3>${iconInfo.name}</h3>
+                <p>${iconInfo.size}x${iconInfo.size}px</p>
+                <p>${iconInfo.usage}</p>
+            `;
+            return card;
+        }
+
+        function loadIcons() {
+            const grid = document.getElementById('iconGrid');
+            iconSizes.forEach(icon => {
+                grid.appendChild(createIconCard(icon));
+            });
+        }
+
+        function downloadIcon() {
+            const link = document.createElement('a');
+            link.href = 'https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/4d2de7de-fd14-45be-a163-05f0cefe3baf';
+            link.download = 'takken-boost-icon-1024x1024.png';
+            link.click();
+        }
+
+        // ページ読み込み時にアイコンを表示
+        loadIcons();
+    </script>
+</body>
+</html>
