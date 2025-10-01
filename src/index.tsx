@@ -5,6 +5,9 @@ import studyRoutes from './study-api-fixed'
 import authRoutes from './auth-api-fixed'
 import mockExamRoutes from './mock-exam-complete'
 import emailRoutes from './email-api'
+import { studyPageHTML } from './pages/study-page'
+import { mockExamPageHTML } from './pages/mock-exam-page'
+import { progressPageHTML } from './pages/progress-page'
 
 export type Bindings = {
   DB: D1Database;
@@ -1349,6 +1352,21 @@ self.addEventListener('fetch', (event) => {
 // デフォルトページ（v9.0.0）
 app.get('/', (c) => {
   return c.html(v9HTML);
+})
+
+// 学習ページ
+app.get('/study', (c) => {
+  return c.html(studyPageHTML);
+})
+
+// 模擬試験ページ  
+app.get('/mock-exam', (c) => {
+  return c.html(mockExamPageHTML);
+})
+
+// 進捗ページ
+app.get('/progress', (c) => {
+  return c.html(progressPageHTML);
 })
 
 // API version endpoint
