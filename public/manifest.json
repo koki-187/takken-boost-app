@@ -1,133 +1,156 @@
 {
   "name": "宅建BOOST v9.0.0 Ultimate Edition",
   "short_name": "宅建BOOST",
-  "description": "AI駆動の宅地建物取引士試験対策アプリケーション - 402問の問題データベースと模擬試験機能",
+  "description": "次世代AI学習プラットフォーム - 402問完全収録の宅建試験対策アプリ",
   "version": "9.0.0",
   "manifest_version": 3,
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#667eea",
-  "theme_color": "#764ba2",
-  "categories": ["education", "productivity"],
+  "background_color": "#764ba2",
+  "theme_color": "#667eea",
   "lang": "ja",
   "dir": "ltr",
   "scope": "/",
+  "categories": ["education", "productivity"],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/icon-72x72.svg",
+      "src": "/icon-72x72.png",
       "sizes": "72x72",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-96x96.svg",
+      "src": "/icon-96x96.png",
       "sizes": "96x96",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-128x128.svg",
+      "src": "/icon-128x128.png",
       "sizes": "128x128",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-144x144.svg",
+      "src": "/icon-144x144.png",
       "sizes": "144x144",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-152x152.svg",
+      "src": "/icon-152x152.png",
       "sizes": "152x152",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-192x192.svg",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-384x384.svg",
+      "src": "/icon-384x384.png",
       "sizes": "384x384",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512x512.svg",
+      "src": "/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
   "screenshots": [
     {
-      "src": "/screenshot-desktop.svg",
-      "sizes": "1920x1080",
-      "type": "image/svg+xml",
-      "label": "Desktop view with 3D logo and purple gradient design"
+      "src": "/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "ホーム画面 - 3Dロゴと機能一覧"
     },
     {
-      "src": "/screenshot-mobile.svg",
-      "sizes": "750x1334",
-      "type": "image/svg+xml",
-      "label": "Mobile view with glassmorphism cards"
+      "src": "/screenshot-2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "学習モード - 402問の問題データベース"
     },
     {
-      "src": "/screenshot-study.svg",
-      "sizes": "1920x1080",
-      "type": "image/svg+xml",
-      "label": "Study mode with 402 questions database"
+      "src": "/screenshot-3.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "模擬試験 - 本番形式50問テスト"
     },
     {
-      "src": "/screenshot-exam.svg",
-      "sizes": "1920x1080",
-      "type": "image/svg+xml",
-      "label": "Mock exam with 50 questions"
+      "src": "/screenshot-4.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "進捗管理 - AI分析レポート"
     }
   ],
   "shortcuts": [
     {
       "name": "学習モード",
       "short_name": "学習",
-      "description": "問題演習を開始",
+      "description": "402問の問題を学習",
       "url": "/study",
       "icons": [
         {
-          "src": "/icon-study-96x96.svg",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
+          "src": "/icon-study.png",
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
     },
     {
       "name": "模擬試験",
       "short_name": "試験",
-      "description": "50問の模擬試験を受験",
+      "description": "50問の模擬試験を開始",
       "url": "/mock-exam",
       "icons": [
         {
-          "src": "/icon-exam-96x96.svg",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
+          "src": "/icon-exam.png",
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
     },
     {
       "name": "進捗確認",
       "short_name": "進捗",
-      "description": "学習進捗とAI分析",
+      "description": "学習進捗を確認",
       "url": "/progress",
       "icons": [
         {
-          "src": "/icon-progress-96x96.svg",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
+          "src": "/icon-progress.png",
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
+    }
+  ],
+  "features": [
+    "402問完全収録",
+    "カテゴリー別学習",
+    "50問模擬試験",
+    "AI弱点分析",
+    "進捗管理",
+    "オフライン対応",
+    "音声読み上げ",
+    "ダークモード"
+  ],
+  "permissions": [
+    "notifications",
+    "storage"
+  ],
+  "related_applications": [],
+  "protocol_handlers": [
+    {
+      "protocol": "web+takkenboost",
+      "url": "/?question=%s"
     }
   ],
   "share_target": {
@@ -140,15 +163,15 @@
       "url": "url"
     }
   },
-  "launch_handler": {
-    "client_mode": ["navigate-existing", "auto"]
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
   },
-  "related_applications": [],
-  "prefer_related_applications": false,
-  "protocol_handlers": [
-    {
-      "protocol": "web+takkenboost",
-      "url": "/open?url=%s"
-    }
-  ]
+  "launch_handler": {
+    "client_mode": "auto"
+  }
 }
