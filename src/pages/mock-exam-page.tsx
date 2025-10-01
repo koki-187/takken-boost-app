@@ -233,6 +233,9 @@ export const mockExamPageHTML = `<!DOCTYPE html>
     
     <!-- JavaScript -->
     <script>
+        // APIのベースURLを設定
+        axios.defaults.baseURL = window.location.origin;
+        
         let examQuestions = [];
         let currentIndex = 0;
         let answers = {};
@@ -245,7 +248,15 @@ export const mockExamPageHTML = `<!DOCTYPE html>
         // 試験問題を読み込む
         async function loadExam() {
             try {
-                const response = await axios.post('/api/mock-exam/start');
+                // ゲストユーザーとして試験を開始
+                const response = await axios.post('/api/mock-exam/start', {
+                    userId: 1  // ゲストユーザーID
+                });
+                
+                if (!response.data || !response.data.questions) {
+                    throw new Error('試験データの形式が正しくありません');
+                }
+                
                 examQuestions = response.data.questions;
                 localStorage.setItem('examId', response.data.examId);
                 initializeNav();
@@ -253,7 +264,9 @@ export const mockExamPageHTML = `<!DOCTYPE html>
                 startTimer();
             } catch (error) {
                 console.error('試験の開始に失敗しました:', error);
-                alert('試験の開始に失敗しました。ページをリロードしてください。');
+                // エラーメッセージを詳しく表示
+                const errorMsg = error.response?.data?.error || error.message || '不明なエラー';
+                alert('試験の開始に失敗しました: ' + errorMsg + '\nページをリロードしてください。');
             }
         }
         

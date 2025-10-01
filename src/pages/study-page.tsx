@@ -209,6 +209,8 @@ export const studyPageHTML = `<!DOCTYPE html>
     <script src="/static/darkmode.js"></script>
     <script src="/static/text-to-speech.js"></script>
     <script>
+        // APIのベースURLを設定
+        axios.defaults.baseURL = window.location.origin;
         let currentQuestion = null;
         let selectedAnswer = null;
         let currentCategory = 'all';
@@ -228,12 +230,26 @@ export const studyPageHTML = `<!DOCTYPE html>
                     : \`/api/study/questions?subject=\${category}&limit=200\`;
                     
                 const response = await axios.get(url);
+                
+                // エラーハンドリング
+                if (!response.data || !response.data.questions) {
+                    throw new Error('問題データの形式が正しくありません');
+                }
+                
                 questions = response.data.questions;
+                
+                if (questions.length === 0) {
+                    document.getElementById('question-text').textContent = '問題が見つかりませんでした。';
+                    return;
+                }
+                
                 currentIndex = 0;
                 displayQuestion();
                 updateCounter();
             } catch (error) {
                 console.error('問題の読み込みに失敗しました:', error);
+                document.getElementById('question-text').textContent = 
+                    'エラー: 問題の読み込みに失敗しました。ページをリロードしてください。';
             }
         }
         

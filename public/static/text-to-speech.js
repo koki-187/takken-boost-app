@@ -86,8 +86,9 @@ class TakkenBoostTTS {
                 padding: 20px;
                 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
                 z-index: 998;
-                min-width: 320px;
-                transform: translateX(400px);
+                min-width: 280px;
+                max-width: 320px;
+                transform: translateX(calc(100% + 50px));
                 transition: transform 0.3s ease;
             }
             
@@ -98,7 +99,7 @@ class TakkenBoostTTS {
             .tts-toggle-btn {
                 position: fixed;
                 bottom: 150px;
-                right: 30px;
+                right: 20px;
                 width: 56px;
                 height: 56px;
                 border-radius: 50%;
@@ -122,6 +123,40 @@ class TakkenBoostTTS {
             
             .tts-toggle-btn.active {
                 background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            }
+            
+            /* デスクトップ対応 */
+            @media (min-width: 1024px) {
+                .tts-control-panel {
+                    right: 20px;
+                    max-width: 350px;
+                }
+            }
+            
+            /* タブレット対応 */
+            @media (max-width: 1023px) and (min-width: 768px) {
+                .tts-control-panel {
+                    right: 10px;
+                    max-width: 300px;
+                }
+                .tts-toggle-btn {
+                    right: 10px;
+                }
+            }
+            
+            /* モバイル対応 */
+            @media (max-width: 767px) {
+                .tts-control-panel {
+                    right: 10px;
+                    left: 10px;
+                    min-width: auto;
+                    max-width: none;
+                    bottom: 100px;
+                }
+                .tts-toggle-btn {
+                    right: 15px;
+                    bottom: 100px;
+                }
             }
             
             .tts-control-header {
