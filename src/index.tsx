@@ -30,16 +30,16 @@ app.route('/api/notifications', emailRoutes)
 app.get('/version/:version?', (c) => {
   const version = c.req.param('version');
   
-  // v9.0.0を返す場合
-  if (version === 'v9' || version === '9') {
-    return c.html(v9HTML);
+  // v8.0.0を返す場合
+  if (version === 'v8' || version === '8') {
+    return c.redirect('/v8');
   }
   
-  // デフォルトはv8.0.0を表示
+  // デフォルトはv9.0.0を表示
   return c.redirect('/');
 });
 
-// v9.0.0 HTMLコンテンツ（外部ファイルから読み込み）
+// v9.0.0 HTMLコンテンツ（メインページ）
 const v9HTML = `<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -64,6 +64,17 @@ const v9HTML = `<!DOCTYPE html>
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => console.log('Service Worker registered:', registration))
+                    .catch(error => console.log('Service Worker registration failed:', error));
+            });
+        }
+    </script>
 </head>
 <body>
     <canvas id="particle-bg"></canvas>
@@ -153,8 +164,8 @@ const v9HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-// 完全版HTMLページ（既存のv8.0.0）
-app.get('/', (c) => {
+// v8.0.0ページ（旧バージョン）
+app.get('/v8', (c) => {
   return c.html(`
 <!DOCTYPE html>
 <html lang="ja">
@@ -1198,7 +1209,59 @@ app.get('/manifest.json', (c) => {
   })
 })
 
-// Service Worker
+// Service Worker v9
+app.get('/service-worker.js', (c) => {
+  const swContent = `
+// 宅建BOOST v9.0.0 Service Worker
+const CACHE_NAME = 'takken-boost-v9-cache';
+const urlsToCache = [
+  '/',
+  '/manifest.json',
+  '/static/styles-v9.css',
+  '/static/app-v9.js',
+  '/static/darkmode.js',
+  '/static/text-to-speech.js',
+  'https://cdn.tailwindcss.com',
+  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css',
+  'https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js',
+  'https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+`;
+  
+  return new Response(swContent, {
+    headers: { 'Content-Type': 'application/javascript' }
+  });
+})
+
+// Service Worker v8 (legacy)
 app.get('/sw.js', (c) => {
   return c.text(`
 // Service Worker for 宅建BOOST
@@ -1281,6 +1344,16 @@ self.addEventListener('fetch', (event) => {
   return new Response(swContent, {
     headers: { 'Content-Type': 'application/javascript' }
   })
+})
+
+// デフォルトページ（v9.0.0）
+app.get('/', (c) => {
+  return c.html(v9HTML);
+})
+
+// API version endpoint
+app.get('/api/version', (c) => {
+  return c.json({ version: 'v9.0.0', status: 'active' });
 })
 
 // 静的ファイル

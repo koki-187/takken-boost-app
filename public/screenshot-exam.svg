@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-exam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#grad-exam)"/>
+  <text x="960" y="108" font-size="54" font-weight="bold" fill="white" text-anchor="middle">宅建BOOST v9.0.0 - exam</text>
+  <rect x="192" y="216" width="1536" height="756" fill="rgba(255,255,255,0.1)" rx="20"/>
+</svg>

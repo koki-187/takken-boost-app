@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>PWA Icons Generator for 宅建BOOST</title>
+</head>
+<body>
+    <h1>宅建BOOST PWA Icons Generator</h1>
+    <div id="status"></div>
+    <div id="icons-container"></div>
+    
+    <script>
+        const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512, 1024];
+        const gradientStart = '#667eea';
+        const gradientEnd = '#764ba2';
+        const statusDiv = document.getElementById('status');
+        const container = document.getElementById('icons-container');
+        
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // グラデーション背景
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, gradientStart);
+            gradient.addColorStop(1, gradientEnd);
+            
+            // 背景を塗りつぶし
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // 円形の白い背景（中央）
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const radius = size * 0.3;
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.fill();
+            
+            // テキスト「宅」を描画
+            ctx.font = `bold ${size * 0.35}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+            ctx.fillStyle = gradientEnd;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('宅', centerX, centerY);
+            
+            // BOOSTテキスト（小さく）
+            if (size >= 128) {
+                ctx.font = `bold ${size * 0.08}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+                ctx.fillStyle = 'white';
+                ctx.fillText('BOOST', centerX, centerY + radius + size * 0.12);
+            }
+            
+            // v9.0バッジ（右上）
+            if (size >= 192) {
+                const badgeSize = size * 0.2;
+                const badgeX = size - badgeSize - size * 0.05;
+                const badgeY = size * 0.05;
+                
+                // バッジ背景
+                ctx.beginPath();
+                ctx.arc(badgeX + badgeSize/2, badgeY + badgeSize/2, badgeSize/2, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ff6b6b';
+                ctx.fill();
+                
+                // v9テキスト
+                ctx.font = `bold ${badgeSize * 0.5}px sans-serif`;
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('v9', badgeX + badgeSize/2, badgeY + badgeSize/2);
+            }
+            
+            return canvas;
+        }
+        
+        function generateSpecialIcon(name, emoji, size = 96) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // グラデーション背景
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, gradientStart);
+            gradient.addColorStop(1, gradientEnd);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // 白い円形背景
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size * 0.4, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.fill();
+            
+            // 絵文字を中央に配置
+            ctx.font = `${size * 0.5}px sans-serif`;
+            ctx.fillStyle = gradientEnd;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(emoji, size / 2, size / 2);
+            
+            return canvas;
+        }
+        
+        // スクリーンショット生成（ダミーコンテンツ）
+        function generateScreenshot(width, height, type) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            // グラデーション背景
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, gradientStart);
+            gradient.addColorStop(1, gradientEnd);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // タイトル
+            ctx.font = `bold ${height * 0.05}px sans-serif`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText(`宅建BOOST v9.0.0 - ${type}`, width/2, height * 0.1);
+            
+            // コンテンツエリア
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(width * 0.1, height * 0.2, width * 0.8, height * 0.7);
+            
+            return canvas;
+        }
+        
+        // アイコン生成と表示
+        function generateAll() {
+            statusDiv.innerHTML = '<h2>Generated Icons:</h2>';
+            
+            // 通常のアイコン
+            iconSizes.forEach(size => {
+                const canvas = generateIcon(size);
+                const div = document.createElement('div');
+                div.style.display = 'inline-block';
+                div.style.margin = '10px';
+                div.style.textAlign = 'center';
+                
+                const link = document.createElement('a');
+                link.download = `icon-${size}x${size}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.appendChild(canvas);
+                
+                const label = document.createElement('p');
+                label.textContent = `${size}x${size}`;
+                
+                div.appendChild(link);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+            
+            // 特殊アイコン
+            const specialIcons = [
+                { name: 'study', emoji: '📚' },
+                { name: 'exam', emoji: '📝' },
+                { name: 'progress', emoji: '📊' }
+            ];
+            
+            specialIcons.forEach(icon => {
+                const canvas = generateSpecialIcon(icon.name, icon.emoji);
+                const div = document.createElement('div');
+                div.style.display = 'inline-block';
+                div.style.margin = '10px';
+                div.style.textAlign = 'center';
+                
+                const link = document.createElement('a');
+                link.download = `icon-${icon.name}-96x96.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.appendChild(canvas);
+                
+                const label = document.createElement('p');
+                label.textContent = `${icon.name} 96x96`;
+                
+                div.appendChild(link);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+            
+            // スクリーンショット
+            const screenshots = [
+                { name: 'desktop', width: 1920, height: 1080 },
+                { name: 'mobile', width: 750, height: 1334 },
+                { name: 'study', width: 1920, height: 1080 },
+                { name: 'exam', width: 1920, height: 1080 }
+            ];
+            
+            screenshots.forEach(screen => {
+                const canvas = generateScreenshot(screen.width, screen.height, screen.name);
+                // スケールダウンして表示
+                canvas.style.width = '192px';
+                canvas.style.height = 'auto';
+                
+                const div = document.createElement('div');
+                div.style.display = 'inline-block';
+                div.style.margin = '10px';
+                div.style.textAlign = 'center';
+                
+                const link = document.createElement('a');
+                link.download = `screenshot-${screen.name}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.appendChild(canvas);
+                
+                const label = document.createElement('p');
+                label.textContent = `Screenshot: ${screen.name}`;
+                
+                div.appendChild(link);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+            
+            statusDiv.innerHTML += '<p style="color: green;">✅ All icons generated! Click each icon to download.</p>';
+        }
+        
+        // ページロード時に自動生成
+        window.onload = generateAll;
+    </script>
+</body>
+</html>

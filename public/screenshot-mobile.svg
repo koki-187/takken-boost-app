@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="750" height="1334" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-mobile" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="750" height="1334" fill="url(#grad-mobile)"/>
+  <text x="375" y="133.4" font-size="66.7" font-weight="bold" fill="white" text-anchor="middle">宅建BOOST v9.0.0 - mobile</text>
+  <rect x="75" y="266.8" width="600" height="933.8" fill="rgba(255,255,255,0.1)" rx="20"/>
+</svg>

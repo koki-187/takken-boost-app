@@ -15,83 +15,77 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/icon-72x72.png",
+      "src": "/icon-72x72.svg",
       "sizes": "72x72",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-96x96.png",
+      "src": "/icon-96x96.svg",
       "sizes": "96x96",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-128x128.png",
+      "src": "/icon-128x128.svg",
       "sizes": "128x128",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-144x144.png",
+      "src": "/icon-144x144.svg",
       "sizes": "144x144",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-152x152.png",
+      "src": "/icon-152x152.svg",
       "sizes": "152x152",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-192x192.png",
+      "src": "/icon-192x192.svg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-384x384.png",
+      "src": "/icon-384x384.svg",
       "sizes": "384x384",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512x512.png",
+      "src": "/icon-512x512.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-1024x1024.png",
-      "sizes": "1024x1024",
-      "type": "image/png",
-      "purpose": "any"
     }
   ],
   "screenshots": [
     {
-      "src": "/screenshot-desktop.png",
+      "src": "/screenshot-desktop.svg",
       "sizes": "1920x1080",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "label": "Desktop view with 3D logo and purple gradient design"
     },
     {
-      "src": "/screenshot-mobile.png",
+      "src": "/screenshot-mobile.svg",
       "sizes": "750x1334",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "label": "Mobile view with glassmorphism cards"
     },
     {
-      "src": "/screenshot-study.png",
+      "src": "/screenshot-study.svg",
       "sizes": "1920x1080",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "label": "Study mode with 402 questions database"
     },
     {
-      "src": "/screenshot-exam.png",
+      "src": "/screenshot-exam.svg",
       "sizes": "1920x1080",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "label": "Mock exam with 50 questions"
     }
   ],
@@ -103,9 +97,9 @@
       "url": "/study",
       "icons": [
         {
-          "src": "/icon-study-96x96.png",
+          "src": "/icon-study-96x96.svg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -116,9 +110,9 @@
       "url": "/mock-exam",
       "icons": [
         {
-          "src": "/icon-exam-96x96.png",
+          "src": "/icon-exam-96x96.svg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -129,9 +123,9 @@
       "url": "/progress",
       "icons": [
         {
-          "src": "/icon-progress-96x96.png",
+          "src": "/icon-progress-96x96.svg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/svg+xml"
         }
       ]
     }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="384" height="384" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="384" height="384" fill="url(#gradient)"/>
+  <circle cx="192" cy="192" r="115.19999999999999" fill="rgba(255,255,255,0.95)"/>
+  <text x="192" y="192" font-family="sans-serif" font-size="134.39999999999998" font-weight="bold" fill="#764ba2" text-anchor="middle" dominant-baseline="central">宅</text>
+  <text x="192" y="353.28" font-family="sans-serif" font-size="30.72" font-weight="bold" fill="white" text-anchor="middle">BOOST</text>
+</svg>
