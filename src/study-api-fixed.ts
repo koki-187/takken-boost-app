@@ -26,20 +26,20 @@ const CATEGORY_MAPPING: Record<string, string[]> = {
 studyRoutes.get('/questions', async (c) => {
   try {
     const { DB } = c.env
-    const { category, difficulty, limit = 10 } = c.req.query()
+    const { category, difficulty, limit = 20 } = c.req.query()
 
     let query = 'SELECT * FROM questions WHERE 1=1'
-    const params = []
+    const params: any[] = []
 
-    if (category && CATEGORY_MAPPING[category as string]) {
-      // 英語キーから日本語カテゴリ名のリストを取得
-      const japaneseCategories = CATEGORY_MAPPING[category as string]
-      const placeholders = japaneseCategories.map(() => '?').join(',')
-      query += ` AND category IN (${placeholders})`
-      params.push(...japaneseCategories)
+    if (category && category !== 'all') {
+      if (CATEGORY_MAPPING[category as string]) {
+        // subjectフィールドで直接フィルタリング（より効率的）
+        query += ' AND subject = ?'
+        params.push(category)
+      }
     }
 
-    if (difficulty) {
+    if (difficulty && difficulty !== 'all') {
       query += ' AND difficulty = ?'
       params.push(difficulty)
     }

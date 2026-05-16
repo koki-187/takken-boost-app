@@ -13,825 +13,1644 @@ export type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
-// Enable CORS
-app.use('/api/*', cors())
+app.use('/api/*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+}))
 
-// Mount API routes
 app.route('/api/study', studyRoutes)
 app.route('/api/auth', authRoutes)
 app.route('/api/mock-exam', mockExamRoutes)
 app.route('/api/notifications', emailRoutes)
 
-// Service Worker for PWA
+// 問題数取得API
+app.get('/api/stats', async (c) => {
+  try {
+    const { DB } = c.env
+    const total = await DB.prepare('SELECT COUNT(*) as cnt FROM questions').first()
+    const bySubject = await DB.prepare(
+      'SELECT subject, COUNT(*) as cnt FROM questions GROUP BY subject'
+    ).all()
+    const byYear = await DB.prepare(
+      'SELECT year, COUNT(*) as cnt FROM questions WHERE year IS NOT NULL GROUP BY year ORDER BY year'
+    ).all()
+    return c.json({
+      success: true,
+      total: (total as any)?.cnt ?? 0,
+      bySubject: bySubject.results,
+      byYear: byYear.results,
+    })
+  } catch {
+    return c.json({ success: true, total: 402, bySubject: [], byYear: [] })
+  }
+})
+
+// 過去問年度別取得API
+app.get('/api/past-exam/:year', async (c) => {
+  try {
+    const year = parseInt(c.req.param('year'))
+    const { DB } = c.env
+    const result = await DB.prepare(
+      'SELECT * FROM questions WHERE year = ? ORDER BY id'
+    ).bind(year).all()
+    return c.json({ success: true, questions: result.results, total: result.results.length })
+  } catch (e: any) {
+    return c.json({ success: false, error: e.message }, 500)
+  }
+})
+
+// Service Worker
 app.get('/service-worker.js', (c) => {
-  return c.text(`
-const CACHE_NAME = 'takken-boost-v9-cache';
-const urlsToCache = [
+  const sw = `
+const CACHE_NAME = 'takken-boost-v10';
+const STATIC_CACHE = 'takken-boost-static-v10';
+
+const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/static/styles-v9.css',
-  '/static/app-v9.js',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js',
-  'https://cdn.tailwindcss.com',
-  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css'
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(STATIC_CACHE).then(cache => cache.addAll(STATIC_ASSETS))
   );
+  self.skipWaiting();
 });
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => response || fetch(event.request))
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then(names =>
+      Promise.all(names
+        .filter(n => n !== CACHE_NAME && n !== STATIC_CACHE)
+        .map(n => caches.delete(n))
+      )
+    )
   );
+  self.clients.claim();
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.filter((cacheName) => cacheName !== CACHE_NAME)
-          .map((cacheName) => caches.delete(cacheName))
-      );
+self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+
+  // API requests - network first
+  if (url.pathname.startsWith('/api/')) {
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+          return res;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Static pages - cache first
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(res => {
+        if (res.ok) {
+          const clone = res.clone();
+          caches.open(STATIC_CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      });
     })
   );
 });
-  `, {
-    headers: {
-      'Content-Type': 'application/javascript',
-    },
-  })
+`;
+  return c.text(sw, 200, { 'Content-Type': 'application/javascript; charset=utf-8' })
 })
 
-// Main Application HTML - v9.0.0 新デザイン
-app.get('/', (c) => {
-  return c.html(`
-<!DOCTYPE html>
+// Main SPA
+app.get('*', (c) => {
+  return c.html(mainHTML)
+})
+
+const mainHTML = `<!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>宅建BOOST v9.0 - Ultimate Edition</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="宅建BOOST">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="宅建BOOST">
-    <meta name="description" content="宅建試験合格を目指す方のための最強学習アプリ">
-    
-    <!-- PWA Links -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/icons/icon-180x180.png">
-    
-    <!-- External Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
-        
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>宅建BOOST - 宅建試験合格アプリ</title>
+<meta name="description" content="宅地建物取引士試験合格に特化したPWA学習アプリ。452問完全収録・AI弱点分析・模擬試験。">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="宅建BOOST">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-180x180.png">
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --c1:#7c3aed;--c2:#4f46e5;--c3:#a855f7;
+  --grad:linear-gradient(135deg,#7c3aed 0%,#4f46e5 100%);
+  --grad2:linear-gradient(135deg,#a855f7 0%,#7c3aed 100%);
+  --bg:#f5f3ff;--card:#fff;--text:#1e1b4b;--sub:#6b7280;
+  --border:#e5e7eb;--success:#10b981;--danger:#ef4444;--warn:#f59e0b;
+  --radius:16px;--shadow:0 4px 24px rgba(124,58,237,.12);
+  --bottom-bar:env(safe-area-inset-bottom,0px);
+}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;padding-bottom:calc(64px + var(--bottom-bar))}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* ===== HEADER ===== */
+#app-header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:var(--grad);
+  padding:env(safe-area-inset-top,0px) 16px 0;
+  box-shadow:0 2px 16px rgba(124,58,237,.3);
+}
+.header-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px;
+}
+.logo{color:#fff;font-size:20px;font-weight:900;letter-spacing:-0.5px;text-decoration:none}
+.logo span{font-size:10px;opacity:.7;margin-left:4px;font-weight:400}
+.header-actions{display:flex;gap:8px}
+.hbtn{
+  background:rgba(255,255,255,.15);border:none;color:#fff;
+  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:.2s;font-size:15px;
+}
+.hbtn:hover{background:rgba(255,255,255,.25)}
 
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background: var(--primary-gradient);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
+/* ===== BOTTOM NAV ===== */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:#fff;border-top:1px solid var(--border);
+  display:flex;
+  padding-bottom:var(--bottom-bar);
+  box-shadow:0 -4px 16px rgba(0,0,0,.08);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:8px 4px;cursor:pointer;border:none;background:none;
+  color:var(--sub);font-size:10px;transition:.2s;gap:3px;
+}
+.nav-item i{font-size:20px}
+.nav-item.active{color:var(--c1)}
+.nav-item.active i{font-weight:900}
 
-        /* 3D Logo Container */
-        #logo-3d {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 80px;
-            height: 80px;
-            z-index: 100;
-            cursor: pointer;
-        }
+/* ===== MAIN CONTENT ===== */
+#main{margin-top:56px;padding:16px;max-width:768px;margin-left:auto;margin-right:auto}
+#main{margin-top:calc(56px + env(safe-area-inset-top,0px))}
 
-        /* Glassmorphism Card */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            transition: all 0.3s ease;
-        }
+/* ===== CARDS ===== */
+.card{
+  background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:20px;margin-bottom:16px;
+}
+.card-grad{
+  background:var(--grad);color:#fff;
+  border-radius:var(--radius);padding:20px;margin-bottom:16px;
+  box-shadow:0 8px 32px rgba(124,58,237,.3);
+}
+.card-sm{
+  background:var(--card);border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);padding:16px;
+}
 
-        .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.5);
-        }
+/* ===== BUTTONS ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 24px;border-radius:50px;border:none;cursor:pointer;
+  font-family:inherit;font-weight:600;font-size:15px;transition:.2s;
+  text-decoration:none;
+}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 4px 16px rgba(124,58,237,.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(124,58,237,.4)}
+.btn-white{background:#fff;color:var(--c1);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.btn-outline{background:transparent;color:var(--c1);border:2px solid var(--c1)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-block{width:100%}
+.btn-lg{padding:16px 32px;font-size:17px}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
 
-        /* 3D Button */
-        .btn-3d {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.2);
-        }
+/* ===== GRID ===== */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:480px){.grid-4{grid-template-columns:repeat(4,1fr)}}
 
-        .btn-3d::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
+/* ===== STAT BOXES ===== */
+.stat-box{
+  background:var(--card);border-radius:12px;
+  padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+.stat-num{font-size:28px;font-weight:900;color:var(--c1);line-height:1}
+.stat-label{font-size:11px;color:var(--sub);margin-top:4px}
 
-        .btn-3d:hover::before {
-            left: 100%;
-        }
+/* ===== FEATURE CARDS ===== */
+.feature-card{
+  background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:20px;cursor:pointer;
+  transition:.2s;border:2px solid transparent;
+  display:flex;flex-direction:column;gap:12px;
+}
+.feature-card:hover{border-color:var(--c1);transform:translateY(-2px)}
+.feature-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;color:#fff;flex-shrink:0;
+}
+.feature-title{font-weight:700;font-size:17px}
+.feature-desc{font-size:13px;color:var(--sub);line-height:1.5}
+.feature-row{display:flex;align-items:flex-start;gap:14px}
 
-        .btn-3d:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 25px 0 rgba(31, 38, 135, 0.4);
-        }
+/* ===== PROGRESS BAR ===== */
+.progress-bar{
+  height:8px;background:var(--border);border-radius:4px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;background:var(--grad);border-radius:4px;
+  transition:width .6s ease;
+}
 
-        /* Floating Animation */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
+/* ===== BADGE ===== */
+.badge{
+  display:inline-flex;align-items:center;padding:3px 10px;
+  border-radius:50px;font-size:11px;font-weight:600;
+}
+.badge-purple{background:#ede9fe;color:var(--c1)}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-yellow{background:#fef3c7;color:#92400e}
+.badge-blue{background:#dbeafe;color:#1e40af}
 
-        .floating {
-            animation: float 3s ease-in-out infinite;
-        }
+/* ===== QUESTION DISPLAY ===== */
+.question-text{
+  font-size:16px;line-height:1.8;font-weight:500;
+  margin-bottom:20px;padding:16px;
+  background:#f8f7ff;border-radius:12px;border-left:4px solid var(--c1);
+}
+.option-btn{
+  width:100%;text-align:left;padding:14px 16px;
+  border:2px solid var(--border);border-radius:12px;
+  background:#fff;cursor:pointer;font-family:inherit;
+  font-size:14px;transition:.2s;display:flex;align-items:flex-start;gap:12px;
+  margin-bottom:8px;
+}
+.option-btn:hover:not(:disabled){border-color:var(--c1);background:#f5f3ff}
+.option-btn.correct{border-color:var(--success)!important;background:#d1fae5!important}
+.option-btn.incorrect{border-color:var(--danger)!important;background:#fee2e2!important}
+.option-btn.show-correct{border-color:var(--success)!important;background:#d1fae5!important}
+.option-label{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--grad);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:13px;flex-shrink:0;margin-top:-2px;
+}
+.option-btn.correct .option-label{background:var(--success)}
+.option-btn.incorrect .option-label{background:var(--danger)}
+.option-btn.show-correct .option-label{background:var(--success)}
+.explanation{
+  margin-top:16px;padding:16px;border-radius:12px;
+  background:#f0fdf4;border:1px solid #86efac;font-size:14px;line-height:1.7;
+  animation:fadeIn .3s ease;
+}
+.explanation.wrong{background:#fff7ed;border-color:#fed7aa}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-        /* Particle Background */
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.5;
-        }
+/* ===== EXAM TIMER ===== */
+.exam-timer{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px;background:rgba(255,255,255,.2);
+  border-radius:50px;color:#fff;font-weight:700;font-size:16px;
+}
+.exam-timer.warning{background:rgba(239,68,68,.3);animation:pulse .5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
 
-        /* Loading Screen */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-gradient);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 0.5s ease;
-        }
+/* ===== CATEGORY PILLS ===== */
+.cat-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:50px;border:2px solid var(--border);
+  cursor:pointer;font-size:13px;font-weight:600;transition:.2s;
+  background:#fff;
+}
+.cat-pill.active{border-color:var(--c1);background:var(--c1);color:#fff}
+.cat-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 
-        .loader-3d {
-            width: 100px;
-            height: 100px;
-            perspective: 800px;
-        }
+/* ===== RESULT CARD ===== */
+.result-circle{
+  width:120px;height:120px;border-radius:50%;
+  border:8px solid var(--c1);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;margin:0 auto 20px;
+  background:#fff;
+}
+.result-circle .score{font-size:36px;font-weight:900;color:var(--c1);line-height:1}
+.result-circle .label{font-size:11px;color:var(--sub)}
 
-        .loader-cube {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: rotate-3d 2s infinite linear;
-        }
+/* ===== SECTION TITLE ===== */
+.section-title{
+  font-size:18px;font-weight:700;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title i{color:var(--c1)}
 
-        @keyframes rotate-3d {
-            0% { transform: rotateX(0deg) rotateY(0deg); }
-            100% { transform: rotateX(360deg) rotateY(360deg); }
-        }
+/* ===== MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:0;animation:overlayIn .2s ease;
+}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{
+  background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:768px;
+  max-height:85vh;overflow-y:auto;padding:24px 20px;
+  animation:sheetUp .25s ease;padding-bottom:calc(24px + var(--bottom-bar));
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{
+  width:40px;height:4px;background:var(--border);border-radius:2px;
+  margin:0 auto 20px;
+}
 
-        .loader-face {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: var(--secondary-gradient);
-            opacity: 0.8;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
+/* ===== EMPTY STATE ===== */
+.empty-state{
+  text-align:center;padding:48px 24px;color:var(--sub);
+}
+.empty-state i{font-size:48px;margin-bottom:16px;opacity:.4}
+.empty-state p{font-size:15px}
 
-        .front { transform: translateZ(50px); }
-        .back { transform: rotateY(180deg) translateZ(50px); }
-        .right { transform: rotateY(90deg) translateZ(50px); }
-        .left { transform: rotateY(-90deg) translateZ(50px); }
-        .top { transform: rotateX(90deg) translateZ(50px); }
-        .bottom { transform: rotateX(-90deg) translateZ(50px); }
+/* ===== TOAST ===== */
+#toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1e1b4b;color:#fff;padding:10px 20px;border-radius:50px;
+  font-size:14px;font-weight:600;z-index:500;opacity:0;
+  transition:.3s;pointer-events:none;white-space:nowrap;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-        /* Responsive Grid */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
-        }
+/* ===== INSTALL BANNER ===== */
+#install-banner{
+  display:none;position:fixed;bottom:72px;left:16px;right:16px;
+  background:#fff;border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.15);
+  padding:16px;z-index:99;align-items:center;gap:12px;
+  border:2px solid var(--c1);
+}
+#install-banner.show{display:flex}
 
-        /* iOS Safe Area */
-        @supports (padding-top: env(safe-area-inset-top)) {
-            body {
-                padding-top: env(safe-area-inset-top);
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-        }
+/* ===== LOADER ===== */
+.loader{
+  display:inline-block;width:20px;height:20px;border-radius:50%;
+  border:3px solid rgba(124,58,237,.2);border-top-color:var(--c1);
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.page-loader{
+  display:flex;align-items:center;justify-content:center;
+  padding:48px;flex-direction:column;gap:16px;color:var(--sub);
+}
 
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --glass-bg: rgba(0, 0, 0, 0.3);
-                --glass-border: rgba(255, 255, 255, 0.1);
-            }
-        }
-    </style>
+/* ===== BACK BUTTON ===== */
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--sub);font-size:14px;font-weight:600;
+  cursor:pointer;border:none;background:none;padding:4px 0;
+  margin-bottom:16px;
+}
+.back-btn:hover{color:var(--c1)}
+
+/* ===== CALENDAR STREAK ===== */
+.streak-badge{
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#f59e0b,#ef4444);
+  color:#fff;padding:6px 14px;border-radius:50px;
+  font-weight:700;font-size:13px;
+}
+
+/* ===== SWIPE AREA ===== */
+.question-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:20px;gap:12px;
+}
+
+/* ===== SCROLL BEHAVIOR ===== */
+html{scroll-behavior:smooth}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--c1);border-radius:2px}
+</style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loader-3d">
-            <div class="loader-cube">
-                <div class="loader-face front"></div>
-                <div class="loader-face back"></div>
-                <div class="loader-face right"></div>
-                <div class="loader-face left"></div>
-                <div class="loader-face top"></div>
-                <div class="loader-face bottom"></div>
-            </div>
-        </div>
+
+<!-- ===== HEADER ===== -->
+<header id="app-header">
+  <div class="header-inner">
+    <a class="logo" href="#" onclick="nav('home');return false">
+      宅建BOOST <span>合格保証アプリ</span>
+    </a>
+    <div class="header-actions">
+      <button class="hbtn" onclick="toggleDark()" title="ダークモード" id="themeBtn">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button class="hbtn" onclick="showInstallBanner()" title="インストール" id="installHeaderBtn">
+        <i class="fas fa-download"></i>
+      </button>
     </div>
+  </div>
+</header>
 
-    <!-- 3D Logo Canvas -->
-    <canvas id="logo-3d"></canvas>
+<!-- ===== MAIN ===== -->
+<div id="main"></div>
 
-    <!-- Particle Background -->
-    <canvas id="particles-canvas"></canvas>
+<!-- ===== BOTTOM NAV ===== -->
+<nav id="bottom-nav">
+  <button class="nav-item active" id="nav-home" onclick="nav('home')">
+    <i class="fas fa-home"></i>ホーム
+  </button>
+  <button class="nav-item" id="nav-study" onclick="nav('study')">
+    <i class="fas fa-book-open"></i>学習
+  </button>
+  <button class="nav-item" id="nav-exam" onclick="nav('exam')">
+    <i class="fas fa-file-alt"></i>模擬試験
+  </button>
+  <button class="nav-item" id="nav-progress" onclick="nav('progress')">
+    <i class="fas fa-chart-line"></i>進捗
+  </button>
+  <button class="nav-item" id="nav-review" onclick="nav('review')">
+    <i class="fas fa-redo"></i>復習
+  </button>
+</nav>
 
-    <!-- Main Container -->
-    <div class="min-h-screen p-4 md:p-8">
-        <!-- Header -->
-        <header class="glass-card mb-8 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <h1 class="text-2xl md:text-3xl font-bold text-white">
-                    宅建BOOST <span class="text-sm">v9.0</span>
-                </h1>
-                <span class="badge bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold">
-                    Ultimate Edition
-                </span>
-            </div>
-            <div class="flex gap-3">
-                <button id="themeToggle" class="btn-icon">
-                    <i class="fas fa-moon text-white"></i>
-                </button>
-                <button id="notificationToggle" class="btn-icon">
-                    <i class="fas fa-bell text-white"></i>
-                </button>
-                <button id="profileBtn" class="btn-icon">
-                    <i class="fas fa-user-circle text-white"></i>
-                </button>
-            </div>
-        </header>
+<!-- ===== TOAST ===== -->
+<div id="toast"></div>
 
-        <!-- Welcome Section -->
-        <div id="welcomeSection" class="glass-card mb-8 text-center">
-            <h2 class="text-4xl font-bold text-white mb-4 floating">
-                宅建試験合格への最速ルート
-            </h2>
-            <p class="text-white/80 text-lg mb-6">
-                402問の完全データベースとAI分析で効率的な学習を実現
-            </p>
-            <div class="flex gap-4 justify-center flex-wrap">
-                <button id="startLearningBtn" class="btn-3d">
-                    <i class="fas fa-rocket mr-2"></i>
-                    学習を開始
-                </button>
-                <button id="tutorialBtn" class="btn-3d">
-                    <i class="fas fa-play-circle mr-2"></i>
-                    チュートリアル
-                </button>
-            </div>
-        </div>
+<!-- ===== INSTALL BANNER ===== -->
+<div id="install-banner">
+  <div style="flex:1">
+    <div style="font-weight:700;font-size:15px">アプリをインストール</div>
+    <div style="font-size:12px;color:var(--sub)">オフラインで学習できます</div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="installPWA()">インストール</button>
+  <button style="border:none;background:none;color:var(--sub);cursor:pointer;font-size:18px" onclick="hideInstallBanner()">✕</button>
+</div>
 
-        <!-- Stats Overview -->
-        <div class="feature-grid mb-8">
-            <div class="glass-card text-center">
-                <i class="fas fa-book text-5xl text-white mb-3"></i>
-                <h3 class="text-3xl font-bold text-white">402</h3>
-                <p class="text-white/80">問題数</p>
-            </div>
-            <div class="glass-card text-center">
-                <i class="fas fa-chart-line text-5xl text-white mb-3"></i>
-                <h3 class="text-3xl font-bold text-white">0%</h3>
-                <p class="text-white/80">進捗率</p>
-            </div>
-            <div class="glass-card text-center">
-                <i class="fas fa-trophy text-5xl text-white mb-3"></i>
-                <h3 class="text-3xl font-bold text-white">-</h3>
-                <p class="text-white/80">ランク</p>
-            </div>
-            <div class="glass-card text-center">
-                <i class="fas fa-fire text-5xl text-white mb-3"></i>
-                <h3 class="text-3xl font-bold text-white">0</h3>
-                <p class="text-white/80">連続日数</p>
-            </div>
-        </div>
+<script>
+// ===== STATE =====
+const S = {
+  page: 'home',
+  stats: null,
+  study: {
+    questions: [], idx: 0, answered: false,
+    category: 'all', difficulty: 'all', year: 'all',
+    correct: 0, total: 0
+  },
+  exam: {
+    active: false, questions: [], answers: {},
+    idx: 0, timeLeft: 7200, timer: null, startTime: null,
+    sessionId: null
+  },
+  progress: { history: [], weakPoints: [] },
+  review: { questions: [] }
+};
 
-        <!-- Feature Cards -->
-        <div class="feature-grid">
-            <!-- Category Learning -->
-            <div class="glass-card feature-card" data-feature="category-learning">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mr-4">
-                        <i class="fas fa-folder-open text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white">カテゴリ学習</h3>
-                </div>
-                <p class="text-white/70 mb-4">
-                    4つのカテゴリから選んで集中学習
-                </p>
-                <button class="btn-3d w-full">
-                    <i class="fas fa-arrow-right mr-2"></i>
-                    開始する
-                </button>
-            </div>
+// localStorage ラッパー
+const LS = {
+  get: (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def } catch { return def } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} },
+};
 
-            <!-- Mock Exam -->
-            <div class="glass-card feature-card" data-feature="mock-exam">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-teal-600 flex items-center justify-center mr-4">
-                        <i class="fas fa-clipboard-list text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white">模擬試験</h3>
-                </div>
-                <p class="text-white/70 mb-4">
-                    本番形式で実力をチェック
-                </p>
-                <button class="btn-3d w-full">
-                    <i class="fas fa-arrow-right mr-2"></i>
-                    受験する
-                </button>
-            </div>
+// ===== ROUTER =====
+function nav(page, params = {}) {
+  S.page = page;
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const navMap = { home:'home', study:'study', exam:'exam', progress:'progress', review:'review',
+    category:'study', question:'study', 'past-exam':'study', result:'exam', 'past-result':'study' };
+  const navEl = document.getElementById('nav-' + (navMap[page] || page));
+  if (navEl) navEl.classList.add('active');
 
-            <!-- AI Analysis -->
-            <div class="glass-card feature-card" data-feature="ai-analysis">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-red-600 flex items-center justify-center mr-4">
-                        <i class="fas fa-brain text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white">AI分析</h3>
-                </div>
-                <p class="text-white/70 mb-4">
-                    弱点を分析して効率的に学習
-                </p>
-                <button class="btn-3d w-full">
-                    <i class="fas fa-arrow-right mr-2"></i>
-                    分析する
-                </button>
-            </div>
+  window.scrollTo(0, 0);
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="page-loader"><div class="loader"></div><p>読み込み中...</p></div>';
 
-            <!-- Statistics -->
-            <div class="glass-card feature-card" data-feature="statistics">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 flex items-center justify-center mr-4">
-                        <i class="fas fa-chart-bar text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white">学習統計</h3>
-                </div>
-                <p class="text-white/70 mb-4">
-                    進捗と成績を詳細に分析
-                </p>
-                <button class="btn-3d w-full">
-                    <i class="fas fa-arrow-right mr-2"></i>
-                    確認する
-                </button>
-            </div>
+  const pages = {
+    home: renderHome, study: renderStudy, exam: renderExam,
+    progress: renderProgress, review: renderReview,
+    category: renderCategory, question: renderQuestion,
+    'past-exam': renderPastExam, result: renderResult, 'past-result': renderPastResult,
+  };
 
-            <!-- Review -->
-            <div class="glass-card feature-card" data-feature="review">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 flex items-center justify-center mr-4">
-                        <i class="fas fa-redo text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white">復習</h3>
-                </div>
-                <p class="text-white/70 mb-4">
-                    間違えた問題を重点的に復習
-                </p>
-                <button class="btn-3d w-full">
-                    <i class="fas fa-arrow-right mr-2"></i>
-                    復習する
-                </button>
-            </div>
+  Object.assign(S, { currentParams: params });
+  (pages[page] || renderHome)(params);
+}
 
-            <!-- Settings -->
-            <div class="glass-card feature-card" data-feature="settings">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-gray-500 to-slate-600 flex items-center justify-center mr-4">
-                        <i class="fas fa-cog text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white">設定</h3>
-                </div>
-                <p class="text-white/70 mb-4">
-                    学習環境をカスタマイズ
-                </p>
-                <button class="btn-3d w-full">
-                    <i class="fas fa-arrow-right mr-2"></i>
-                    設定する
-                </button>
-            </div>
-        </div>
+// ===== TOAST =====
+function toast(msg, ms = 2000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
 
-        <!-- Install Prompt -->
-        <div id="installPrompt" class="glass-card mt-8 hidden">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <i class="fas fa-download text-3xl text-white mr-4"></i>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">アプリをインストール</h3>
-                        <p class="text-white/70 text-sm">オフラインでも学習可能になります</p>
-                    </div>
-                </div>
-                <button id="installBtn" class="btn-3d">
-                    インストール
-                </button>
-            </div>
-        </div>
+// ===== HOME PAGE =====
+async function renderHome() {
+  if (!S.stats) {
+    try {
+      const r = await fetch('/api/stats');
+      const data = await r.json();
+      S.stats = data;
+    } catch {
+      S.stats = { total: 402, bySubject: [], byYear: [] };
+    }
+  }
+
+  const hist = LS.get('study_history', []);
+  const total = hist.length;
+  const correct = hist.filter(h => h.correct).length;
+  const accuracy = total > 0 ? Math.round(correct / total * 100) : 0;
+  const streak = calcStreak();
+  const todayCount = hist.filter(h => h.date === today()).length;
+  const totalQ = S.stats?.total || 402;
+  const years = (S.stats?.byYear || []).map(r => r.year).filter(Boolean).sort((a,b)=>b-a);
+
+  document.getElementById('main').innerHTML = \`
+<div class="card-grad">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div>
+      <div style="font-size:13px;opacity:.8">宅地建物取引士試験</div>
+      <div style="font-size:24px;font-weight:900">合格への最速ルート</div>
     </div>
-
-    <!-- Dynamic Content Container -->
-    <div id="dynamicContent"></div>
-
-    <!-- Tutorial Overlay -->
-    <div id="tutorialOverlay" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="glass-card max-w-2xl w-full">
-            <h2 class="text-2xl font-bold text-white mb-4">
-                <i class="fas fa-graduation-cap mr-2"></i>
-                チュートリアル
-            </h2>
-            <div id="tutorialContent">
-                <!-- Tutorial content will be dynamically inserted -->
-            </div>
-            <div class="flex justify-between mt-6">
-                <button id="tutorialPrev" class="btn-3d">
-                    <i class="fas fa-chevron-left mr-2"></i>
-                    前へ
-                </button>
-                <div class="flex gap-2" id="tutorialDots">
-                    <!-- Dots will be dynamically inserted -->
-                </div>
-                <button id="tutorialNext" class="btn-3d">
-                    次へ
-                    <i class="fas fa-chevron-right ml-2"></i>
-                </button>
-            </div>
-        </div>
+    \${streak > 0 ? \`<div class="streak-badge"><i class="fas fa-fire"></i>\${streak}日連続</div>\` : ''}
+  </div>
+  <div class="grid-4" style="gap:8px">
+    <div class="stat-box" style="background:rgba(255,255,255,.15);color:#fff">
+      <div class="stat-num" style="color:#fff">\${totalQ}</div>
+      <div class="stat-label" style="color:rgba(255,255,255,.7)">総問題数</div>
     </div>
+    <div class="stat-box" style="background:rgba(255,255,255,.15);color:#fff">
+      <div class="stat-num" style="color:#fff">\${total}</div>
+      <div class="stat-label" style="color:rgba(255,255,255,.7)">解答済み</div>
+    </div>
+    <div class="stat-box" style="background:rgba(255,255,255,.15);color:#fff">
+      <div class="stat-num" style="color:#fff">\${accuracy}%</div>
+      <div class="stat-label" style="color:rgba(255,255,255,.7)">正答率</div>
+    </div>
+    <div class="stat-box" style="background:rgba(255,255,255,.15);color:#fff">
+      <div class="stat-num" style="color:#fff">\${todayCount}</div>
+      <div class="stat-label" style="color:rgba(255,255,255,.7)">今日の問題</div>
+    </div>
+  </div>
+</div>
 
-    <!-- Custom Scripts -->
-    <script src="/static/app-v9.js"></script>
-    <script>
-        // Initialize app when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            // Hide loading screen
-            setTimeout(() => {
-                const loadingScreen = document.getElementById('loadingScreen');
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => loadingScreen.style.display = 'none', 500);
-            }, 1500);
+<div class="section-title"><i class="fas fa-bolt"></i>クイックスタート</div>
+<div class="grid-2" style="margin-bottom:16px">
+  <button class="btn btn-primary btn-lg" onclick="nav('study')" style="border-radius:16px;height:64px">
+    <i class="fas fa-book-open"></i>学習開始
+  </button>
+  <button class="btn btn-white btn-lg" onclick="startExam()" style="border-radius:16px;height:64px;color:var(--c1)">
+    <i class="fas fa-file-alt"></i>模擬試験
+  </button>
+</div>
 
-            // Initialize 3D logo
-            if (window.THREE) {
-                init3DLogo();
-            }
+<div class="section-title"><i class="fas fa-th-large"></i>学習メニュー</div>
+<div class="feature-card" onclick="nav('study')" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">
+      <i class="fas fa-graduation-cap"></i>
+    </div>
+    <div>
+      <div class="feature-title">カテゴリ別学習</div>
+      <div class="feature-desc">権利関係・宅建業法・法令制限・税その他の4カテゴリを体系的に学習</div>
+    </div>
+  </div>
+</div>
 
-            // Initialize particles
-            initParticles();
+<div class="feature-card" onclick="nav('exam')" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#059669,#0d9488)">
+      <i class="fas fa-clipboard-check"></i>
+    </div>
+    <div>
+      <div class="feature-title">本番形式 模擬試験</div>
+      <div class="feature-desc">50問・2時間の本番形式試験。詳細な採点・解説付き</div>
+    </div>
+  </div>
+</div>
 
-            // Initialize animations
-            initAnimations();
+\${years.length > 0 ? \`
+<div class="feature-card" onclick="nav('past-exam',{year:\${years[0]}})" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#dc2626,#b91c1c)">
+      <i class="fas fa-history"></i>
+    </div>
+    <div>
+      <div class="feature-title">過去問チャレンジ <span class="badge badge-red" style="font-size:10px">NEW</span></div>
+      <div class="feature-desc">令和6年(2024年)本試験50問 — 本番さながらの演習</div>
+    </div>
+  </div>
+</div>
+\` : ''}
 
-            // Check PWA install
-            checkPWAInstall();
+<div class="feature-card" onclick="nav('review')" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#f59e0b,#ea580c)">
+      <i class="fas fa-sync-alt"></i>
+    </div>
+    <div>
+      <div class="feature-title">弱点集中復習</div>
+      <div class="feature-desc">間違えた問題を優先して復習。AIが学習パターンを分析</div>
+    </div>
+  </div>
+</div>
 
-            // Register Service Worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('Service Worker registered:', reg))
-                    .catch(err => console.error('Service Worker registration failed:', err));
-            }
-        });
+<div class="feature-card" onclick="nav('progress')" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">
+      <i class="fas fa-chart-line"></i>
+    </div>
+    <div>
+      <div class="feature-title">学習進捗・統計</div>
+      <div class="feature-desc">分野別の正答率グラフ・学習履歴・合格予測スコア</div>
+    </div>
+  </div>
+</div>
 
-        // 3D Logo Initialization
-        function init3DLogo() {
-            const canvas = document.getElementById('logo-3d');
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ 
-                canvas: canvas, 
-                alpha: true,
-                antialias: true 
-            });
-            
-            renderer.setSize(80, 80);
-            renderer.setPixelRatio(window.devicePixelRatio);
+\${years.length > 0 ? \`
+<div class="section-title" style="margin-top:8px"><i class="fas fa-calendar-alt"></i>過去問年度別</div>
+<div class="cat-pills">
+  \${years.map(y => \`
+    <div class="cat-pill" onclick="nav('past-exam',{year:\${y}})">
+      令和\${y-2018}年(\${y})
+    </div>
+  \`).join('')}
+</div>
+\` : ''}
 
-            // Create 3D text or logo geometry
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                emissive: 0x667eea,
-                emissiveIntensity: 0.3,
-                shininess: 100
-            });
-            const cube = new THREE.Mesh(geometry, material);
-            scene.add(cube);
+<div class="section-title" style="margin-top:8px"><i class="fas fa-info-circle"></i>試験情報</div>
+<div class="card">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div><div style="font-size:12px;color:var(--sub)">試験日程</div><div style="font-weight:700">毎年10月第3日曜日</div></div>
+    <div><div style="font-size:12px;color:var(--sub)">合格基準点</div><div style="font-weight:700">50問中 36点前後</div></div>
+    <div><div style="font-size:12px;color:var(--sub)">合格率</div><div style="font-weight:700">約15〜17%</div></div>
+    <div><div style="font-size:12px;color:var(--sub)">試験時間</div><div style="font-weight:700">2時間</div></div>
+  </div>
+</div>
+\`;
+}
 
-            // Add lights
-            const light = new THREE.DirectionalLight(0xffffff, 1);
-            light.position.set(1, 1, 1);
-            scene.add(light);
-            scene.add(new THREE.AmbientLight(0x404040));
+// ===== STUDY PAGE =====
+function renderStudy() {
+  document.getElementById('main').innerHTML = \`
+<div class="section-title"><i class="fas fa-book-open"></i>カテゴリ別学習</div>
+<p style="font-size:14px;color:var(--sub);margin-bottom:16px">分野を選んで集中学習。解説付きで理解を深めましょう</p>
 
-            camera.position.z = 2.5;
+<div class="section-title" style="font-size:15px">分野を選ぶ</div>
+<div style="display:grid;gap:12px">
+  <div class="feature-card" onclick="nav('category',{subject:'all'})">
+    <div class="feature-row">
+      <div class="feature-icon" style="background:var(--grad)"><i class="fas fa-star"></i></div>
+      <div>
+        <div class="feature-title">全分野ランダム</div>
+        <div class="feature-desc">全402問からランダムに出題。本番同様の幅広い知識を確認</div>
+      </div>
+    </div>
+  </div>
+  <div class="feature-card" onclick="nav('category',{subject:'rights'})">
+    <div class="feature-row">
+      <div class="feature-icon" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)"><i class="fas fa-balance-scale"></i></div>
+      <div>
+        <div class="feature-title">権利関係</div>
+        <div class="feature-desc">民法・借地借家法・区分所有法・不動産登記法（14問/50問）</div>
+        <div class="badge badge-purple" style="margin-top:6px">140問収録</div>
+      </div>
+    </div>
+  </div>
+  <div class="feature-card" onclick="nav('category',{subject:'businessLaw'})">
+    <div class="feature-row">
+      <div class="feature-icon" style="background:linear-gradient(135deg,#059669,#0d9488)"><i class="fas fa-building"></i></div>
+      <div>
+        <div class="feature-title">宅建業法</div>
+        <div class="feature-desc">宅建業の免許・宅建士・重要事項・報酬制限（20問/50問）</div>
+        <div class="badge badge-green" style="margin-top:6px">140問収録</div>
+      </div>
+    </div>
+  </div>
+  <div class="feature-card" onclick="nav('category',{subject:'restrictions'})">
+    <div class="feature-row">
+      <div class="feature-icon" style="background:linear-gradient(135deg,#dc2626,#b91c1c)"><i class="fas fa-map-marked-alt"></i></div>
+      <div>
+        <div class="feature-title">法令上の制限</div>
+        <div class="feature-desc">都市計画法・建築基準法・農地法・国土利用計画法（8問/50問）</div>
+        <div class="badge badge-red" style="margin-top:6px">80問収録</div>
+      </div>
+    </div>
+  </div>
+  <div class="feature-card" onclick="nav('category',{subject:'taxOther'})">
+    <div class="feature-row">
+      <div class="feature-icon" style="background:linear-gradient(135deg,#d97706,#b45309)"><i class="fas fa-yen-sign"></i></div>
+      <div>
+        <div class="feature-title">税・その他</div>
+        <div class="feature-desc">不動産取得税・固定資産税・所得税・鑑定評価（8問/50問）</div>
+        <div class="badge badge-yellow" style="margin-top:6px">42問収録</div>
+      </div>
+    </div>
+  </div>
+</div>
+\`;
+}
 
-            // Animation loop
-            function animate() {
-                requestAnimationFrame(animate);
-                cube.rotation.x += 0.01;
-                cube.rotation.y += 0.01;
-                renderer.render(scene, camera);
-            }
-            animate();
+// ===== CATEGORY LEARNING =====
+async function renderCategory({ subject = 'all' } = {}) {
+  document.getElementById('main').innerHTML = '<div class="page-loader"><div class="loader"></div><p>問題を取得中...</p></div>';
 
-            // Mouse interaction
-            canvas.addEventListener('mouseenter', () => {
-                anime({
-                    targets: cube.rotation,
-                    x: cube.rotation.x + Math.PI * 2,
-                    y: cube.rotation.y + Math.PI * 2,
-                    duration: 1000,
-                    easing: 'easeOutElastic'
-                });
-            });
-        }
+  try {
+    const params = new URLSearchParams({ limit: '20' });
+    if (subject !== 'all') params.set('category', subject);
 
-        // Particle Background
-        function initParticles() {
-            const canvas = document.getElementById('particles-canvas');
-            const ctx = canvas.getContext('2d');
-            let particles = [];
+    const r = await fetch('/api/study/questions?' + params);
+    const data = await r.json();
 
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+    if (!data.success || !data.questions?.length) {
+      document.getElementById('main').innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>問題を取得できませんでした</p></div>';
+      return;
+    }
 
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 3 + 1;
-                    this.speedX = Math.random() * 3 - 1.5;
-                    this.speedY = Math.random() * 3 - 1.5;
-                    this.opacity = Math.random() * 0.5 + 0.2;
-                }
+    S.study.questions = data.questions;
+    S.study.idx = 0;
+    S.study.correct = 0;
+    S.study.total = 0;
+    S.study.category = subject;
 
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
+    renderQuestion();
+  } catch (e) {
+    document.getElementById('main').innerHTML = '<div class="empty-state"><i class="fas fa-wifi"></i><p>通信エラー。接続を確認してください</p></div>';
+  }
+}
 
-                    if (this.x > canvas.width) this.x = 0;
-                    if (this.x < 0) this.x = canvas.width;
-                    if (this.y > canvas.height) this.y = 0;
-                    if (this.y < 0) this.y = canvas.height;
-                }
+// ===== QUESTION PAGE =====
+function renderQuestion() {
+  const { questions, idx } = S.study;
+  if (idx >= questions.length) {
+    renderStudyResult();
+    return;
+  }
 
-                draw() {
-                    ctx.fillStyle = \`rgba(255, 255, 255, \${this.opacity})\`;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
+  const q = questions[idx];
+  let options = [];
+  try { options = typeof q.options === 'string' ? JSON.parse(q.options) : (q.options || []) } catch {}
 
-            // Create particles
-            for (let i = 0; i < 100; i++) {
-                particles.push(new Particle());
-            }
+  const subjectLabel = { rights:'権利関係', businessLaw:'宅建業法', restrictions:'法令制限', taxOther:'税・その他' };
+  const diffLabel = { basic:'基礎', intermediate:'標準', advanced:'応用' };
 
-            // Animation loop
-            function animateParticles() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(particle => {
-                    particle.update();
-                    particle.draw();
-                });
-                requestAnimationFrame(animateParticles);
-            }
-            animateParticles();
+  document.getElementById('main').innerHTML = \`
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+  <button class="back-btn" onclick="nav('study')"><i class="fas fa-chevron-left"></i>戻る</button>
+  <div style="font-size:13px;color:var(--sub);font-weight:600">\${idx+1} / \${questions.length}問</div>
+</div>
 
-            // Resize handler
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-        }
+<div class="progress-bar" style="margin-bottom:16px">
+  <div class="progress-fill" style="width:\${(idx/questions.length*100).toFixed(1)}%"></div>
+</div>
 
-        // Initialize Anime.js animations
-        function initAnimations() {
-            // Feature cards entrance animation
-            anime({
-                targets: '.feature-card',
-                translateY: [50, 0],
-                opacity: [0, 1],
-                duration: 1000,
-                delay: anime.stagger(100),
-                easing: 'easeOutQuart'
-            });
+<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+  <span class="badge badge-purple">\${subjectLabel[q.subject]||q.subject||q.category}</span>
+  <span class="badge badge-\${q.difficulty==='basic'?'green':q.difficulty==='advanced'?'red':'blue'}">\${diffLabel[q.difficulty]||q.difficulty||'標準'}</span>
+  \${q.year ? \`<span class="badge badge-yellow">令和\${q.year-2018}年(\${q.year})</span>\` : ''}
+</div>
 
-            // Button hover effects
-            document.querySelectorAll('.btn-3d').forEach(btn => {
-                btn.addEventListener('mouseenter', () => {
-                    anime({
-                        targets: btn,
-                        scale: 1.1,
-                        duration: 300,
-                        easing: 'easeOutQuart'
-                    });
-                });
+<div class="question-text">\${q.question_text}</div>
 
-                btn.addEventListener('mouseleave', () => {
-                    anime({
-                        targets: btn,
-                        scale: 1,
-                        duration: 300,
-                        easing: 'easeOutQuart'
-                    });
-                });
-            });
-        }
+<div id="options">
+  \${options.map((opt, i) => \`
+    <button class="option-btn" id="opt-\${i}" onclick="selectAnswer(\${i+1}, \${q.correct_answer}, \${JSON.stringify(q.explanation||'').replace(/"/g,'&quot;')})">
+      <div class="option-label">\${i+1}</div>
+      <div style="flex:1">\${opt}</div>
+    </button>
+  \`).join('')}
+</div>
 
-        // PWA Install
-        let deferredPrompt;
-        
-        function checkPWAInstall() {
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                document.getElementById('installPrompt').classList.remove('hidden');
-            });
+<div id="explanation-area"></div>
 
-            document.getElementById('installBtn')?.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        console.log('PWA installed');
-                        document.getElementById('installPrompt').classList.add('hidden');
-                    }
-                    deferredPrompt = null;
-                }
-            });
-        }
-    </script>
+<div class="question-nav" id="nav-area" style="display:none">
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="q-result-badge"></span>
+    <span style="font-size:13px;color:var(--sub)">正答率: <strong id="acc-display">\${S.study.total > 0 ? Math.round(S.study.correct/S.study.total*100) : 0}%</strong></span>
+  </div>
+  <button class="btn btn-primary" onclick="nextQuestion()">
+    \${idx+1 < questions.length ? '次の問題 <i class="fas fa-chevron-right"></i>' : '結果を見る <i class="fas fa-flag-checkered"></i>'}
+  </button>
+</div>
+\`;
+}
+
+function selectAnswer(selected, correct, explanation) {
+  if (S.study.answered) return;
+  S.study.answered = true;
+
+  const isCorrect = selected === correct;
+  S.study.total++;
+  if (isCorrect) S.study.correct++;
+
+  // Record history
+  const q = S.study.questions[S.study.idx];
+  const hist = LS.get('study_history', []);
+  hist.push({ qid: q.id, correct: isCorrect, date: today(), subject: q.subject });
+  if (hist.length > 2000) hist.splice(0, hist.length - 2000);
+  LS.set('study_history', hist);
+
+  // Wrong answers for review
+  if (!isCorrect) {
+    const wrong = LS.get('wrong_questions', []);
+    if (!wrong.find(w => w.id === q.id)) {
+      wrong.push({ ...q, wrongCount: 1 });
+    } else {
+      wrong.find(w => w.id === q.id).wrongCount++;
+    }
+    LS.set('wrong_questions', wrong);
+  } else {
+    const wrong = LS.get('wrong_questions', []);
+    const idx = wrong.findIndex(w => w.id === q.id);
+    if (idx > -1) wrong.splice(idx, 1);
+    LS.set('wrong_questions', wrong);
+  }
+
+  // Color options
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i+1 === correct) btn.classList.add(isCorrect && i+1===selected ? 'correct' : 'show-correct');
+    if (i+1 === selected && !isCorrect) btn.classList.add('incorrect');
+  });
+
+  // Explanation
+  const expEl = document.getElementById('explanation-area');
+  expEl.innerHTML = \`<div class="explanation \${isCorrect?'':'wrong'}">
+    <div style="font-weight:700;margin-bottom:8px;\${isCorrect?'color:var(--success)':'color:var(--danger)'}">
+      \${isCorrect ? '✓ 正解！' : '✗ 不正解 — 正解は選択肢 '+correct}
+    </div>
+    <div style="font-size:14px;line-height:1.7">\${explanation || '解説は準備中です。'}</div>
+  </div>\`;
+
+  const badge = document.getElementById('q-result-badge');
+  badge.innerHTML = isCorrect
+    ? '<span class="badge badge-green">正解</span>'
+    : '<span class="badge badge-red">不正解</span>';
+  document.getElementById('acc-display').textContent = Math.round(S.study.correct/S.study.total*100) + '%';
+  document.getElementById('nav-area').style.display = 'flex';
+  S.study.answered = false;
+}
+
+function nextQuestion() {
+  S.study.idx++;
+  renderQuestion();
+}
+
+function renderStudyResult() {
+  const { correct, total, questions } = S.study;
+  const acc = total > 0 ? Math.round(correct / total * 100) : 0;
+  const rank = acc >= 80 ? '🥇 優秀' : acc >= 60 ? '🥈 合格圏' : '🥉 要復習';
+
+  document.getElementById('main').innerHTML = \`
+<div class="card" style="text-align:center;padding:32px">
+  <div style="font-size:18px;font-weight:700;margin-bottom:20px">学習セッション完了</div>
+  <div class="result-circle">
+    <div class="score">\${acc}%</div>
+    <div class="label">正答率</div>
+  </div>
+  <div style="font-size:24px;margin-bottom:8px">\${rank}</div>
+  <div style="color:var(--sub);font-size:15px">\${correct}問正解 / \${total}問中</div>
+</div>
+<div class="grid-2" style="gap:12px">
+  <button class="btn btn-primary btn-block" onclick="nav('study')">
+    <i class="fas fa-redo"></i>もう一度
+  </button>
+  <button class="btn btn-white btn-block" onclick="nav('review')">
+    <i class="fas fa-book"></i>復習する
+  </button>
+</div>
+\`;
+}
+
+// ===== EXAM PAGE =====
+function renderExam() {
+  if (S.exam.active) {
+    renderActiveExam();
+    return;
+  }
+
+  document.getElementById('main').innerHTML = \`
+<div class="section-title"><i class="fas fa-file-alt"></i>模擬試験</div>
+<p style="font-size:14px;color:var(--sub);margin-bottom:20px">本番形式で実力を確認しましょう</p>
+
+<div class="card-grad" style="margin-bottom:16px">
+  <div style="font-size:20px;font-weight:900;margin-bottom:8px">本番形式試験</div>
+  <div style="opacity:.8;font-size:14px;margin-bottom:16px">50問・制限時間2時間</div>
+  <div class="grid-2" style="gap:8px;margin-bottom:16px">
+    <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:12px;text-align:center">
+      <div style="font-size:24px;font-weight:900">50</div><div style="font-size:12px;opacity:.8">問</div>
+    </div>
+    <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:12px;text-align:center">
+      <div style="font-size:24px;font-weight:900">120</div><div style="font-size:12px;opacity:.8">分</div>
+    </div>
+  </div>
+  <button class="btn btn-white btn-block" onclick="startExam()" id="examStartBtn" style="color:var(--c1);font-weight:700">
+    <i class="fas fa-play"></i>試験を開始する
+  </button>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-list-ol"></i>出題構成</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8f7ff;border-radius:8px">
+      <span style="font-weight:600"><span style="color:var(--c1)">●</span> 権利関係</span>
+      <span class="badge badge-purple">14問</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f0fdf4;border-radius:8px">
+      <span style="font-weight:600"><span style="color:var(--success)">●</span> 宅建業法</span>
+      <span class="badge badge-green">20問</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fff7ed;border-radius:8px">
+      <span style="font-weight:600"><span style="color:var(--warn)">●</span> 法令制限</span>
+      <span class="badge badge-yellow">8問</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fef2f2;border-radius:8px">
+      <span style="font-weight:600"><span style="color:var(--danger)">●</span> 税・その他</span>
+      <span class="badge badge-red">8問</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-history"></i>試験履歴</div>
+  \${renderExamHistory()}
+</div>
+\`;
+}
+
+function renderExamHistory() {
+  const history = LS.get('exam_history', []);
+  if (!history.length) return '<div class="empty-state" style="padding:24px"><i class="fas fa-clipboard"></i><p>まだ試験を受けていません</p></div>';
+
+  return history.slice(-5).reverse().map(h => \`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-weight:600">\${h.date}</div>
+        <div style="font-size:12px;color:var(--sub)">\${h.correct}/\${h.total}問正解</div>
+      </div>
+      <div class="badge \${h.score >= 72 ? 'badge-green' : h.score >= 60 ? 'badge-blue' : 'badge-red'}">\${h.score}%</div>
+    </div>
+  \`).join('');
+}
+
+async function startExam() {
+  const btn = document.getElementById('examStartBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<div class="loader"></div>準備中...'; }
+
+  try {
+    const r = await fetch('/api/mock-exam/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: 1, examType: 'full' })
+    });
+    const data = await r.json();
+
+    if (!data.success || !data.questions?.length) throw new Error('問題取得失敗');
+
+    S.exam.active = true;
+    S.exam.questions = data.questions;
+    S.exam.answers = {};
+    S.exam.idx = 0;
+    S.exam.timeLeft = data.timeLimit || 7200;
+    S.exam.startTime = Date.now();
+    S.exam.sessionId = data.sessionId;
+
+    if (S.exam.timer) clearInterval(S.exam.timer);
+    S.exam.timer = setInterval(tickExamTimer, 1000);
+
+    renderActiveExam();
+  } catch (e) {
+    toast('試験の開始に失敗しました。再試行してください。', 3000);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-play"></i>試験を開始する'; }
+  }
+}
+
+function tickExamTimer() {
+  S.exam.timeLeft--;
+  if (S.exam.timeLeft <= 0) {
+    clearInterval(S.exam.timer);
+    submitExam();
+    return;
+  }
+  const el = document.getElementById('exam-timer-text');
+  if (el) {
+    el.textContent = formatTime(S.exam.timeLeft);
+    const timerEl = el.closest('.exam-timer');
+    if (timerEl && S.exam.timeLeft < 600) timerEl.classList.add('warning');
+  }
+}
+
+function formatTime(secs) {
+  const m = Math.floor(secs / 60).toString().padStart(2, '0');
+  const s = (secs % 60).toString().padStart(2, '0');
+  return \`\${m}:\${s}\`;
+}
+
+function renderActiveExam() {
+  const { questions, idx, answers, timeLeft } = S.exam;
+  const q = questions[idx];
+  let options = [];
+  try { options = typeof q.options === 'string' ? JSON.parse(q.options) : (q.options || []) } catch {}
+
+  const answered = Object.keys(answers).length;
+
+  document.getElementById('main').innerHTML = \`
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+  <div style="font-size:14px;font-weight:700">問 \${idx+1} / \${questions.length}</div>
+  <div class="exam-timer">
+    <i class="fas fa-clock"></i>
+    <span id="exam-timer-text">\${formatTime(timeLeft)}</span>
+  </div>
+  <div style="font-size:13px;color:var(--sub)">回答: \${answered}/\${questions.length}</div>
+</div>
+
+<div class="progress-bar" style="margin-bottom:16px">
+  <div class="progress-fill" style="width:\${(answered/questions.length*100).toFixed(1)}%"></div>
+</div>
+
+<div class="question-text">\${q.question_text}</div>
+
+<div id="exam-options">
+  \${options.map((opt, i) => {
+    const sel = answers[q.id] === i+1;
+    return \`<button class="option-btn \${sel ? 'selected' : ''}"
+      onclick="selectExamAnswer('\${q.id}', \${i+1})"
+      style="\${sel ? 'border-color:var(--c1);background:#f5f3ff;' : ''}">
+      <div class="option-label" style="\${sel ? 'background:var(--c1);' : ''}">\${i+1}</div>
+      <div style="flex:1">\${opt}</div>
+    </button>\`;
+  }).join('')}
+</div>
+
+<div style="display:flex;justify-content:space-between;margin-top:20px;gap:12px">
+  <button class="btn btn-outline" onclick="moveExamQ(-1)" \${idx===0?'disabled':''}>
+    <i class="fas fa-chevron-left"></i>前へ
+  </button>
+  <button class="btn btn-danger btn-sm" onclick="confirmSubmitExam()" style="padding:12px 16px">
+    <i class="fas fa-flag-checkered"></i>終了
+  </button>
+  <button class="btn btn-primary" onclick="moveExamQ(1)" \${idx>=questions.length-1?'disabled':''}>
+    次へ<i class="fas fa-chevron-right"></i>
+  </button>
+</div>
+
+<div style="margin-top:16px">
+  <div style="font-size:12px;color:var(--sub);margin-bottom:8px">問題一覧</div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px">
+    \${questions.map((qq, i) => \`
+      <button onclick="S.exam.idx=\${i};renderActiveExam()" style="
+        width:32px;height:32px;border-radius:6px;border:2px solid \${i===idx?'var(--c1)':answers[qq.id]?'var(--success)':'var(--border)'};
+        background:\${i===idx?'var(--c1)':answers[qq.id]?'#d1fae5':'#fff'};
+        color:\${i===idx?'#fff':answers[qq.id]?'var(--success)':'var(--sub)'};
+        font-size:11px;font-weight:700;cursor:pointer;
+      ">\${i+1}</button>
+    \`).join('')}
+  </div>
+</div>
+\`;
+}
+
+function selectExamAnswer(qid, answer) {
+  S.exam.answers[qid] = answer;
+  renderActiveExam();
+}
+
+function moveExamQ(dir) {
+  S.exam.idx = Math.max(0, Math.min(S.exam.questions.length - 1, S.exam.idx + dir));
+  renderActiveExam();
+}
+
+function confirmSubmitExam() {
+  const answered = Object.keys(S.exam.answers).length;
+  const total = S.exam.questions.length;
+  const unanswered = total - answered;
+
+  if (unanswered > 0) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = \`<div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div style="text-align:center;padding:16px">
+        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:var(--warn);margin-bottom:16px"></i>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">未回答があります</div>
+        <div style="color:var(--sub);margin-bottom:24px">\${unanswered}問が未回答です。このまま終了しますか？</div>
+        <div class="grid-2" style="gap:12px">
+          <button class="btn btn-outline btn-block" onclick="this.closest('.modal-overlay').remove()">戻る</button>
+          <button class="btn btn-danger btn-block" onclick="this.closest('.modal-overlay').remove();submitExam()">終了する</button>
+        </div>
+      </div>
+    </div>\`;
+    document.body.appendChild(modal);
+  } else {
+    submitExam();
+  }
+}
+
+async function submitExam() {
+  clearInterval(S.exam.timer);
+
+  const { questions, answers, startTime } = S.exam;
+  const timeSpent = Math.round((Date.now() - startTime) / 1000);
+
+  let correct = 0;
+  const results = questions.map(q => {
+    const selected = answers[q.id] || null;
+    const isCorrect = selected === q.correct_answer;
+    if (isCorrect) correct++;
+    return { ...q, selected, isCorrect };
+  });
+
+  const score = Math.round(correct / questions.length * 100);
+
+  // Save history
+  const hist = LS.get('exam_history', []);
+  hist.push({ date: today(), correct, total: questions.length, score, timeSpent });
+  LS.set('exam_history', hist);
+
+  // Save wrong answers
+  const wrong = LS.get('wrong_questions', []);
+  results.forEach(r => {
+    if (!r.isCorrect) {
+      const existing = wrong.find(w => w.id === r.id);
+      if (existing) existing.wrongCount++;
+      else wrong.push({ ...r, wrongCount: 1 });
+    } else {
+      const idx = wrong.findIndex(w => w.id === r.id);
+      if (idx > -1) wrong.splice(idx, 1);
+    }
+  });
+  LS.set('wrong_questions', wrong);
+
+  S.exam.active = false;
+  S.exam.results = results;
+  S.exam.score = score;
+  S.exam.correct = correct;
+
+  nav('result');
+}
+
+function renderResult() {
+  const { results, score, correct, questions } = S.exam;
+  if (!results) { nav('exam'); return; }
+
+  const total = results?.length || 0;
+  const rank = score >= 80 ? '🏆 合格圏上位' : score >= 70 ? '✅ 合格圏' : score >= 60 ? '⚠️ ボーダー' : '📚 要学習';
+  const color = score >= 70 ? 'var(--success)' : score >= 60 ? 'var(--warn)' : 'var(--danger)';
+
+  const bySubject = {};
+  results?.forEach(r => {
+    if (!bySubject[r.subject]) bySubject[r.subject] = { correct: 0, total: 0 };
+    bySubject[r.subject].total++;
+    if (r.isCorrect) bySubject[r.subject].correct++;
+  });
+
+  const subLabel = { rights:'権利関係', businessLaw:'宅建業法', restrictions:'法令制限', taxOther:'税・その他' };
+
+  document.getElementById('main').innerHTML = \`
+<div class="card" style="text-align:center;padding:32px">
+  <div style="font-size:20px;font-weight:900;margin-bottom:20px">模擬試験 結果</div>
+  <div class="result-circle" style="border-color:\${color}">
+    <div class="score" style="color:\${color}">\${score}%</div>
+    <div class="label">\${correct}/\${total}問</div>
+  </div>
+  <div style="font-size:22px;margin-bottom:8px">\${rank}</div>
+  <div style="color:var(--sub);font-size:14px">合格ラインの目安: 70%以上</div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-chart-bar"></i>分野別成績</div>
+  \${Object.entries(bySubject).map(([s, d]) => \`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:13px;font-weight:600">\${subLabel[s]||s}</span>
+        <span style="font-size:13px;color:var(--sub)">\${d.correct}/\${d.total}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:\${Math.round(d.correct/d.total*100)}%;background:\${d.correct/d.total>=.7?'var(--success)':'var(--danger)'}"></div>
+      </div>
+    </div>
+  \`).join('')}
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-list"></i>問題別結果</div>
+  <div style="max-height:300px;overflow-y:auto">
+    \${(results||[]).map((r, i) => \`
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+          background:\${r.isCorrect?'var(--success)':'var(--danger)'};color:#fff;font-size:12px;font-weight:700;flex-shrink:0">
+          \${i+1}
+        </div>
+        <div style="flex:1;font-size:13px;color:var(--sub)" class="text-truncate">\${r.question_text?.slice(0,50)||'...'}...</div>
+        <span class="badge \${r.isCorrect?'badge-green':'badge-red'}">\${r.isCorrect?'○':'✗'}</span>
+      </div>
+    \`).join('')}
+  </div>
+</div>
+
+<div class="grid-2" style="gap:12px">
+  <button class="btn btn-primary btn-block" onclick="nav('exam')">
+    <i class="fas fa-redo"></i>もう一度
+  </button>
+  <button class="btn btn-white btn-block" onclick="nav('review')">
+    <i class="fas fa-book"></i>復習する
+  </button>
+</div>
+\`;
+}
+
+// ===== PAST EXAM =====
+async function renderPastExam({ year = 2024 } = {}) {
+  document.getElementById('main').innerHTML = '<div class="page-loader"><div class="loader"></div><p>過去問を取得中...</p></div>';
+
+  try {
+    const r = await fetch(\`/api/past-exam/\${year}\`);
+    const data = await r.json();
+
+    if (!data.success || !data.questions?.length) {
+      document.getElementById('main').innerHTML = \`<div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>令和\${year-2018}年(\${year})の問題データがありません</p>
+        <button class="btn btn-primary" style="margin-top:16px" onclick="nav('home')">ホームへ</button>
+      </div>\`;
+      return;
+    }
+
+    S.study.questions = data.questions;
+    S.study.idx = 0;
+    S.study.correct = 0;
+    S.study.total = 0;
+    S.study.category = 'past';
+    S.study.year = year;
+
+    renderPastExamQuestion();
+  } catch (e) {
+    document.getElementById('main').innerHTML = '<div class="empty-state"><i class="fas fa-wifi"></i><p>通信エラー</p></div>';
+  }
+}
+
+function renderPastExamQuestion() {
+  const { questions, idx } = S.study;
+  if (idx >= questions.length) {
+    renderPastResult();
+    return;
+  }
+
+  const q = questions[idx];
+  let options = [];
+  try { options = typeof q.options === 'string' ? JSON.parse(q.options) : (q.options || []) } catch {}
+  const year = S.study.year;
+
+  document.getElementById('main').innerHTML = \`
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+  <button class="back-btn" onclick="nav('home')"><i class="fas fa-chevron-left"></i>戻る</button>
+  <div>
+    <span class="badge badge-red">令和\${year-2018}年(\${year})</span>
+    <span style="font-size:13px;color:var(--sub);margin-left:8px">問\${idx+1}/\${questions.length}</span>
+  </div>
+</div>
+
+<div class="progress-bar" style="margin-bottom:16px">
+  <div class="progress-fill" style="width:\${(idx/questions.length*100).toFixed(1)}%"></div>
+</div>
+
+<div class="question-text"><strong>問\${idx+1}.</strong> \${q.question_text}</div>
+
+<div id="options">
+  \${options.map((opt, i) => \`
+    <button class="option-btn" id="opt-\${i}" onclick="selectAnswer(\${i+1}, \${q.correct_answer}, \${JSON.stringify(q.explanation||'').replace(/"/g,'&quot;')})">
+      <div class="option-label">\${i+1}</div>
+      <div style="flex:1">\${opt}</div>
+    </button>
+  \`).join('')}
+</div>
+
+<div id="explanation-area"></div>
+
+<div class="question-nav" id="nav-area" style="display:none">
+  <div><span id="q-result-badge"></span></div>
+  <button class="btn btn-primary" onclick="nextPastQuestion()">
+    \${idx+1 < questions.length ? '次の問題 <i class="fas fa-chevron-right"></i>' : '結果を見る <i class="fas fa-flag-checkered"></i>'}
+  </button>
+</div>
+\`;
+}
+
+function nextPastQuestion() {
+  S.study.idx++;
+  renderPastExamQuestion();
+}
+
+function renderPastResult() {
+  const { correct, total, year } = S.study;
+  const score = total > 0 ? Math.round(correct / total * 100) : 0;
+  const pass = correct >= 36;
+
+  document.getElementById('main').innerHTML = \`
+<div class="card" style="text-align:center;padding:32px">
+  <div style="font-size:18px;font-weight:700;margin-bottom:4px">令和\${year-2018}年(\${year}) 過去問</div>
+  <div style="color:var(--sub);margin-bottom:20px">全問チャレンジ完了</div>
+  <div class="result-circle" style="border-color:\${pass?'var(--success)':'var(--danger)'}">
+    <div class="score" style="color:\${pass?'var(--success)':'var(--danger)'}">\${correct}</div>
+    <div class="label">/\${total}問</div>
+  </div>
+  <div style="font-size:24px;margin-bottom:8px">\${pass ? '🏆 合格点突破！' : '📚 もう少し！'}</div>
+  <div style="color:var(--sub)">\${score}% — 合格の目安は36点(72%)</div>
+</div>
+<div class="grid-2" style="gap:12px">
+  <button class="btn btn-primary btn-block" onclick="nav('past-exam',{year:\${year}})">
+    <i class="fas fa-redo"></i>再挑戦
+  </button>
+  <button class="btn btn-white btn-block" onclick="nav('home')">
+    <i class="fas fa-home"></i>ホームへ
+  </button>
+</div>
+\`;
+}
+
+// ===== PROGRESS PAGE =====
+function renderProgress() {
+  const hist = LS.get('study_history', []);
+  const examHist = LS.get('exam_history', []);
+
+  const total = hist.length;
+  const correct = hist.filter(h => h.correct).length;
+  const accuracy = total > 0 ? Math.round(correct / total * 100) : 0;
+  const streak = calcStreak();
+
+  const bySubject = {};
+  ['rights', 'businessLaw', 'restrictions', 'taxOther'].forEach(s => {
+    const items = hist.filter(h => h.subject === s);
+    bySubject[s] = {
+      total: items.length,
+      correct: items.filter(h => h.correct).length,
+    };
+  });
+
+  const subLabel = { rights:'権利関係', businessLaw:'宅建業法', restrictions:'法令制限', taxOther:'税・その他' };
+  const subColors = { rights:'#7c3aed', businessLaw:'#059669', restrictions:'#dc2626', taxOther:'#d97706' };
+
+  // Last 7 days
+  const last7 = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().slice(0, 10);
+    const dayItems = hist.filter(h => h.date === dateStr);
+    last7.push({ date: dateStr, count: dayItems.length, correct: dayItems.filter(h=>h.correct).length });
+  }
+
+  document.getElementById('main').innerHTML = \`
+<div class="section-title"><i class="fas fa-chart-line"></i>学習進捗</div>
+
+<div class="grid-4" style="gap:8px;margin-bottom:16px">
+  <div class="stat-box">
+    <div class="stat-num">\${total}</div>
+    <div class="stat-label">総回答数</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num" style="color:\${accuracy>=70?'var(--success)':'var(--danger)'}">\${accuracy}%</div>
+    <div class="stat-label">正答率</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num" style="color:var(--warn)">\${streak}</div>
+    <div class="stat-label">連続日数</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">\${examHist.length}</div>
+    <div class="stat-label">模擬試験数</div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-chart-bar"></i>分野別成績</div>
+  \${Object.entries(bySubject).map(([s, d]) => {
+    const acc = d.total > 0 ? Math.round(d.correct / d.total * 100) : 0;
+    return \`<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:14px;font-weight:600">\${subLabel[s]}</span>
+        <span style="font-size:13px;color:var(--sub)">\${d.correct}/\${d.total}問 (\${acc}%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:\${acc}%;background:\${subColors[s]}"></div>
+      </div>
+    </div>\`;
+  }).join('')}
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-calendar-week"></i>直近7日間の学習</div>
+  <div style="display:flex;align-items:flex-end;gap:4px;height:80px;padding:8px 0">
+    \${last7.map(d => {
+      const pct = d.count > 0 ? Math.min(100, d.count * 5) : 0;
+      const day = new Date(d.date).getDay();
+      const dayLabel = ['日','月','火','水','木','金','土'][day];
+      return \`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="width:100%;background:\${d.count>0?'var(--c1)':'var(--border)'};
+          height:\${pct}%;min-height:\${d.count>0?'4px':'4px'};border-radius:4px;max-height:60px"></div>
+        <div style="font-size:10px;color:var(--sub)">\${dayLabel}</div>
+        \${d.count > 0 ? \`<div style="font-size:9px;color:var(--c1);font-weight:700">\${d.count}</div>\` : ''}
+      </div>\`;
+    }).join('')}
+  </div>
+</div>
+
+\${examHist.length > 0 ? \`
+<div class="card">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-clipboard-list"></i>模擬試験履歴</div>
+  \${examHist.slice(-5).reverse().map(h => \`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-weight:600">\${h.date}</div>
+        <div style="font-size:12px;color:var(--sub)">\${h.correct}/\${h.total}問正解</div>
+      </div>
+      <div class="badge \${h.score>=70?'badge-green':h.score>=60?'badge-blue':'badge-red'}">\${h.score}%</div>
+    </div>
+  \`).join('')}
+</div>
+\` : ''}
+
+<div style="margin-top:16px;text-align:center">
+  <button class="btn btn-outline btn-sm" onclick="if(confirm('学習履歴をリセットしますか？'))resetData()">
+    <i class="fas fa-trash"></i>データをリセット
+  </button>
+</div>
+\`;
+}
+
+// ===== REVIEW PAGE =====
+function renderReview() {
+  const wrong = LS.get('wrong_questions', []);
+
+  if (!wrong.length) {
+    document.getElementById('main').innerHTML = \`
+<div class="section-title"><i class="fas fa-sync-alt"></i>弱点復習</div>
+<div class="empty-state">
+  <i class="fas fa-check-circle" style="color:var(--success)"></i>
+  <p style="margin-top:8px">まだ復習する問題がありません</p>
+  <p style="font-size:13px;margin-top:4px">問題を解いて間違えた問題がここに表示されます</p>
+  <button class="btn btn-primary" style="margin-top:16px" onclick="nav('study')">
+    <i class="fas fa-book"></i>学習を開始
+  </button>
+</div>\`;
+    return;
+  }
+
+  const sorted = [...wrong].sort((a, b) => (b.wrongCount || 1) - (a.wrongCount || 1));
+
+  document.getElementById('main').innerHTML = \`
+<div class="section-title"><i class="fas fa-sync-alt"></i>弱点復習</div>
+<p style="font-size:14px;color:var(--sub);margin-bottom:12px">\${wrong.length}問の復習問題があります</p>
+
+<button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="startReviewSession()">
+  <i class="fas fa-play"></i>全問を復習する（\${wrong.length}問）
+</button>
+
+<div class="card">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-exclamation-triangle" style="color:var(--warn)"></i>間違えた問題</div>
+  \${sorted.slice(0, 20).map(q => \`
+    <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1;font-size:14px">\${q.question_text?.slice(0,60)||''}...</div>
+        <span class="badge badge-red">\${q.wrongCount||1}回</span>
+      </div>
+      <div style="margin-top:4px;font-size:12px;color:var(--sub)">\${q.category||q.subject}</div>
+    </div>
+  \`).join('')}
+</div>
+\`;
+}
+
+function startReviewSession() {
+  const wrong = LS.get('wrong_questions', []);
+  S.study.questions = wrong.slice(0, 20);
+  S.study.idx = 0;
+  S.study.correct = 0;
+  S.study.total = 0;
+  S.study.category = 'review';
+  renderQuestion();
+}
+
+// ===== UTILS =====
+function today() { return new Date().toISOString().slice(0, 10); }
+
+function calcStreak() {
+  const hist = LS.get('study_history', []);
+  const dates = [...new Set(hist.map(h => h.date))].sort().reverse();
+  if (!dates.length) return 0;
+
+  let streak = 0;
+  const now = today();
+  let check = now;
+
+  for (const d of dates) {
+    if (d === check) {
+      streak++;
+      const prev = new Date(check); prev.setDate(prev.getDate() - 1);
+      check = prev.toISOString().slice(0, 10);
+    } else if (d < check) break;
+  }
+  return streak;
+}
+
+function resetData() {
+  localStorage.clear();
+  toast('データをリセットしました');
+  nav('progress');
+}
+
+// ===== DARK MODE =====
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  LS.set('dark', isDark);
+  document.getElementById('themeBtn').innerHTML = isDark
+    ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+}
+
+function initDarkMode() {
+  const pref = LS.get('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (pref) {
+    document.body.classList.add('dark');
+    const btn = document.getElementById('themeBtn');
+    if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
+  }
+}
+
+// Dark mode CSS
+const darkStyle = document.createElement('style');
+darkStyle.textContent = \`
+body.dark { --bg:#0f172a; --card:#1e293b; --text:#f1f5f9; --sub:#94a3b8; --border:#334155; }
+body.dark .glass-card { background:#1e293b; }
+body.dark .option-btn { background:#1e293b; border-color:#334155; color:#f1f5f9; }
+body.dark .option-btn:hover:not(:disabled) { background:#2d3f55; }
+body.dark #bottom-nav { background:#1e293b; border-color:#334155; }
+body.dark .stat-box { background:#1e293b; }
+body.dark .card { background:#1e293b; }
+body.dark .feature-card { background:#1e293b; }
+body.dark .cat-pill { background:#1e293b; border-color:#334155; color:#f1f5f9; }
+body.dark .question-text { background:#1e293b; color:#f1f5f9; }
+\`;
+document.head.appendChild(darkStyle);
+
+// ===== PWA INSTALL =====
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('install-banner');
+  if (banner && !LS.get('install_dismissed', false)) banner.classList.add('show');
+});
+
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r => {
+      if (r.outcome === 'accepted') { toast('インストールしました！'); hideInstallBanner(); }
+      deferredPrompt = null;
+    });
+  } else {
+    toast('ブラウザのメニューから「ホーム画面に追加」を選択してください', 4000);
+  }
+}
+
+function showInstallBanner() {
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.classList.add('show');
+}
+
+function hideInstallBanner() {
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.classList.remove('show');
+  LS.set('install_dismissed', true);
+}
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(r => console.log('SW registered'))
+      .catch(e => console.log('SW failed:', e));
+  });
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  initDarkMode();
+  nav('home');
+});
+</script>
 </body>
-</html>
-  `)
-})
-
-// Manifest for PWA
-app.get('/manifest.json', (c) => {
-  return c.json({
-    "name": "宅建BOOST v9.0 Ultimate Edition",
-    "short_name": "宅建BOOST",
-    "description": "宅建試験合格を目指す方のための最強学習アプリ",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#667eea",
-    "theme_color": "#667eea",
-    "orientation": "portrait",
-    "categories": ["education", "productivity"],
-    "icons": [
-      {
-        "src": "/icons/icon-72x72.png",
-        "sizes": "72x72",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icons/icon-96x96.png",
-        "sizes": "96x96",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icons/icon-128x128.png",
-        "sizes": "128x128",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icons/icon-144x144.png",
-        "sizes": "144x144",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icons/icon-152x152.png",
-        "sizes": "152x152",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icons/icon-192x192.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icons/icon-384x384.png",
-        "sizes": "384x384",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icons/icon-512x512.png",
-        "sizes": "512x512",
-        "type": "image/png",
-        "purpose": "any maskable"
-      }
-    ],
-    "screenshots": [
-      {
-        "src": "/screenshots/home.png",
-        "sizes": "1080x1920",
-        "type": "image/png",
-        "form_factor": "narrow",
-        "label": "ホーム画面"
-      },
-      {
-        "src": "/screenshots/study.png",
-        "sizes": "1080x1920",
-        "type": "image/png",
-        "form_factor": "narrow",
-        "label": "学習画面"
-      }
-    ],
-    "shortcuts": [
-      {
-        "name": "カテゴリ学習",
-        "short_name": "学習",
-        "description": "カテゴリ別学習を開始",
-        "url": "/study",
-        "icons": [{ "src": "/icons/study.png", "sizes": "96x96" }]
-      },
-      {
-        "name": "模擬試験",
-        "short_name": "試験",
-        "description": "模擬試験を受験",
-        "url": "/exam",
-        "icons": [{ "src": "/icons/exam.png", "sizes": "96x96" }]
-      }
-    ]
-  })
-})
+</html>`;
 
 export default app
