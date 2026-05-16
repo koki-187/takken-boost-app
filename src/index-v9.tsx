@@ -164,6 +164,8 @@ const mainHTML = `<!DOCTYPE html>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -459,30 +461,51 @@ html{scroll-behavior:smooth}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--c1);border-radius:2px}
 
-/* ===== MULTI-OS TOUCH ===== */
-button,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-@media(hover:none){
-  .btn:hover{transform:none!important;box-shadow:none!important}
-  .btn:active{transform:scale(.97)!important;opacity:.88}
-  .feature-card:hover{transform:none;border-color:transparent}
-  .feature-card:active{transform:scale(.98)!important;border-color:var(--c1)}
-  .option-btn:hover:not(:disabled){border-color:var(--border);background:var(--card)}
-  .option-btn:active:not(:disabled){border-color:var(--c1);background:#f5f3ff}
+/* ===== 3D CUBE MONUMENT ===== */
+.cube-hero{
+  position:relative;width:100%;height:220px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;cursor:pointer;
+}
+#logo-3d-container{
+  width:200px;height:200px;position:relative;z-index:2;
+  filter:drop-shadow(0 12px 32px rgba(124,58,237,.4));
+}
+.cube-glow{
+  position:absolute;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(168,85,247,.35) 0%,rgba(124,58,237,.15) 40%,transparent 70%);
+  z-index:1;pointer-events:none;
+  animation:cubeGlowPulse 3s ease-in-out infinite;
+}
+@keyframes cubeGlowPulse{
+  0%,100%{transform:scale(1);opacity:.7}
+  50%{transform:scale(1.1);opacity:1}
 }
 
-/* ===== BOTTOM NAV ENHANCED ===== */
-#bottom-nav{min-height:64px}
-.nav-item{position:relative;min-height:64px;padding:10px 4px 8px;touch-action:manipulation}
-.nav-item i{font-size:22px;transition:.2s}
-.nav-item.active i{transform:scale(1.1)}
-.nav-pill{
-  position:absolute;top:6px;left:50%;transform:translateX(-50%);
-  width:20px;height:3px;background:var(--c1);border-radius:2px;
-  opacity:0;transition:.2s;
+/* ===== FLOATING PARTICLES ===== */
+.particle-bg{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+  border-radius:var(--radius);
 }
-.nav-item.active .nav-pill{opacity:1}
-.nav-item span{font-size:10px;transition:.2s}
-.nav-item.active span{font-weight:700;color:var(--c1)}
+.particle{
+  position:absolute;border-radius:50%;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.6),rgba(167,139,250,.4));
+  box-shadow:0 0 8px rgba(255,255,255,.3);
+}
+@keyframes particleFloat{
+  0%{transform:translateY(100%) translateX(0);opacity:0}
+  10%,90%{opacity:.8}
+  100%{transform:translateY(-200%) translateX(var(--drift,0));opacity:0}
+}
+
+/* ===== HERO ANIMATIONS ===== */
+.fade-in-up{opacity:0;transform:translateY(20px);animation:fadeInUp .8s ease forwards}
+@keyframes fadeInUp{to{opacity:1;transform:translateY(0)}}
+.fade-delay-1{animation-delay:.1s}
+.fade-delay-2{animation-delay:.2s}
+.fade-delay-3{animation-delay:.3s}
+.fade-delay-4{animation-delay:.4s}
+.fade-delay-5{animation-delay:.5s}
 
 /* ===== ANSWER ANIMATIONS ===== */
 @keyframes correctPop{
@@ -493,93 +516,23 @@ button,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transpare
 }
 .option-btn.correct{animation:correctPop .4s ease}
 .option-btn.incorrect{animation:incorrectShake .35s ease}
+
+/* ===== ANSWER FLASH OVERLAY ===== */
 @keyframes resultFlash{
   0%{opacity:0;transform:scale(.4) rotate(-10deg)}
   40%{opacity:1;transform:scale(1.2) rotate(5deg)}
   70%{opacity:1;transform:scale(1) rotate(0)}
   100%{opacity:0;transform:scale(.85)}
 }
-.answer-flash{
-  position:fixed;inset:0;z-index:400;pointer-events:none;
-  display:flex;align-items:center;justify-content:center;
-}
-.answer-flash-icon{
-  font-size:88px;animation:resultFlash .75s ease forwards;
-  filter:drop-shadow(0 4px 16px rgba(0,0,0,.2));
-}
+.answer-flash{position:fixed;inset:0;z-index:400;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.answer-flash-icon{font-size:88px;animation:resultFlash .75s ease forwards;filter:drop-shadow(0 4px 16px rgba(0,0,0,.2))}
 
-/* ===== STICKY NEXT BUTTON ===== */
-.sticky-next{
-  position:sticky;
-  bottom:calc(64px + env(safe-area-inset-bottom,0px) + 8px);
-  z-index:50;padding:10px 0 4px;
-  background:linear-gradient(to top,var(--bg) 75%,transparent);
-}
-
-/* ===== EXPLANATION ENHANCED ===== */
-.exp-card{
-  margin-top:16px;border-radius:16px;overflow:hidden;
-  animation:fadeIn .3s ease;border:1.5px solid #86efac;
-}
-.exp-card.wrong{border-color:#fca5a5}
-.exp-header{
-  padding:14px 16px 10px;background:#d1fae5;
-  display:flex;align-items:center;gap:10px;
-}
-.exp-card.wrong .exp-header{background:#fee2e2}
-.exp-header-icon{font-size:24px;line-height:1}
-.exp-header-title{font-weight:800;font-size:16px;color:#065f46}
-.exp-card.wrong .exp-header-title{color:#991b1b}
-.exp-correct-hint{font-size:12px;color:#059669;font-weight:600;margin-top:2px}
-.exp-card.wrong .exp-correct-hint{color:#dc2626}
-.exp-body{
-  padding:14px 16px;background:#f0fdf4;
-  font-size:14px;line-height:1.85;color:var(--text);
-}
-.exp-card.wrong .exp-body{background:#fff7ed}
-
-/* ===== HERO CARD ===== */
-.hero-stat{
-  background:rgba(255,255,255,.18);border-radius:14px;
-  padding:14px 10px;text-align:center;
-}
-.hero-stat-num{font-size:26px;font-weight:900;color:#fff;line-height:1}
-.hero-stat-label{font-size:10px;color:rgba(255,255,255,.75);margin-top:4px;font-weight:500}
-
-/* ===== QUICK START BUTTONS ===== */
-.quick-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.quick-btn{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;padding:20px 12px;border-radius:20px;border:none;cursor:pointer;
-  font-family:inherit;font-weight:700;font-size:15px;
-  transition:.2s;touch-action:manipulation;
-}
-.quick-btn:active{transform:scale(.96)}
-.quick-btn i{font-size:28px}
-.quick-primary{background:var(--grad);color:#fff;box-shadow:0 6px 20px rgba(124,58,237,.35)}
-.quick-secondary{background:var(--card);color:var(--c1);box-shadow:0 4px 16px rgba(0,0,0,.1);border:2px solid rgba(124,58,237,.15)}
-
-/* ===== SECTION CHIP ===== */
-.section-chip{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--c1);color:#fff;padding:5px 14px;
-  border-radius:50px;font-size:12px;font-weight:700;margin-bottom:14px;
-}
-
-/* ===== RESULT RING (SVG circle) ===== */
-.result-ring{width:140px;height:140px;position:relative;margin:0 auto 20px}
-.result-ring svg{transform:rotate(-90deg)}
-.result-ring-text{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-}
-.result-ring-score{font-size:38px;font-weight:900;line-height:1}
-.result-ring-label{font-size:11px;color:var(--sub)}
-
-/* ===== DESKTOP ===== */
-@media(min-width:768px){
-  #main{max-width:640px}
-  .quick-row{grid-template-columns:1fr 1fr}
+/* ===== MULTI-OS TOUCH ===== */
+button,[onclick]{touch-action:manipulation}
+@media(hover:none){
+  .btn:hover{transform:none}
+  .btn:active{transform:scale(.97);opacity:.88}
+  .feature-card:active{transform:scale(.98);border-color:var(--c1)}
 }
 </style>
 </head>
@@ -608,24 +561,19 @@ button,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transpare
 <!-- ===== BOTTOM NAV ===== -->
 <nav id="bottom-nav">
   <button class="nav-item active" id="nav-home" onclick="nav('home')">
-    <div class="nav-pill"></div>
-    <i class="fas fa-home"></i><span>ホーム</span>
+    <i class="fas fa-home"></i>ホーム
   </button>
   <button class="nav-item" id="nav-study" onclick="nav('study')">
-    <div class="nav-pill"></div>
-    <i class="fas fa-book-open"></i><span>学習</span>
+    <i class="fas fa-book-open"></i>学習
   </button>
   <button class="nav-item" id="nav-exam" onclick="nav('exam')">
-    <div class="nav-pill"></div>
-    <i class="fas fa-file-alt"></i><span>模擬試験</span>
+    <i class="fas fa-file-alt"></i>模擬試験
   </button>
   <button class="nav-item" id="nav-progress" onclick="nav('progress')">
-    <div class="nav-pill"></div>
-    <i class="fas fa-chart-line"></i><span>進捗</span>
+    <i class="fas fa-chart-line"></i>進捗
   </button>
   <button class="nav-item" id="nav-review" onclick="nav('review')">
-    <div class="nav-pill"></div>
-    <i class="fas fa-redo"></i><span>復習</span>
+    <i class="fas fa-redo"></i>復習
   </button>
 </nav>
 
@@ -720,122 +668,142 @@ async function renderHome() {
   const totalQ = S.stats?.total || 402;
   const years = (S.stats?.byYear || []).map(r => r.year).filter(Boolean).sort((a,b)=>b-a);
 
-  const wrongCount = LS.get('wrong_questions', []).length;
-  const todayGoal = 20;
-  const todayPct = Math.min(100, Math.round(todayCount / todayGoal * 100));
-
   document.getElementById('main').innerHTML = \`
-<!-- ===== HERO ===== -->
-<div class="card-grad" style="padding:20px 20px 24px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+<!-- ===== 3D CUBE MONUMENT ===== -->
+<div class="cube-hero fade-in-up">
+  <div class="cube-glow"></div>
+  <div id="logo-3d-container"></div>
+</div>
+
+<div class="card-grad fade-in-up fade-delay-1" style="position:relative;overflow:hidden">
+  <div class="particle-bg" id="hero-particles"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;position:relative;z-index:2">
     <div>
-      <div style="font-size:12px;opacity:.75;letter-spacing:.5px">宅地建物取引士試験</div>
-      <div style="font-size:22px;font-weight:900;margin-top:2px">今日も一問一答 📖</div>
+      <div style="font-size:13px;opacity:.8">宅地建物取引士試験</div>
+      <div style="font-size:24px;font-weight:900">合格への最速ルート</div>
     </div>
-    \${streak > 0 ? \`<div class="streak-badge"><i class="fas fa-fire"></i>\${streak}日</div>\` : ''}
+    \${streak > 0 ? \`<div class="streak-badge"><i class="fas fa-fire"></i>\${streak}日連続</div>\` : ''}
   </div>
-
-  <!-- 今日の進捗バー -->
-  <div style="margin-bottom:18px">
-    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:12px;color:rgba(255,255,255,.75)">今日の学習</span>
-      <span style="font-size:12px;font-weight:700;color:#fff">\${todayCount} / \${todayGoal}問</span>
-    </div>
-    <div style="height:8px;background:rgba(255,255,255,.2);border-radius:4px;overflow:hidden">
-      <div style="height:100%;width:\${todayPct}%;background:#fff;border-radius:4px;transition:width .6s ease"></div>
-    </div>
-  </div>
-
-  <!-- 統計グリッド -->
   <div class="grid-4" style="gap:8px">
-    <div class="hero-stat">
-      <div class="hero-stat-num">\${totalQ}</div>
-      <div class="hero-stat-label">総問題数</div>
+    <div class="stat-box" style="background:rgba(255,255,255,.15);color:#fff">
+      <div class="stat-num" style="color:#fff">\${totalQ}</div>
+      <div class="stat-label" style="color:rgba(255,255,255,.7)">総問題数</div>
     </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">\${total}</div>
-      <div class="hero-stat-label">解答済み</div>
+    <div class="stat-box" style="background:rgba(255,255,255,.15);color:#fff">
+      <div class="stat-num" style="color:#fff">\${total}</div>
+      <div class="stat-label" style="color:rgba(255,255,255,.7)">解答済み</div>
     </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num" style="color:\${accuracy>=70?'#86efac':'#fca5a5'}">\${accuracy}%</div>
-      <div class="hero-stat-label">正答率</div>
+    <div class="stat-box" style="background:rgba(255,255,255,.15);color:#fff">
+      <div class="stat-num" style="color:#fff">\${accuracy}%</div>
+      <div class="stat-label" style="color:rgba(255,255,255,.7)">正答率</div>
     </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">\${todayCount}</div>
-      <div class="hero-stat-label">今日</div>
+    <div class="stat-box" style="background:rgba(255,255,255,.15);color:#fff">
+      <div class="stat-num" style="color:#fff">\${todayCount}</div>
+      <div class="stat-label" style="color:rgba(255,255,255,.7)">今日の問題</div>
     </div>
   </div>
 </div>
 
-<!-- ===== QUICK START ===== -->
-<div class="quick-row">
-  <button class="quick-btn quick-primary" onclick="nav('study')">
+<div class="section-title"><i class="fas fa-bolt"></i>クイックスタート</div>
+<div class="grid-2" style="margin-bottom:16px">
+  <button class="btn btn-primary btn-lg" onclick="nav('study')" style="border-radius:16px;height:64px">
     <i class="fas fa-book-open"></i>学習開始
   </button>
-  <button class="quick-btn quick-secondary" onclick="startExam()">
+  <button class="btn btn-white btn-lg" onclick="startExam()" style="border-radius:16px;height:64px;color:var(--c1)">
     <i class="fas fa-file-alt"></i>模擬試験
   </button>
 </div>
 
-<!-- ===== MENU ===== -->
-<div style="margin-bottom:6px"><span class="section-chip"><i class="fas fa-th-large"></i>学習メニュー</span></div>
-<div style="display:grid;gap:10px;margin-bottom:20px">
-  <div class="feature-card" onclick="nav('study')">
-    <div class="feature-row">
-      <div class="feature-icon" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)"><i class="fas fa-graduation-cap"></i></div>
-      <div>
-        <div class="feature-title">カテゴリ別学習</div>
-        <div class="feature-desc">権利関係・宅建業法・法令制限・税その他の4カテゴリ</div>
-      </div>
+<div class="section-title"><i class="fas fa-th-large"></i>学習メニュー</div>
+<div class="feature-card" onclick="nav('study')" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">
+      <i class="fas fa-graduation-cap"></i>
     </div>
-  </div>
-
-  \${years.length > 0 ? \`
-  <div class="feature-card" onclick="nav('past-exam',{year:\${years[0]}})">
-    <div class="feature-row">
-      <div class="feature-icon" style="background:linear-gradient(135deg,#dc2626,#b91c1c)"><i class="fas fa-history"></i></div>
-      <div>
-        <div class="feature-title">過去問チャレンジ <span class="badge badge-red" style="font-size:10px;vertical-align:middle">NEW</span></div>
-        <div class="feature-desc">令和6年(2024年)本試験50問 — 本番さながらの演習</div>
-      </div>
-    </div>
-  </div>
-  \` : ''}
-
-  <div class="feature-card" onclick="nav('review')" style="position:relative">
-    <div class="feature-row">
-      <div class="feature-icon" style="background:linear-gradient(135deg,#f59e0b,#ea580c)"><i class="fas fa-sync-alt"></i></div>
-      <div>
-        <div class="feature-title">弱点集中復習
-          \${wrongCount > 0 ? \`<span class="badge badge-red" style="font-size:10px;vertical-align:middle;margin-left:6px">\${wrongCount}問</span>\` : ''}
-        </div>
-        <div class="feature-desc">間違えた問題を優先復習。苦手を潰して合格へ</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="feature-card" onclick="nav('progress')">
-    <div class="feature-row">
-      <div class="feature-icon" style="background:linear-gradient(135deg,#2563eb,#7c3aed)"><i class="fas fa-chart-line"></i></div>
-      <div>
-        <div class="feature-title">学習進捗・統計</div>
-        <div class="feature-desc">分野別正答率グラフ・学習履歴・合格予測スコア</div>
-      </div>
+    <div>
+      <div class="feature-title">カテゴリ別学習</div>
+      <div class="feature-desc">権利関係・宅建業法・法令制限・税その他の4カテゴリを体系的に学習</div>
     </div>
   </div>
 </div>
 
-<!-- ===== 試験情報 ===== -->
-<div style="margin-bottom:6px"><span class="section-chip"><i class="fas fa-info-circle"></i>試験情報</span></div>
+<div class="feature-card" onclick="nav('exam')" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#059669,#0d9488)">
+      <i class="fas fa-clipboard-check"></i>
+    </div>
+    <div>
+      <div class="feature-title">本番形式 模擬試験</div>
+      <div class="feature-desc">50問・2時間の本番形式試験。詳細な採点・解説付き</div>
+    </div>
+  </div>
+</div>
+
+\${years.length > 0 ? \`
+<div class="feature-card" onclick="nav('past-exam',{year:\${years[0]}})" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#dc2626,#b91c1c)">
+      <i class="fas fa-history"></i>
+    </div>
+    <div>
+      <div class="feature-title">過去問チャレンジ <span class="badge badge-red" style="font-size:10px">NEW</span></div>
+      <div class="feature-desc">令和6年(2024年)本試験50問 — 本番さながらの演習</div>
+    </div>
+  </div>
+</div>
+\` : ''}
+
+<div class="feature-card" onclick="nav('review')" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#f59e0b,#ea580c)">
+      <i class="fas fa-sync-alt"></i>
+    </div>
+    <div>
+      <div class="feature-title">弱点集中復習</div>
+      <div class="feature-desc">間違えた問題を優先して復習。AIが学習パターンを分析</div>
+    </div>
+  </div>
+</div>
+
+<div class="feature-card" onclick="nav('progress')" style="margin-bottom:12px">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">
+      <i class="fas fa-chart-line"></i>
+    </div>
+    <div>
+      <div class="feature-title">学習進捗・統計</div>
+      <div class="feature-desc">分野別の正答率グラフ・学習履歴・合格予測スコア</div>
+    </div>
+  </div>
+</div>
+
+\${years.length > 0 ? \`
+<div class="section-title" style="margin-top:8px"><i class="fas fa-calendar-alt"></i>過去問年度別</div>
+<div class="cat-pills">
+  \${years.map(y => \`
+    <div class="cat-pill" onclick="nav('past-exam',{year:\${y}})">
+      令和\${y-2018}年(\${y})
+    </div>
+  \`).join('')}
+</div>
+\` : ''}
+
+<div class="section-title" style="margin-top:8px"><i class="fas fa-info-circle"></i>試験情報</div>
 <div class="card">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-    <div><div style="font-size:11px;color:var(--sub)">試験日程</div><div style="font-weight:700;font-size:14px">10月第3日曜日</div></div>
-    <div><div style="font-size:11px;color:var(--sub)">合格基準点</div><div style="font-weight:700;font-size:14px">36点前後 / 50問</div></div>
-    <div><div style="font-size:11px;color:var(--sub)">合格率</div><div style="font-weight:700;font-size:14px">約15〜17%</div></div>
-    <div><div style="font-size:11px;color:var(--sub)">試験時間</div><div style="font-weight:700;font-size:14px">2時間</div></div>
+    <div><div style="font-size:12px;color:var(--sub)">試験日程</div><div style="font-weight:700">毎年10月第3日曜日</div></div>
+    <div><div style="font-size:12px;color:var(--sub)">合格基準点</div><div style="font-weight:700">50問中 36点前後</div></div>
+    <div><div style="font-size:12px;color:var(--sub)">合格率</div><div style="font-weight:700">約15〜17%</div></div>
+    <div><div style="font-size:12px;color:var(--sub)">試験時間</div><div style="font-weight:700">2時間</div></div>
   </div>
 </div>
 \`;
+
+  // Initialize 3D cube and particles after DOM is in place
+  setTimeout(() => {
+    initCubeLogo();
+    createHeroParticles();
+  }, 30);
 }
 
 // ===== STUDY PAGE =====
@@ -919,7 +887,6 @@ async function renderCategory({ subject = 'all' } = {}) {
     S.study.idx = 0;
     S.study.correct = 0;
     S.study.total = 0;
-    S.study.answered = false;
     S.study.category = subject;
 
     renderQuestion();
@@ -972,18 +939,14 @@ function renderQuestion() {
 
 <div id="explanation-area"></div>
 
-<div id="nav-area" style="display:none">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span id="q-result-badge"></span>
-      <span style="font-size:13px;color:var(--sub)">正答率: <strong id="acc-display">\${S.study.total > 0 ? Math.round(S.study.correct/S.study.total*100) : 0}%</strong></span>
-    </div>
+<div class="question-nav" id="nav-area" style="display:none">
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="q-result-badge"></span>
+    <span style="font-size:13px;color:var(--sub)">正答率: <strong id="acc-display">\${S.study.total > 0 ? Math.round(S.study.correct/S.study.total*100) : 0}%</strong></span>
   </div>
-  <div class="sticky-next">
-    <button class="btn btn-primary btn-block btn-lg" onclick="nextQuestion()" style="border-radius:16px">
-      \${idx+1 < questions.length ? '<i class="fas fa-arrow-right"></i> 次の問題' : '<i class="fas fa-flag-checkered"></i> 結果を見る'}
-    </button>
-  </div>
+  <button class="btn btn-primary" onclick="nextQuestion()">
+    \${idx+1 < questions.length ? '次の問題 <i class="fas fa-chevron-right"></i>' : '結果を見る <i class="fas fa-flag-checkered"></i>'}
+  </button>
 </div>
 \`;
 
@@ -1028,48 +991,26 @@ function selectAnswer(selected, correct, explanation) {
     LS.set('wrong_questions', wrong);
   }
 
-  // Color options + animations
+  // Color options
   document.querySelectorAll('.option-btn').forEach((btn, i) => {
     btn.disabled = true;
     if (i+1 === correct) btn.classList.add(isCorrect && i+1===selected ? 'correct' : 'show-correct');
     if (i+1 === selected && !isCorrect) btn.classList.add('incorrect');
   });
 
-  // Flash overlay animation
-  const flash = document.createElement('div');
-  flash.className = 'answer-flash';
-  flash.innerHTML = \`<div class="answer-flash-icon">\${isCorrect ? '✅' : '❌'}</div>\`;
-  document.body.appendChild(flash);
-  setTimeout(() => flash.remove(), 800);
-
-  // Haptic feedback (iOS/Android)
-  if (navigator.vibrate) navigator.vibrate(isCorrect ? [60] : [60, 40, 80]);
-
-  // Enhanced explanation card
+  // Explanation
   const expEl = document.getElementById('explanation-area');
-  const correctOptText = (() => {
-    const opts = S.study.questions[S.study.idx]?.options;
-    try {
-      const arr = typeof opts === 'string' ? JSON.parse(opts) : (opts || []);
-      return arr[correct - 1] ? \`選択肢\${correct}: \${arr[correct-1].slice(0,40)}…\` : \`選択肢\${correct}\`;
-    } catch { return \`選択肢\${correct}\`; }
-  })();
-
-  expEl.innerHTML = \`<div class="exp-card \${isCorrect?'':'wrong'}">
-    <div class="exp-header">
-      <div class="exp-header-icon">\${isCorrect ? '🎉' : '📖'}</div>
-      <div>
-        <div class="exp-header-title">\${isCorrect ? '正解！' : '不正解'}</div>
-        \${!isCorrect ? \`<div class="exp-correct-hint danger">✓ 正解: \${correctOptText}</div>\` : ''}
-      </div>
+  expEl.innerHTML = \`<div class="explanation \${isCorrect?'':'wrong'}">
+    <div style="font-weight:700;margin-bottom:8px;\${isCorrect?'color:var(--success)':'color:var(--danger)'}">
+      \${isCorrect ? '✓ 正解！' : '✗ 不正解 — 正解は選択肢 '+correct}
     </div>
-    <div class="exp-body">\${explanation || '解説は準備中です。'}</div>
+    <div style="font-size:14px;line-height:1.7">\${explanation || '解説は準備中です。'}</div>
   </div>\`;
 
   const badge = document.getElementById('q-result-badge');
-  if (badge) badge.innerHTML = isCorrect
-    ? '<span class="badge badge-green"><i class="fas fa-check"></i> 正解</span>'
-    : '<span class="badge badge-red"><i class="fas fa-times"></i> 不正解</span>';
+  badge.innerHTML = isCorrect
+    ? '<span class="badge badge-green">正解</span>'
+    : '<span class="badge badge-red">不正解</span>';
   const accEl = document.getElementById('acc-display');
   if (accEl) accEl.textContent = Math.round(S.study.correct/S.study.total*100) + '%';
   document.getElementById('nav-area').style.display = 'flex';
@@ -1466,7 +1407,6 @@ async function renderPastExam({ year = 2024 } = {}) {
     S.study.idx = 0;
     S.study.correct = 0;
     S.study.total = 0;
-    S.study.answered = false;
     S.study.category = 'past';
     S.study.year = year;
 
@@ -1514,15 +1454,11 @@ function renderPastExamQuestion() {
 
 <div id="explanation-area"></div>
 
-<div id="nav-area" style="display:none">
-  <div style="padding:12px 0 4px;display:flex;align-items:center;gap:8px">
-    <span id="q-result-badge"></span>
-  </div>
-  <div class="sticky-next">
-    <button class="btn btn-primary btn-block btn-lg" onclick="nextPastQuestion()" style="border-radius:16px">
-      \${idx+1 < questions.length ? '<i class="fas fa-arrow-right"></i> 次の問題' : '<i class="fas fa-flag-checkered"></i> 結果を見る'}
-    </button>
-  </div>
+<div class="question-nav" id="nav-area" style="display:none">
+  <div><span id="q-result-badge"></span></div>
+  <button class="btn btn-primary" onclick="nextPastQuestion()">
+    \${idx+1 < questions.length ? '次の問題 <i class="fas fa-chevron-right"></i>' : '結果を見る <i class="fas fa-flag-checkered"></i>'}
+  </button>
 </div>
 \`;
 
@@ -1756,7 +1692,6 @@ function startReviewSession() {
   S.study.idx = 0;
   S.study.correct = 0;
   S.study.total = 0;
-  S.study.answered = false;
   S.study.category = 'review';
   renderQuestion();
 }
@@ -1812,39 +1747,16 @@ function initDarkMode() {
 // Dark mode CSS
 const darkStyle = document.createElement('style');
 darkStyle.textContent = \`
-body.dark {
-  --bg:#0f172a; --card:#1e293b; --text:#f1f5f9; --sub:#94a3b8;
-  --border:#334155; --shadow:0 4px 24px rgba(0,0,0,.4);
-}
+body.dark { --bg:#0f172a; --card:#1e293b; --text:#f1f5f9; --sub:#94a3b8; --border:#334155; }
+body.dark .glass-card { background:#1e293b; }
 body.dark .option-btn { background:#1e293b; border-color:#334155; color:#f1f5f9; }
-body.dark .option-btn:active:not(:disabled) { background:#2d3f55; }
-body.dark .option-btn.show-correct { background:#064e3b!important; border-color:#10b981!important; }
+body.dark .option-btn:hover:not(:disabled) { background:#2d3f55; }
 body.dark #bottom-nav { background:#1e293b; border-color:#334155; }
 body.dark .stat-box { background:#1e293b; }
-body.dark .card, body.dark .card-sm { background:#1e293b; }
-body.dark .feature-card { background:#1e293b; border-color:#334155; }
-body.dark .feature-card:active { border-color:var(--c1); }
+body.dark .card { background:#1e293b; }
+body.dark .feature-card { background:#1e293b; }
 body.dark .cat-pill { background:#1e293b; border-color:#334155; color:#f1f5f9; }
-body.dark .question-text { background:#1e293b; color:#f1f5f9; border-left-color:var(--c3); }
-body.dark .modal-sheet { background:#1e293b; color:#f1f5f9; }
-body.dark .modal-handle { background:#475569; }
-body.dark .exp-card { border-color:#334155; }
-body.dark .exp-header { background:#134e4a; }
-body.dark .exp-card.wrong .exp-header { background:#450a0a; }
-body.dark .exp-body { background:#0f2720; color:#e2e8f0; }
-body.dark .exp-card.wrong .exp-body { background:#2c0a0a; }
-body.dark #toast { background:#334155; }
-body.dark #install-banner { background:#1e293b; border-color:var(--c1); }
-body.dark .back-btn { color:#94a3b8; }
-body.dark .hero-stat { background:rgba(255,255,255,.12); }
-body.dark .quick-secondary { background:#1e293b; border-color:rgba(167,139,250,.3); }
-body.dark .progress-bar { background:#334155; }
-body.dark .sticky-next { background:linear-gradient(to top,#0f172a 75%,transparent); }
-body.dark .badge-purple { background:#3b0764; color:#c4b5fd; }
-body.dark .badge-green { background:#052e16; color:#86efac; }
-body.dark .badge-red { background:#450a0a; color:#fca5a5; }
-body.dark .badge-yellow { background:#422006; color:#fde68a; }
-body.dark .badge-blue { background:#082f49; color:#93c5fd; }
+body.dark .question-text { background:#1e293b; color:#f1f5f9; }
 \`;
 document.head.appendChild(darkStyle);
 
@@ -1889,6 +1801,133 @@ if ('serviceWorker' in navigator) {
       .then(r => console.log('SW registered'))
       .catch(e => console.log('SW failed:', e));
   });
+}
+
+// ===== 3D CUBE MONUMENT (原デザイン復元) =====
+let _cube3D = null;
+function initCubeLogo() {
+  const container = document.getElementById('logo-3d-container');
+  if (!container || typeof THREE === 'undefined') return;
+  // Dispose previous instance
+  if (_cube3D) { try { _cube3D.dispose(); } catch {} _cube3D = null; }
+  container.innerHTML = '';
+
+  const W = container.clientWidth, H = container.clientHeight;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, W/H, 0.1, 1000);
+  camera.position.z = 3;
+  const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
+  renderer.setSize(W, H);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
+
+  // Create 6 face materials
+  const faceColors = ['#7c3aed','#4f46e5','#a855f7','#6366f1','#8b5cf6','#7c3aed'];
+  const materials = [];
+  for (let i = 0; i < 6; i++) {
+    const c = document.createElement('canvas');
+    c.width = 512; c.height = 512;
+    const ctx = c.getContext('2d');
+    const g = ctx.createLinearGradient(0,0,512,512);
+    g.addColorStop(0, faceColors[i]);
+    g.addColorStop(1, '#4f46e5');
+    ctx.fillStyle = g; ctx.fillRect(0,0,512,512);
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 14;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (i === 0 || i === 1) {
+      ctx.font = 'bold 84px "Noto Sans JP",Arial';
+      ctx.fillText('宅建', 256, 200);
+      ctx.fillText('BOOST', 256, 290);
+      ctx.shadowBlur = 0;
+      ctx.font = 'bold 28px "Noto Sans JP",Arial';
+      ctx.fillStyle = '#fde047';
+      ctx.fillText('v10', 256, 360);
+    } else if (i === 2 || i === 3) {
+      ctx.font = 'bold 140px "Noto Sans JP",Arial';
+      ctx.fillText(i === 2 ? '宅' : '建', 256, 256);
+    } else {
+      ctx.font = 'bold 64px Arial';
+      ctx.fillText('TAKKEN', 256, 220);
+      ctx.fillText('BOOST', 256, 295);
+      ctx.shadowBlur = 0;
+      ctx.font = 'bold 26px Arial';
+      ctx.fillStyle = '#fde047';
+      ctx.fillText('合格保証', 256, 360);
+    }
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255,255,255,.35)';
+    ctx.lineWidth = 5; ctx.strokeRect(20, 20, 472, 472);
+    const tex = new THREE.CanvasTexture(c);
+    materials.push(new THREE.MeshPhongMaterial({map:tex, specular:0x444444, shininess:120}));
+  }
+
+  const cube = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), materials);
+  scene.add(cube);
+
+  // Glow
+  const glow = new THREE.Mesh(
+    new THREE.BoxGeometry(2.15, 2.15, 2.15),
+    new THREE.MeshBasicMaterial({color:0xa855f7, transparent:true, opacity:.12, side:THREE.BackSide})
+  );
+  cube.add(glow);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, .65));
+  const dl = new THREE.DirectionalLight(0xffffff, .85);
+  dl.position.set(5,5,5); scene.add(dl);
+  const pl1 = new THREE.PointLight(0x7c3aed, .6); pl1.position.set(-5,5,5); scene.add(pl1);
+  const pl2 = new THREE.PointLight(0xa855f7, .6); pl2.position.set(5,-5,5); scene.add(pl2);
+
+  let isRotating = true, mx = 0, my = 0, rafId = null;
+
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    mx = ((e.clientX - rect.left)/rect.width)*2 - 1;
+    my = -((e.clientY - rect.top)/rect.height)*2 + 1;
+  });
+  container.addEventListener('click', () => {
+    isRotating = !isRotating;
+    if (typeof anime !== 'undefined') {
+      anime({targets: cube.scale, x:[1,1.2,1], y:[1,1.2,1], z:[1,1.2,1], duration:600, easing:'easeOutElastic(1,.5)'});
+    }
+  });
+
+  function animate() {
+    rafId = requestAnimationFrame(animate);
+    if (isRotating) { cube.rotation.x += .005; cube.rotation.y += .01; }
+    cube.rotation.x += (my*.5 - cube.rotation.x)*.05;
+    cube.rotation.y += (mx*.5 - cube.rotation.y)*.05;
+    cube.position.y = Math.sin(Date.now()*.001)*.1;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  _cube3D = {
+    dispose() {
+      if (rafId) cancelAnimationFrame(rafId);
+      renderer.dispose();
+      if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+    }
+  };
+}
+
+function createHeroParticles() {
+  const container = document.getElementById('hero-particles');
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random()*8 + 4;
+    p.style.width = size+'px';
+    p.style.height = size+'px';
+    p.style.left = (Math.random()*100)+'%';
+    p.style.bottom = '-10px';
+    p.style.setProperty('--drift', (Math.random()*60-30)+'px');
+    p.style.animation = \`particleFloat \${5+Math.random()*5}s linear \${Math.random()*5}s infinite\`;
+    container.appendChild(p);
+  }
 }
 
 // ===== INIT =====
