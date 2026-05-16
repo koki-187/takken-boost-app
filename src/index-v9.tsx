@@ -641,6 +641,102 @@ body.dark .weak-card{
 }
 .wrong-item:active{transform:scale(.99);border-color:var(--danger)}
 body.dark .wrong-item{background:rgba(239,68,68,.15)}
+
+/* ===== READABILITY ===== */
+.stat-label{font-size:12px}
+.hero-stat-label{font-size:11px}
+
+/* ===== EXP ACTION BAR (TTS/Bookmark/Copy) ===== */
+.exp-actions{
+  display:flex;gap:8px;padding:10px 16px;background:#ecfdf5;
+  border-top:1px solid #86efac;
+}
+.exp-card.wrong .exp-actions{background:#fff7ed;border-top-color:#fed7aa}
+body.dark .exp-actions{background:#0f2720;border-top-color:#334155}
+body.dark .exp-card.wrong .exp-actions{background:#2c0a0a}
+.exp-action-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px;border-radius:8px;background:rgba(255,255,255,.6);
+  border:1px solid var(--border);font-size:12px;font-weight:600;
+  color:var(--text);cursor:pointer;transition:.15s;
+}
+.exp-action-btn:active{transform:scale(.96)}
+.exp-action-btn.active{background:var(--c1);color:#fff;border-color:var(--c1)}
+body.dark .exp-action-btn{background:rgba(0,0,0,.3);color:#f1f5f9}
+
+/* ===== DAILY MISSION CARD ===== */
+.mission-card{
+  background:linear-gradient(135deg,#fef3c7,#fed7aa);
+  border-radius:16px;padding:14px 16px;margin-bottom:14px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  border:2px solid transparent;transition:.2s;
+}
+.mission-card:active{transform:scale(.99);border-color:#f59e0b}
+body.dark .mission-card{
+  background:linear-gradient(135deg,#422006,#451a03);color:#fde68a;
+}
+.mission-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,#f59e0b,#dc2626);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.mission-title{font-weight:800;font-size:14px;margin-bottom:2px}
+.mission-desc{font-size:12px;color:var(--sub);line-height:1.4}
+body.dark .mission-desc{color:#fbbf24}
+.mission-progress{
+  margin-top:6px;height:5px;background:rgba(255,255,255,.5);
+  border-radius:3px;overflow:hidden;
+}
+.mission-progress-fill{height:100%;background:#dc2626;border-radius:3px;transition:width .6s}
+
+/* ===== CONFETTI (CSS-only, no library) ===== */
+.confetti-container{
+  position:fixed;inset:0;pointer-events:none;z-index:600;overflow:hidden;
+}
+.confetti{
+  position:absolute;width:10px;height:10px;top:-20px;
+  animation:confettiFall linear forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+
+/* ===== NEXT ACTION CARD (result page) ===== */
+.next-action{
+  background:var(--card);border:2px solid var(--c1);
+  border-radius:16px;padding:16px;margin-bottom:16px;
+  display:flex;align-items:center;gap:14px;
+}
+.next-action-icon{
+  width:48px;height:48px;border-radius:14px;background:var(--grad);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.next-action-body{flex:1;font-size:13px;line-height:1.5}
+.next-action-title{font-weight:800;font-size:15px;margin-bottom:4px;color:var(--c1)}
+
+/* ===== CHART LEGEND (progress page) ===== */
+.chart-legend{
+  background:rgba(124,58,237,.06);border-radius:12px;
+  padding:10px 14px;margin-bottom:14px;font-size:12px;line-height:1.6;
+  color:var(--sub);
+}
+body.dark .chart-legend{background:rgba(168,85,247,.12);color:#c4b5fd}
+.chart-legend strong{color:var(--c1)}
+body.dark .chart-legend strong{color:#c4b5fd}
+
+/* ===== SKELETON LOADER ===== */
+.skeleton{
+  background:linear-gradient(90deg,var(--border) 0%,#f1f5f9 50%,var(--border) 100%);
+  background-size:200% 100%;animation:skel 1.5s infinite;
+  border-radius:8px;
+}
+body.dark .skeleton{
+  background:linear-gradient(90deg,#334155 0%,#475569 50%,#334155 100%);
+}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
@@ -858,6 +954,32 @@ async function renderHome() {
   </div>
 </div>
 
+\${(() => {
+  const m = getDailyMission();
+  if (m.completed) {
+    return \`<div class="mission-card" onclick="nav('study')">
+      <div class="mission-icon" style="background:linear-gradient(135deg,#10b981,#059669)">🎯</div>
+      <div style="flex:1">
+        <div class="mission-title">今日のミッション達成！</div>
+        <div class="mission-desc">継続が合格への近道。さらに学習を続けますか？</div>
+      </div>
+      <i class="fas fa-chevron-right" style="color:var(--sub)"></i>
+    </div>\`;
+  }
+  const total = 10 + Math.min(5, m.wrongToReview);
+  const done = m.todayCount;
+  const pct = Math.min(100, Math.round(done / total * 100));
+  return \`<div class="mission-card" onclick="nav('study')">
+    <div class="mission-icon">🔥</div>
+    <div style="flex:1;min-width:0">
+      <div class="mission-title">今日のミッション</div>
+      <div class="mission-desc">新規\${m.newGoal}問 + 復習\${m.wrongToReview}問で合格力UP（\${done}/\${total}問）</div>
+      <div class="mission-progress"><div class="mission-progress-fill" style="width:\${pct}%"></div></div>
+    </div>
+    <i class="fas fa-chevron-right" style="color:var(--sub)"></i>
+  </div>\`;
+})()}
+
 <div class="section-title"><i class="fas fa-bolt"></i>クイックスタート</div>
 <div class="grid-2" style="margin-bottom:16px">
   <button class="btn btn-primary btn-lg" onclick="nav('study')" style="border-radius:16px;height:64px">
@@ -953,11 +1075,25 @@ async function renderHome() {
 </div>
 \`;
 
-  // Initialize 3D cube and particles after DOM is in place
-  setTimeout(() => {
-    initCubeLogo();
-    createHeroParticles();
-  }, 30);
+  // Initialize 3D cube and particles via ResizeObserver (reliable, no race)
+  const container = document.getElementById('logo-3d-container');
+  if (container) {
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(entries => {
+        const e = entries[0];
+        if (e && e.contentRect.width > 10) {
+          ro.disconnect();
+          initCubeLogo();
+          createHeroParticles();
+        }
+      });
+      ro.observe(container);
+      // Fallback for browsers that fire RO late
+      setTimeout(() => { if (!_cube3D) { initCubeLogo(); createHeroParticles(); } }, 200);
+    } else {
+      setTimeout(() => { initCubeLogo(); createHeroParticles(); }, 30);
+    }
+  }
 }
 
 // ===== STUDY PAGE =====
@@ -1152,14 +1288,30 @@ function selectAnswer(selected, correct, explanation) {
     if (i+1 === selected && !isCorrect) btn.classList.add('incorrect');
   });
 
-  // Explanation
+  // Explanation card with TTS/bookmark/copy
   const expEl = document.getElementById('explanation-area');
-  expEl.innerHTML = \`<div class="explanation \${isCorrect?'':'wrong'}">
-    <div style="font-weight:700;margin-bottom:8px;\${isCorrect?'color:var(--success)':'color:var(--danger)'}">
-      \${isCorrect ? '✓ 正解！' : '✗ 不正解 — 正解は選択肢 '+correct}
+  const expText = explanation || '解説は準備中です。';
+  const ttsText = \`\${isCorrect ? '正解' : '不正解。正解は選択肢' + correct + '。'} 解説。\${expText}\`.replace(/[\`'"]/g,'').replace(/\\n/g,' ');
+  const copyText = \`\${q.question_text}\\n\\n正解: 選択肢\${correct}\\n\\n\${expText}\`.replace(/[\`']/g,'');
+  const bookmarked = q?.id ? isBookmarked(q.id) : false;
+
+  expEl.innerHTML = \`<div class="exp-card \${isCorrect?'':'wrong'}">
+    <div class="exp-header">
+      <div class="exp-header-icon">\${isCorrect ? '🎉' : '📖'}</div>
+      <div>
+        <div class="exp-header-title">\${isCorrect ? '正解！' : '不正解 — 正解は選択肢 '+correct}</div>
+      </div>
     </div>
-    <div style="font-size:14px;line-height:1.7">\${explanation || '解説は準備中です。'}</div>
+    <div class="exp-body">\${expText}</div>
+    <div class="exp-actions">
+      <button class="exp-action-btn" data-tts onclick="speakText(\\\`\${ttsText}\\\`, this)"><i class="fas fa-volume-up"></i>読み上げ</button>
+      \${q?.id ? \`<button class="exp-action-btn \${bookmarked?'active':''}" onclick="toggleBookmark('\${q.id}', this)"><i class="fas fa-bookmark"></i>保存</button>\` : ''}
+      <button class="exp-action-btn" onclick="copyExplanation(\\\`\${copyText}\\\`)"><i class="fas fa-copy"></i>コピー</button>
+    </div>
   </div>\`;
+
+  // Spaced repetition tracking
+  if (q?.id) markReviewed(q.id, isCorrect);
 
   const badge = document.getElementById('q-result-badge');
   badge.innerHTML = isCorrect
@@ -1487,6 +1639,42 @@ function renderResult() {
 
   const subLabel = { rights:'権利関係', businessLaw:'宅建業法', restrictions:'法令制限', taxOther:'税・その他' };
 
+  // Fire confetti if passed
+  if (score >= 72) setTimeout(fireConfetti, 200);
+
+  // Next action recommendation
+  let nextAction = '';
+  if (score >= 80) {
+    nextAction = \`<div class="next-action">
+      <div class="next-action-icon" style="background:linear-gradient(135deg,#10b981,#059669)">🏆</div>
+      <div class="next-action-body">
+        <div class="next-action-title">合格圏上位！この調子を維持</div>
+        <span style="color:var(--sub)">過去問チャレンジで本番形式に慣れていきましょう。</span>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="nav('past-exam',{year:2024})"><i class="fas fa-history"></i>令和6年過去問</button>
+      </div>
+    </div>\`;
+  } else if (score >= 72) {
+    nextAction = \`<div class="next-action">
+      <div class="next-action-icon" style="background:linear-gradient(135deg,#059669,#0d9488)">✅</div>
+      <div class="next-action-body">
+        <div class="next-action-title">合格ライン突破！油断は禁物</div>
+        <span style="color:var(--sub)">誤答を1問ずつ確認し、苦手分野を潰しましょう。</span>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="nav('review')"><i class="fas fa-redo"></i>復習する</button>
+      </div>
+    </div>\`;
+  } else {
+    const lowSub = Object.entries(bySubject).sort((a,b) => (a[1].correct/a[1].total) - (b[1].correct/b[1].total))[0];
+    const subLabelMap = { rights:'rights', businessLaw:'businessLaw', restrictions:'restrictions', taxOther:'taxOther' };
+    nextAction = \`<div class="next-action">
+      <div class="next-action-icon" style="background:linear-gradient(135deg,#f59e0b,#dc2626)">📚</div>
+      <div class="next-action-body">
+        <div class="next-action-title">あと少し！弱点を集中攻略</div>
+        <span style="color:var(--sub)">特に「\${subLabel[lowSub[0]]||lowSub[0]}」（\${lowSub[1].correct}/\${lowSub[1].total}）を強化しましょう。</span>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="nav('category',{subject:'\${subLabelMap[lowSub[0]]||lowSub[0]}'})"><i class="fas fa-play"></i>この分野を学習</button>
+      </div>
+    </div>\`;
+  }
+
   document.getElementById('main').innerHTML = \`
 <div class="card" style="text-align:center;padding:32px">
   <div style="font-size:20px;font-weight:900;margin-bottom:20px">模擬試験 結果</div>
@@ -1497,6 +1685,8 @@ function renderResult() {
   <div style="font-size:22px;margin-bottom:8px">\${rank}</div>
   <div style="color:var(--sub);font-size:14px">合格ラインの目安: 36点以上(72%)</div>
 </div>
+
+\${nextAction}
 
 <div class="card" style="margin-bottom:16px">
   <div class="section-title" style="font-size:15px"><i class="fas fa-chart-bar"></i>分野別成績</div>
@@ -1715,6 +1905,9 @@ function renderProgress() {
 
 \${weakHTML}
 
+<div class="chart-legend">
+  <strong>📊 レーダーチャートの読み方:</strong> 4分野（権利関係・宅建業法・法令制限・税その他）の正答率を表示。中心(0%)から外側(100%)へ向かうほど高得点。<strong>72%以上</strong>を全分野で目指しましょう。
+</div>
 <canvas id="progress-chart" style="max-height:240px;margin-bottom:16px"></canvas>
 
 <div class="grid-4" style="gap:8px;margin-bottom:16px">
@@ -2236,6 +2429,108 @@ function maybeShowIOSInstall() {
   document.body.appendChild(modal);
 }
 
+// ===== TEXT-TO-SPEECH =====
+let _ttsUtterance = null;
+function speakText(text, btnEl) {
+  if (!('speechSynthesis' in window)) { toast('音声機能が利用できません'); return; }
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    document.querySelectorAll('.exp-action-btn[data-tts]').forEach(b => b.classList.remove('active'));
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP'; u.rate = 1.0; u.pitch = 1.0;
+  const voices = speechSynthesis.getVoices();
+  const ja = voices.find(v => v.lang.startsWith('ja'));
+  if (ja) u.voice = ja;
+  u.onend = () => btnEl?.classList.remove('active');
+  u.onerror = () => btnEl?.classList.remove('active');
+  btnEl?.classList.add('active');
+  _ttsUtterance = u;
+  speechSynthesis.speak(u);
+}
+
+// ===== BOOKMARK =====
+function toggleBookmark(qid, btnEl) {
+  const bm = LS.get('bookmarks', []);
+  const idx = bm.indexOf(qid);
+  if (idx > -1) { bm.splice(idx, 1); toast('ブックマーク解除'); btnEl?.classList.remove('active'); }
+  else { bm.push(qid); toast('ブックマーク保存'); btnEl?.classList.add('active'); }
+  LS.set('bookmarks', bm);
+}
+function isBookmarked(qid) { return LS.get('bookmarks', []).includes(qid); }
+
+// ===== COPY EXPLANATION =====
+function copyExplanation(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => toast('解説をコピーしました')).catch(() => toast('コピーに失敗'));
+  } else { toast('コピー機能未対応'); }
+}
+
+// ===== CONFETTI (CSS-only) =====
+function fireConfetti() {
+  const c = document.createElement('div');
+  c.className = 'confetti-container';
+  const colors = ['#7c3aed','#a855f7','#fde047','#10b981','#ef4444','#3b82f6'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti';
+    p.style.left = Math.random()*100 + '%';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration = (2 + Math.random()*2) + 's';
+    p.style.animationDelay = Math.random()*0.5 + 's';
+    p.style.transform = 'rotate('+Math.random()*360+'deg)';
+    if (Math.random() > 0.5) p.style.borderRadius = '50%';
+    c.appendChild(p);
+  }
+  document.body.appendChild(c);
+  setTimeout(() => c.remove(), 5000);
+}
+
+// ===== DAILY MISSION =====
+function getDailyMission() {
+  const wrong = LS.get('wrong_questions', []);
+  const todayStr = today();
+  const hist = LS.get('study_history', []);
+  const todayCount = hist.filter(h => h.date === todayStr).length;
+  const wrongToReview = wrong.slice(0, 5).length;
+  const newGoal = Math.max(0, 10 - todayCount);
+  return {
+    todayCount,
+    newGoal,
+    wrongToReview,
+    completed: todayCount >= 10 && wrongToReview === 0,
+  };
+}
+
+// ===== SPACED REPETITION (1d/3d/7d/14d intervals) =====
+function getDueReviewQuestions() {
+  const wrong = LS.get('wrong_questions', []);
+  const now = Date.now();
+  const intervalsMs = [1, 3, 7, 14].map(d => d*24*60*60*1000);
+  return wrong.filter(w => {
+    const lastSeen = w.lastSeen || 0;
+    const level = w.srLevel || 0;
+    const interval = intervalsMs[Math.min(level, intervalsMs.length-1)] || intervalsMs[0];
+    return now - lastSeen >= interval;
+  });
+}
+function markReviewed(qid, wasCorrect) {
+  const wrong = LS.get('wrong_questions', []);
+  const w = wrong.find(x => x.id === qid);
+  if (w) {
+    w.lastSeen = Date.now();
+    if (wasCorrect) {
+      w.srLevel = (w.srLevel || 0) + 1;
+      if (w.srLevel >= 4) {
+        const idx = wrong.indexOf(w);
+        if (idx > -1) wrong.splice(idx, 1);
+      }
+    } else { w.srLevel = 0; }
+    LS.set('wrong_questions', wrong);
+  }
+}
+
 // ===== RESULT WRONG ANSWER EXPLANATION MODAL =====
 function showExplanationFor(idx) {
   const r = S.exam.results?.[idx];
@@ -2244,6 +2539,9 @@ function showExplanationFor(idx) {
   try { options = typeof r.options === 'string' ? JSON.parse(r.options) : (r.options || []); } catch {}
   const correctText = options[r.correct_answer-1] || '';
   const selectedText = r.selected ? (options[r.selected-1] || '未回答') : '未回答';
+  const explanation = r.explanation || '解説は準備中です。';
+  const ttsText = \`問題。\${r.question_text} 正解は選択肢\${r.correct_answer}。\${correctText} 解説。\${explanation}\`;
+  const bookmarked = isBookmarked(r.id);
 
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
@@ -2266,9 +2564,14 @@ function showExplanationFor(idx) {
           <div class="exp-header-icon">📖</div>
           <div><div class="exp-header-title" style="color:#065f46">詳しい解説</div></div>
         </div>
-        <div class="exp-body" style="line-height:1.9">\${r.explanation || '解説は準備中です。'}</div>
+        <div class="exp-body" style="line-height:1.9">\${explanation}</div>
+        <div class="exp-actions">
+          <button class="exp-action-btn" data-tts onclick="speakText(\\\`\${ttsText.replace(/\`/g,'').replace(/'/g,'').replace(/"/g,'').replace(/\\n/g,' ')}\\\`, this)"><i class="fas fa-volume-up"></i>読み上げ</button>
+          <button class="exp-action-btn \${bookmarked?'active':''}" onclick="toggleBookmark('\${r.id}', this)"><i class="fas fa-bookmark"></i>保存</button>
+          <button class="exp-action-btn" onclick="copyExplanation(\\\`\${(r.question_text+'\\n\\n正解: '+correctText+'\\n\\n'+explanation).replace(/\`/g,'').replace(/'/g,'').replace(/\\n/g,'\\\\n')}\\\`)"><i class="fas fa-copy"></i>コピー</button>
+        </div>
       </div>
-      <button class="btn btn-primary btn-block" style="margin-top:16px" onclick="this.closest('.modal-overlay').remove()">閉じる</button>
+      <button class="btn btn-primary btn-block" style="margin-top:16px" onclick="this.closest('.modal-overlay').remove();speechSynthesis.cancel()">閉じる</button>
     </div>
   </div>\`;
   document.body.appendChild(modal);
