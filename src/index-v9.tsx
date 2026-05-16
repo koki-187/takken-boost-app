@@ -1016,14 +1016,28 @@ async function renderHome() {
 </div>
 
 \${years.length > 0 ? \`
-<div class="feature-card" onclick="nav('past-exam',{year:\${years[0]}})" style="margin-bottom:12px">
+<div class="feature-card" onclick="nav('past-exam',{year:\${years.filter(y=>y!==2026)[0]||years[0]}})" style="margin-bottom:12px">
   <div class="feature-row">
     <div class="feature-icon" style="background:linear-gradient(135deg,#dc2626,#b91c1c)">
       <i class="fas fa-history"></i>
     </div>
     <div>
-      <div class="feature-title">過去問チャレンジ <span class="badge badge-red" style="font-size:10px">NEW</span></div>
-      <div class="feature-desc">令和6年(2024年)本試験50問 — 本番さながらの演習</div>
+      <div class="feature-title">過去問チャレンジ <span class="badge badge-red" style="font-size:10px">5年分</span></div>
+      <div class="feature-desc">令和3〜令和7年の本試験モデル問題 250問 — 本番さながらの演習</div>
+    </div>
+  </div>
+</div>
+\` : ''}
+
+\${years.includes(2026) ? \`
+<div class="feature-card" onclick="nav('past-exam',{year:2026})" style="margin-bottom:12px;border:2px solid #f59e0b;background:linear-gradient(135deg,rgba(254,243,199,0.4),rgba(254,215,170,0.3))">
+  <div class="feature-row">
+    <div class="feature-icon" style="background:linear-gradient(135deg,#f59e0b,#dc2626)">
+      <i class="fas fa-robot"></i>
+    </div>
+    <div>
+      <div class="feature-title">令和8年AI予測模試 <span class="badge badge-yellow" style="font-size:10px">NEW</span></div>
+      <div class="feature-desc">過去5年トレンド分析+最新法改正で予測した50問 — 来年の本試験対策に</div>
     </div>
   </div>
 </div>
@@ -1057,8 +1071,9 @@ async function renderHome() {
 <div class="section-title" style="margin-top:8px"><i class="fas fa-calendar-alt"></i>過去問年度別</div>
 <div class="cat-pills">
   \${years.map(y => \`
-    <div class="cat-pill" onclick="nav('past-exam',{year:\${y}})">
-      令和\${y-2018}年(\${y})
+    <div class="cat-pill\${y===2026?' style-predicted':''}" onclick="nav('past-exam',{year:\${y}})"
+         style="\${y===2026?'background:linear-gradient(135deg,#f59e0b,#dc2626);color:#fff;border-color:#dc2626':''}">
+      \${y===2026 ? '<i class="fas fa-robot" style="margin-right:4px"></i>令和8年AI予測' : '令和'+(y-2018)+'年('+y+')'}
     </div>
   \`).join('')}
 </div>
@@ -1775,11 +1790,16 @@ function renderPastExamQuestion() {
   try { options = typeof q.options === 'string' ? JSON.parse(q.options) : (q.options || []) } catch {}
   const year = S.study.year;
 
+  const isPredicted = year === 2026;
+  const yearBadge = isPredicted
+    ? '<span class="badge badge-yellow"><i class="fas fa-robot"></i> 令和8年AI予測</span>'
+    : \`<span class="badge badge-red">令和\${year-2018}年(\${year})</span>\`;
+
   document.getElementById('main').innerHTML = \`
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
   <button class="back-btn" onclick="nav('home')"><i class="fas fa-chevron-left"></i>戻る</button>
   <div>
-    <span class="badge badge-red">令和\${year-2018}年(\${year})</span>
+    \${yearBadge}
     <span style="font-size:13px;color:var(--sub);margin-left:8px">問\${idx+1}/\${questions.length}</span>
   </div>
 </div>
@@ -1829,10 +1849,15 @@ function renderPastResult() {
   const { correct, total, year } = S.study;
   const score = total > 0 ? Math.round(correct / total * 100) : 0;
   const pass = correct >= 36;
+  const isPredicted = year === 2026;
+  const titleText = isPredicted ? '令和8年AI予測模試' : \`令和\${year-2018}年(\${year}) 過去問\`;
+
+  // Confetti on pass
+  if (pass) setTimeout(fireConfetti, 200);
 
   document.getElementById('main').innerHTML = \`
 <div class="card" style="text-align:center;padding:32px">
-  <div style="font-size:18px;font-weight:700;margin-bottom:4px">令和\${year-2018}年(\${year}) 過去問</div>
+  <div style="font-size:18px;font-weight:700;margin-bottom:4px">\${titleText}</div>
   <div style="color:var(--sub);margin-bottom:20px">全問チャレンジ完了</div>
   <div class="result-circle" style="border-color:\${pass?'var(--success)':'var(--danger)'}">
     <div class="score" style="color:\${pass?'var(--success)':'var(--danger)'}">\${correct}</div>
