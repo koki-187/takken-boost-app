@@ -1080,12 +1080,101 @@ async function renderHome() {
 \` : ''}
 
 <div class="section-title" style="margin-top:8px"><i class="fas fa-info-circle"></i>試験情報</div>
-<div class="card">
+<div class="card" style="margin-bottom:12px">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     <div><div style="font-size:12px;color:var(--sub)">試験日程</div><div style="font-weight:700">毎年10月第3日曜日</div></div>
     <div><div style="font-size:12px;color:var(--sub)">合格基準点</div><div style="font-weight:700">50問中 36点前後</div></div>
     <div><div style="font-size:12px;color:var(--sub)">合格率</div><div style="font-weight:700">約15〜17%</div></div>
     <div><div style="font-size:12px;color:var(--sub)">試験時間</div><div style="font-weight:700">2時間</div></div>
+  </div>
+</div>
+
+<!-- ===== 申込スケジュール ===== -->
+<div class="card" style="margin-bottom:12px;border-left:4px solid var(--c1)">
+  <div class="section-title" style="font-size:15px;margin-bottom:10px"><i class="fas fa-calendar-check"></i>令和8年(2026)受験申込</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(124,58,237,.08);border-radius:10px">
+      <i class="fas fa-globe" style="color:var(--c1);font-size:18px;width:24px"></i>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px">インターネット申込</div>
+        <div style="font-size:12px;color:var(--sub)">7月1日(水) 9:30 〜 7月15日(水) 21:59 ※例年同時期</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(124,58,237,.05);border-radius:10px">
+      <i class="fas fa-envelope" style="color:var(--c1);font-size:18px;width:24px"></i>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px">郵送申込</div>
+        <div style="font-size:12px;color:var(--sub)">7月1日(水) 〜 7月31日(金) 消印有効 ※例年同時期</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(245,158,11,.1);border-radius:10px">
+      <i class="fas fa-flag-checkered" style="color:#f59e0b;font-size:18px;width:24px"></i>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px">試験日 / 合格発表</div>
+        <div style="font-size:12px;color:var(--sub)">試験: 10月18日(日) / 合格発表: 11月25日(水)頃</div>
+      </div>
+    </div>
+  </div>
+  <a href="https://www.retio.or.jp/exam/" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:10px;background:var(--c1);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">
+    <i class="fas fa-external-link-alt"></i>不動産適正取引推進機構(RETIO)で詳細確認
+  </a>
+</div>
+
+<!-- ===== 5点免除（登録講習） ===== -->
+<div class="card" style="margin-bottom:12px;border-left:4px solid #f59e0b">
+  <div class="section-title" style="font-size:15px;margin-bottom:10px">
+    <i class="fas fa-graduation-cap" style="color:#f59e0b"></i>5点免除（登録講習）
+    <span class="badge badge-yellow" style="font-size:10px;margin-left:6px">合格率UP</span>
+  </div>
+  <p style="font-size:13px;line-height:1.6;color:var(--sub);margin-bottom:10px">宅建業に従事している方が登録講習を修了すると、本試験で<strong style="color:#f59e0b">5問が免除</strong>（45問試験・90分）になります。例年、合格率が約10%以上UP。</p>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="padding:10px;background:rgba(245,158,11,.08);border-radius:10px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-id-card" style="color:#f59e0b;margin-right:4px"></i>受講対象</div>
+      <div style="font-size:12px;color:var(--sub)">宅建業者の従業者（従業者証明書を持つ方）</div>
+    </div>
+    <div style="padding:10px;background:rgba(245,158,11,.08);border-radius:10px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-clock" style="color:#f59e0b;margin-right:4px"></i>講習申込時期</div>
+      <div style="font-size:12px;color:var(--sub)">通年（各実施機関により異なる）。本試験対策には<strong>1月〜6月頃の修了</strong>がオススメ</div>
+    </div>
+    <div style="padding:10px;background:rgba(245,158,11,.08);border-radius:10px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-calendar" style="color:#f59e0b;margin-right:4px"></i>有効期間</div>
+      <div style="font-size:12px;color:var(--sub)">講習修了後<strong>3年以内</strong>の試験で適用</div>
+    </div>
+    <div style="padding:10px;background:rgba(245,158,11,.08);border-radius:10px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-yen-sign" style="color:#f59e0b;margin-right:4px"></i>受講料 目安</div>
+      <div style="font-size:12px;color:var(--sub)">15,000〜22,000円（実施機関により異なる）。通信講座2ヶ月+スクーリング2日が一般的</div>
+    </div>
+    <div style="padding:10px;background:rgba(220,38,38,.08);border-radius:10px;border:1px dashed #fca5a5">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px;color:#991b1b"><i class="fas fa-exclamation-circle" style="margin-right:4px"></i>申込時注意</div>
+      <div style="font-size:12px;color:var(--sub)">本試験申込時に「登録講習修了者」として申込が必要（試験は45問・問46〜50が免除）</div>
+    </div>
+  </div>
+  <a href="https://www.mlit.go.jp/totikensangyo/const/sosei_const_tk3_000056.html" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:10px;background:#f59e0b;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">
+    <i class="fas fa-external-link-alt"></i>国土交通省 登録講習実施機関一覧
+  </a>
+</div>
+
+<!-- ===== 年間スケジュール ===== -->
+<div class="card" style="margin-bottom:12px">
+  <div class="section-title" style="font-size:15px;margin-bottom:10px"><i class="fas fa-stream"></i>年間スケジュール</div>
+  <div style="position:relative;padding-left:20px">
+    <div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--c1),#f59e0b)"></div>
+    \${[
+      {month:'1〜6月', label:'登録講習受講・修了', color:'#f59e0b', desc:'5点免除を狙うならこの時期に'},
+      {month:'7月初〜中旬', label:'受験申込（ネット）', color:'var(--c1)', desc:'7/1〜7/15頃 9:30開始'},
+      {month:'7月末', label:'郵送申込締切', color:'var(--c1)', desc:'7/31消印有効'},
+      {month:'8〜10月初', label:'直前学習・模擬試験', color:'#10b981', desc:'本アプリで仕上げ'},
+      {month:'10月第3日曜', label:'本試験', color:'#dc2626', desc:'13:00〜15:00（2時間）'},
+      {month:'11月下旬', label:'合格発表', color:'#3b82f6', desc:'11/25頃'},
+    ].map(s => \`
+      <div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start">
+        <div style="width:14px;height:14px;border-radius:50%;background:\${s.color};margin-left:-22px;margin-top:4px;flex-shrink:0;box-shadow:0 0 0 3px var(--card)"></div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13px"><span style="color:\${s.color}">\${s.month}</span> — \${s.label}</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:2px">\${s.desc}</div>
+        </div>
+      </div>
+    \`).join('')}
   </div>
 </div>
 \`;
