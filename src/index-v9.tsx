@@ -686,13 +686,13 @@ button,[onclick]{touch-action:manipulation}
 
 /* ===== WEAK SUBJECT RECOMMENDATION ===== */
 .weak-card{
-  background:linear-gradient(135deg,#fef3c7,#fde68a);
+  background:linear-gradient(135deg,#ede9fe,#ddd6fe);
   border-radius:16px;padding:16px;margin-bottom:16px;
-  border-left:4px solid #f59e0b;
+  border-left:4px solid var(--c1);
 }
 body.dark .weak-card{
-  background:linear-gradient(135deg,#422006,#451a03);
-  border-left-color:#fbbf24;color:#fde68a;
+  background:linear-gradient(135deg,#3b0764,#4c1d95);
+  border-left-color:#c4b5fd;color:#ddd6fe;
 }
 .weak-title{font-weight:800;font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .weak-body{font-size:13px;line-height:1.6;margin-bottom:10px}
@@ -730,29 +730,30 @@ body.dark .exp-action-btn{background:rgba(0,0,0,.3);color:#f1f5f9}
 
 /* ===== DAILY MISSION CARD ===== */
 .mission-card{
-  background:linear-gradient(135deg,#fef3c7,#fed7aa);
+  background:linear-gradient(135deg,#ede9fe,#ddd6fe);
   border-radius:16px;padding:14px 16px;margin-bottom:14px;
   display:flex;align-items:center;gap:12px;cursor:pointer;
   border:2px solid transparent;transition:.2s;
 }
-.mission-card:active{transform:scale(.99);border-color:#f59e0b}
+.mission-card:active{transform:scale(.99);border-color:var(--c1)}
 body.dark .mission-card{
-  background:linear-gradient(135deg,#422006,#451a03);color:#fde68a;
+  background:linear-gradient(135deg,#3b0764,#4c1d95);color:#ddd6fe;
 }
 .mission-icon{
   width:48px;height:48px;border-radius:14px;
-  background:linear-gradient(135deg,#f59e0b,#dc2626);color:#fff;
+  background:var(--grad);color:#fff;
   display:flex;align-items:center;justify-content:center;
-  font-size:22px;flex-shrink:0;
+  font-size:22px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.3);
 }
-.mission-title{font-weight:800;font-size:14px;margin-bottom:2px}
+.mission-title{font-weight:800;font-size:14px;margin-bottom:2px;color:var(--c1)}
+body.dark .mission-title{color:#c4b5fd}
 .mission-desc{font-size:12px;color:var(--sub);line-height:1.4}
-body.dark .mission-desc{color:#fbbf24}
+body.dark .mission-desc{color:#a78bfa}
 .mission-progress{
   margin-top:6px;height:5px;background:rgba(255,255,255,.5);
   border-radius:3px;overflow:hidden;
 }
-.mission-progress-fill{height:100%;background:#dc2626;border-radius:3px;transition:width .6s}
+.mission-progress-fill{height:100%;background:var(--c1);border-radius:3px;transition:width .6s}
 
 /* ===== CONFETTI (CSS-only, no library) ===== */
 .confetti-container{
@@ -1087,13 +1088,15 @@ async function renderHome() {
   const years = (S.stats?.byYear || []).map(r => r.year).filter(Boolean).sort((a,b)=>b-a);
 
   document.getElementById('main').innerHTML = \`
-<!-- ===== UNIFIED HERO (cube + stats) ===== -->
-<div class="card-grad fade-in-up" style="position:relative;overflow:hidden;padding-top:12px">
+<!-- ===== 3D CUBE MONUMENT (standalone, prominent) ===== -->
+<div class="cube-hero fade-in-up" style="height:220px;margin-bottom:12px">
+  <div class="cube-glow"></div>
+  <div id="logo-3d-container" style="width:200px;height:200px"></div>
+</div>
+
+<!-- ===== HERO STATS CARD ===== -->
+<div class="card-grad fade-in-up fade-delay-1" style="position:relative;overflow:hidden">
   <div class="particle-bg" id="hero-particles"></div>
-  <div class="cube-hero" style="height:180px;margin-bottom:8px;position:relative;z-index:2">
-    <div class="cube-glow"></div>
-    <div id="logo-3d-container" style="width:160px;height:160px"></div>
-  </div>
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;z-index:2">
     <div>
       <div style="font-size:12px;opacity:.85;letter-spacing:.5px">宅地建物取引士試験</div>
@@ -1217,13 +1220,13 @@ async function renderHome() {
 \` : ''}
 
 \${years.includes(2026) ? \`
-<div class="feature-card" onclick="nav('past-exam',{year:2026})" style="margin-bottom:12px;border:2px solid #f59e0b;background:linear-gradient(135deg,rgba(254,243,199,0.4),rgba(254,215,170,0.3))">
+<div class="feature-card" onclick="nav('past-exam',{year:2026})" style="margin-bottom:12px;border:2px solid var(--c1);background:linear-gradient(135deg,rgba(237,233,254,0.6),rgba(221,214,254,0.4))">
   <div class="feature-row">
-    <div class="feature-icon" style="background:linear-gradient(135deg,#f59e0b,#dc2626)">
+    <div class="feature-icon" style="background:var(--grad);position:relative">
       <i class="fas fa-robot"></i>
     </div>
     <div>
-      <div class="feature-title">令和8年AI予測模試 <span class="badge badge-yellow" style="font-size:10px">NEW</span></div>
+      <div class="feature-title">令和8年AI予測模試 <span class="badge badge-purple" style="font-size:10px;background:#fde047;color:#854d0e">NEW</span></div>
       <div class="feature-desc">過去5年トレンド分析+最新法改正で予測した50問 — 来年の本試験対策に</div>
     </div>
   </div>
@@ -1259,7 +1262,7 @@ async function renderHome() {
 <div class="cat-pills">
   \${years.map(y => \`
     <div class="cat-pill\${y===2026?' style-predicted':''}" onclick="nav('past-exam',{year:\${y}})"
-         style="\${y===2026?'background:linear-gradient(135deg,#f59e0b,#dc2626);color:#fff;border-color:#dc2626':''}">
+         style="\${y===2026?'background:var(--grad);color:#fff;border-color:var(--c1)':''}">
       \${y===2026 ? '<i class="fas fa-robot" style="margin-right:4px"></i>令和8年AI予測' : '令和'+(y-2018)+'年('+y+')'}
     </div>
   \`).join('')}
@@ -1308,35 +1311,35 @@ async function renderHome() {
 </div>
 
 <!-- ===== 5点免除（登録講習） ===== -->
-<div class="card" style="margin-bottom:12px;border-left:4px solid #f59e0b">
+<div class="card" style="margin-bottom:12px;border-left:4px solid var(--c1)">
   <div class="section-title" style="font-size:15px;margin-bottom:10px">
-    <i class="fas fa-graduation-cap" style="color:#f59e0b"></i>5点免除（登録講習）
-    <span class="badge badge-yellow" style="font-size:10px;margin-left:6px">合格率UP</span>
+    <i class="fas fa-graduation-cap" style="color:var(--c1)"></i>5点免除（登録講習）
+    <span class="badge badge-purple" style="font-size:10px;margin-left:6px">合格率UP</span>
   </div>
-  <p style="font-size:13px;line-height:1.6;color:var(--sub);margin-bottom:10px">宅建業に従事している方が登録講習を修了すると、本試験で<strong style="color:#f59e0b">5問が免除</strong>（45問試験・90分）になります。例年、合格率が約10%以上UP。</p>
+  <p style="font-size:13px;line-height:1.6;color:var(--sub);margin-bottom:10px">宅建業に従事している方が登録講習を修了すると、本試験で<strong style="color:var(--c1)">5問が免除</strong>（45問試験・90分）になります。例年、合格率が約10%以上UP。</p>
   <div style="display:flex;flex-direction:column;gap:8px">
-    <div style="padding:10px;background:rgba(245,158,11,.08);border-radius:10px">
-      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-id-card" style="color:#f59e0b;margin-right:4px"></i>受講対象</div>
+    <div style="padding:10px;background:rgba(124,58,237,.06);border-radius:10px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-id-card" style="color:var(--c1);margin-right:4px"></i>受講対象</div>
       <div style="font-size:12px;color:var(--sub)">宅建業者の従業者（従業者証明書を持つ方）</div>
     </div>
-    <div style="padding:10px;background:rgba(245,158,11,.08);border-radius:10px">
-      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-clock" style="color:#f59e0b;margin-right:4px"></i>講習申込時期</div>
+    <div style="padding:10px;background:rgba(124,58,237,.06);border-radius:10px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-clock" style="color:var(--c1);margin-right:4px"></i>講習申込時期</div>
       <div style="font-size:12px;color:var(--sub)">通年（各実施機関により異なる）。本試験対策には<strong>1月〜6月頃の修了</strong>がオススメ</div>
     </div>
-    <div style="padding:10px;background:rgba(245,158,11,.08);border-radius:10px">
-      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-calendar" style="color:#f59e0b;margin-right:4px"></i>有効期間</div>
+    <div style="padding:10px;background:rgba(124,58,237,.06);border-radius:10px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-calendar" style="color:var(--c1);margin-right:4px"></i>有効期間</div>
       <div style="font-size:12px;color:var(--sub)">講習修了後<strong>3年以内</strong>の試験で適用</div>
     </div>
-    <div style="padding:10px;background:rgba(245,158,11,.08);border-radius:10px">
-      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-yen-sign" style="color:#f59e0b;margin-right:4px"></i>受講料 目安</div>
+    <div style="padding:10px;background:rgba(124,58,237,.06);border-radius:10px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px"><i class="fas fa-yen-sign" style="color:var(--c1);margin-right:4px"></i>受講料 目安</div>
       <div style="font-size:12px;color:var(--sub)">15,000〜22,000円（実施機関により異なる）。通信講座2ヶ月+スクーリング2日が一般的</div>
     </div>
-    <div style="padding:10px;background:rgba(220,38,38,.08);border-radius:10px;border:1px dashed #fca5a5">
-      <div style="font-weight:700;font-size:13px;margin-bottom:2px;color:#991b1b"><i class="fas fa-exclamation-circle" style="margin-right:4px"></i>申込時注意</div>
+    <div style="padding:10px;background:rgba(124,58,237,.1);border-radius:10px;border:1px dashed var(--c3)">
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px;color:var(--c1)"><i class="fas fa-exclamation-circle" style="margin-right:4px"></i>申込時注意</div>
       <div style="font-size:12px;color:var(--sub)">本試験申込時に「登録講習修了者」として申込が必要（試験は45問・問46〜50が免除）</div>
     </div>
   </div>
-  <a href="https://www.mlit.go.jp/totikensangyo/const/sosei_const_tk3_000056.html" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:10px;background:#f59e0b;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">
+  <a href="https://www.mlit.go.jp/totikensangyo/const/sosei_const_tk3_000056.html" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:10px;background:var(--grad);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;box-shadow:0 4px 12px rgba(124,58,237,.25)">
     <i class="fas fa-external-link-alt"></i>国土交通省 登録講習実施機関一覧
   </a>
 </div>
@@ -1972,7 +1975,7 @@ function renderResult() {
     const lowSub = Object.entries(bySubject).sort((a,b) => (a[1].correct/a[1].total) - (b[1].correct/b[1].total))[0];
     const subLabelMap = { rights:'rights', businessLaw:'businessLaw', restrictions:'restrictions', taxOther:'taxOther' };
     nextAction = \`<div class="next-action">
-      <div class="next-action-icon" style="background:linear-gradient(135deg,#f59e0b,#dc2626)">📚</div>
+      <div class="next-action-icon" style="background:var(--grad)">📚</div>
       <div class="next-action-body">
         <div class="next-action-title">あと少し！弱点を集中攻略</div>
         <span style="color:var(--sub)">特に「\${subLabel[lowSub[0]]||lowSub[0]}」（\${lowSub[1].correct}/\${lowSub[1].total}）を強化しましょう。</span>
