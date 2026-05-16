@@ -64,8 +64,8 @@ app.get('/api/past-exam/:year', async (c) => {
 // Service Worker
 app.get('/service-worker.js', (c) => {
   const sw = `
-const CACHE_NAME = 'takken-boost-v10';
-const STATIC_CACHE = 'takken-boost-static-v10';
+const CACHE_NAME = 'takken-boost-v11';
+const STATIC_CACHE = 'takken-boost-static-v11';
 
 const STATIC_ASSETS = [
   '/',
@@ -542,7 +542,7 @@ button,[onclick]{touch-action:manipulation}
 <header id="app-header">
   <div class="header-inner">
     <a class="logo" href="#" onclick="nav('home');return false">
-      宅建BOOST <span>合格保証アプリ</span>
+      宅建BOOST <span>合格アプリ</span>
     </a>
     <div class="header-actions">
       <button class="hbtn" onclick="toggleDark()" title="ダークモード" id="themeBtn">
@@ -625,6 +625,19 @@ function nav(page, params = {}) {
   if (navEl) navEl.classList.add('active');
 
   window.scrollTo(0, 0);
+
+  // Dispose 3D cube when leaving home (memory leak prevention)
+  if (page !== 'home' && typeof _cube3D !== 'undefined' && _cube3D) {
+    try { _cube3D.dispose(); } catch {}
+    _cube3D = null;
+  }
+
+  // Stop exam timer when leaving exam pages (prevents background timer leak)
+  if (page !== 'exam' && page !== 'result' && S.exam?.active && S.exam.timer) {
+    clearInterval(S.exam.timer);
+    S.exam.timer = null;
+  }
+
   const main = document.getElementById('main');
   main.innerHTML = '<div class="page-loader"><div class="loader"></div><p>読み込み中...</p></div>';
 
@@ -1527,11 +1540,11 @@ function renderProgress() {
   const subLabel = { rights:'権利関係', businessLaw:'宅建業法', restrictions:'法令制限', taxOther:'税・その他' };
   const subColors = { rights:'#7c3aed', businessLaw:'#059669', restrictions:'#dc2626', taxOther:'#d97706' };
 
-  // Last 7 days
+  // Last 7 days (use local date, not UTC, to match today() format)
   const last7 = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().slice(0, 10);
+    const dateStr = \`\${d.getFullYear()}-\${String(d.getMonth()+1).padStart(2,'0')}-\${String(d.getDate()).padStart(2,'0')}\`;
     const dayItems = hist.filter(h => h.date === dateStr);
     last7.push({ date: dateStr, count: dayItems.length, correct: dayItems.filter(h=>h.correct).length });
   }
@@ -1609,7 +1622,7 @@ function renderProgress() {
 \` : ''}
 
 <div style="margin-top:16px;text-align:center">
-  <button class="btn btn-outline btn-sm" onclick="if(confirm('学習履歴をリセットしますか？'))resetData()">
+  <button class="btn btn-outline btn-sm" onclick="confirmResetData()">
     <i class="fas fa-trash"></i>データをリセット
   </button>
 </div>
@@ -1715,7 +1728,7 @@ function calcStreak() {
     if (d === check) {
       streak++;
       const prev = new Date(check); prev.setDate(prev.getDate() - 1);
-      check = prev.toISOString().slice(0, 10);
+      check = \`\${prev.getFullYear()}-\${String(prev.getMonth()+1).padStart(2,'0')}-\${String(prev.getDate()).padStart(2,'0')}\`;
     } else if (d < check) break;
   }
   return streak;
@@ -1725,6 +1738,24 @@ function resetData() {
   localStorage.clear();
   toast('データをリセットしました');
   nav('progress');
+}
+
+function confirmResetData() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = \`<div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div style="text-align:center;padding:16px">
+      <i class="fas fa-exclamation-triangle" style="font-size:48px;color:var(--warn);margin-bottom:16px"></i>
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">学習履歴をリセット</div>
+      <div style="color:var(--sub);margin-bottom:24px">全ての学習履歴・誤答記録が削除されます。元に戻せません。</div>
+      <div class="grid-2" style="gap:12px">
+        <button class="btn btn-outline btn-block" onclick="this.closest('.modal-overlay').remove()">キャンセル</button>
+        <button class="btn btn-danger btn-block" onclick="this.closest('.modal-overlay').remove();resetData()">リセット</button>
+      </div>
+    </div>
+  </div>\`;
+  document.body.appendChild(modal);
 }
 
 // ===== DARK MODE =====
@@ -1812,13 +1843,16 @@ function initCubeLogo() {
   if (_cube3D) { try { _cube3D.dispose(); } catch {} _cube3D = null; }
   container.innerHTML = '';
 
-  const W = container.clientWidth, H = container.clientHeight;
+  // Guard against 0-size container (CSS not yet applied)
+  let W = container.clientWidth, H = container.clientHeight;
+  if (W < 10 || H < 10) { W = 200; H = 200; }
+
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, W/H, 0.1, 1000);
   camera.position.z = 3;
   const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
   renderer.setSize(W, H);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   container.appendChild(renderer.domElement);
 
   // Create 6 face materials
@@ -1853,7 +1887,7 @@ function initCubeLogo() {
       ctx.shadowBlur = 0;
       ctx.font = 'bold 26px Arial';
       ctx.fillStyle = '#fde047';
-      ctx.fillText('合格保証', 256, 360);
+      ctx.fillText('合格への道', 256, 360);
     }
     ctx.shadowBlur = 0;
     ctx.strokeStyle = 'rgba(255,255,255,.35)';
