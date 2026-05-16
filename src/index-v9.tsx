@@ -27,6 +27,7 @@ app.route('/api/notifications', emailRoutes)
 // 問題数取得API
 app.get('/api/stats', async (c) => {
   try {
+    if (!c.env?.DB) return c.json({ success: false, error: 'DB not bound' }, 500);
     const { DB } = c.env
     const total = await DB.prepare('SELECT COUNT(*) as cnt FROM questions').first()
     const bySubject = await DB.prepare(
@@ -92,6 +93,21 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
+
+  if (url.pathname === '/' || url.pathname === '/index.html') {
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(STATIC_CACHE).then(c => c.put(e.request, clone));
+          }
+          return res;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
 
   // API requests - network first
   if (url.pathname.startsWith('/api/')) {
@@ -825,7 +841,7 @@ function renderQuestion() {
 
 <div id="options">
   \${options.map((opt, i) => \`
-    <button class="option-btn" id="opt-\${i}" onclick="selectAnswer(\${i+1}, \${q.correct_answer}, \${JSON.stringify(q.explanation||'').replace(/"/g,'&quot;')})">
+    <button class="option-btn" id="opt-\${i}" data-answer="\${i+1}">
       <div class="option-label">\${i+1}</div>
       <div style="flex:1">\${opt}</div>
     </button>
@@ -844,6 +860,15 @@ function renderQuestion() {
   </button>
 </div>
 \`;
+
+  // オプションクリックのイベントデリゲート
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ans = parseInt(btn.getAttribute('data-answer'));
+      const q2 = S.study.questions[S.study.idx];
+      selectAnswer(ans, q2.correct_answer, q2.explanation || '');
+    });
+  });
 }
 
 function selectAnswer(selected, correct, explanation) {
@@ -897,12 +922,13 @@ function selectAnswer(selected, correct, explanation) {
   badge.innerHTML = isCorrect
     ? '<span class="badge badge-green">正解</span>'
     : '<span class="badge badge-red">不正解</span>';
-  document.getElementById('acc-display').textContent = Math.round(S.study.correct/S.study.total*100) + '%';
+  const accEl = document.getElementById('acc-display');
+  if (accEl) accEl.textContent = Math.round(S.study.correct/S.study.total*100) + '%';
   document.getElementById('nav-area').style.display = 'flex';
-  S.study.answered = false;
 }
 
 function nextQuestion() {
+  S.study.answered = false;
   S.study.idx++;
   renderQuestion();
 }
@@ -1158,6 +1184,7 @@ function confirmSubmitExam() {
 }
 
 async function submitExam() {
+  if (!S.exam.active) return;
   clearInterval(S.exam.timer);
 
   const { questions, answers, startTime } = S.exam;
@@ -1205,8 +1232,8 @@ function renderResult() {
   if (!results) { nav('exam'); return; }
 
   const total = results?.length || 0;
-  const rank = score >= 80 ? '🏆 合格圏上位' : score >= 70 ? '✅ 合格圏' : score >= 60 ? '⚠️ ボーダー' : '📚 要学習';
-  const color = score >= 70 ? 'var(--success)' : score >= 60 ? 'var(--warn)' : 'var(--danger)';
+  const rank = score >= 80 ? '🏆 合格圏上位' : score >= 72 ? '✅ 合格圏' : score >= 60 ? '⚠️ ボーダー' : '📚 要学習';
+  const color = score >= 72 ? 'var(--success)' : score >= 60 ? 'var(--warn)' : 'var(--danger)';
 
   const bySubject = {};
   results?.forEach(r => {
@@ -1225,7 +1252,7 @@ function renderResult() {
     <div class="label">\${correct}/\${total}問</div>
   </div>
   <div style="font-size:22px;margin-bottom:8px">\${rank}</div>
-  <div style="color:var(--sub);font-size:14px">合格ラインの目安: 70%以上</div>
+  <div style="color:var(--sub);font-size:14px">合格ラインの目安: 36点以上(72%)</div>
 </div>
 
 <div class="card" style="margin-bottom:16px">
@@ -1329,7 +1356,7 @@ function renderPastExamQuestion() {
 
 <div id="options">
   \${options.map((opt, i) => \`
-    <button class="option-btn" id="opt-\${i}" onclick="selectAnswer(\${i+1}, \${q.correct_answer}, \${JSON.stringify(q.explanation||'').replace(/"/g,'&quot;')})">
+    <button class="option-btn" id="opt-\${i}" data-answer="\${i+1}">
       <div class="option-label">\${i+1}</div>
       <div style="flex:1">\${opt}</div>
     </button>
@@ -1345,9 +1372,19 @@ function renderPastExamQuestion() {
   </button>
 </div>
 \`;
+
+  // オプションクリックのイベントデリゲート
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ans = parseInt(btn.getAttribute('data-answer'));
+      const q2 = S.study.questions[S.study.idx];
+      selectAnswer(ans, q2.correct_answer, q2.explanation || '');
+    });
+  });
 }
 
 function nextPastQuestion() {
+  S.study.answered = false;
   S.study.idx++;
   renderPastExamQuestion();
 }
@@ -1413,6 +1450,8 @@ function renderProgress() {
   document.getElementById('main').innerHTML = \`
 <div class="section-title"><i class="fas fa-chart-line"></i>学習進捗</div>
 
+<canvas id="progress-chart" style="max-height:240px;margin-bottom:16px"></canvas>
+
 <div class="grid-4" style="gap:8px;margin-bottom:16px">
   <div class="stat-box">
     <div class="stat-num">\${total}</div>
@@ -1474,7 +1513,7 @@ function renderProgress() {
         <div style="font-weight:600">\${h.date}</div>
         <div style="font-size:12px;color:var(--sub)">\${h.correct}/\${h.total}問正解</div>
       </div>
-      <div class="badge \${h.score>=70?'badge-green':h.score>=60?'badge-blue':'badge-red'}">\${h.score}%</div>
+      <div class="badge \${h.score>=72?'badge-green':h.score>=60?'badge-blue':'badge-red'}">\${h.score}%</div>
     </div>
   \`).join('')}
 </div>
@@ -1486,6 +1525,33 @@ function renderProgress() {
   </button>
 </div>
 \`;
+
+  setTimeout(() => {
+    const ctx = document.getElementById('progress-chart');
+    if (!ctx || !window.Chart) return;
+    new window.Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['権利関係', '宅建業法', '法令制限', '税・その他'],
+        datasets: [{
+          label: '正答率(%)',
+          data: [
+            bySubject.rights?.total > 0 ? Math.round(bySubject.rights.correct/bySubject.rights.total*100) : 0,
+            bySubject.businessLaw?.total > 0 ? Math.round(bySubject.businessLaw.correct/bySubject.businessLaw.total*100) : 0,
+            bySubject.restrictions?.total > 0 ? Math.round(bySubject.restrictions.correct/bySubject.restrictions.total*100) : 0,
+            bySubject.taxOther?.total > 0 ? Math.round(bySubject.taxOther.correct/bySubject.taxOther.total*100) : 0,
+          ],
+          backgroundColor: 'rgba(124,58,237,0.2)',
+          borderColor: 'rgba(124,58,237,0.8)',
+          pointBackgroundColor: 'rgba(124,58,237,1)',
+        }]
+      },
+      options: {
+        scales: { r: { min: 0, max: 100, ticks: { stepSize: 25 } } },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }, 100);
 }
 
 // ===== REVIEW PAGE =====
@@ -1542,7 +1608,10 @@ function startReviewSession() {
 }
 
 // ===== UTILS =====
-function today() { return new Date().toISOString().slice(0, 10); }
+function today() {
+  const d = new Date();
+  return \`\${d.getFullYear()}-\${String(d.getMonth()+1).padStart(2,'0')}-\${String(d.getDate()).padStart(2,'0')}\`;
+}
 
 function calcStreak() {
   const hist = LS.get('study_history', []);
@@ -1614,10 +1683,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 function installPWA() {
   if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(r => {
+    const prompt = deferredPrompt;
+    deferredPrompt = null;
+    prompt.prompt();
+    prompt.userChoice.then(r => {
       if (r.outcome === 'accepted') { toast('インストールしました！'); hideInstallBanner(); }
-      deferredPrompt = null;
     });
   } else {
     toast('ブラウザのメニューから「ホーム画面に追加」を選択してください', 4000);
