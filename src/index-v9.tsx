@@ -62,7 +62,7 @@ app.get('/api/stats', async (c) => {
       byYear: byYear.results,
     })
   } catch {
-    return c.json({ success: true, total: 402, bySubject: [], byYear: [] })
+    return c.json({ success: true, total: 702, bySubject: [], byYear: [] })
   }
 })
 
@@ -89,8 +89,8 @@ app.get('/api/past-exam/:year', async (c) => {
 // Service Worker
 app.get('/service-worker.js', (c) => {
   const sw = `
-const CACHE_NAME = 'takken-boost-v11';
-const STATIC_CACHE = 'takken-boost-static-v11';
+const CACHE_NAME = 'takken-boost-v12';
+const STATIC_CACHE = 'takken-boost-static-v12';
 
 const STATIC_ASSETS = [
   '/',
@@ -177,7 +177,7 @@ const mainHTML = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>宅建BOOST - 宅建試験合格アプリ</title>
-<meta name="description" content="宅地建物取引士試験合格に特化したPWA学習アプリ。452問完全収録・AI弱点分析・模擬試験。">
+<meta name="description" content="宅地建物取引士試験合格に特化したPWA学習アプリ。702問完全収録（過去5年本試験モデル+令和8年AI予測模試）・AI弱点分析・模擬試験。">
 <meta name="theme-color" content="#7c3aed">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -789,7 +789,7 @@ body.dark .skeleton{
     <div class="onb-step active" data-step="1">
       <div class="onb-icon">📚</div>
       <div class="onb-title">宅建BOOSTへようこそ</div>
-      <div class="onb-body">宅地建物取引士試験合格をサポートする学習アプリ。<br><strong>452問</strong>の練習問題に詳細な解説付き。スキマ時間で着実に合格力を養成しましょう。</div>
+      <div class="onb-body">宅地建物取引士試験合格をサポートする学習アプリ。<br><strong>702問</strong>の練習問題（過去5年本試験モデル+令和8年AI予測模試含む）に詳細な解説付き。スキマ時間で着実に合格力を養成しましょう。</div>
     </div>
     <div class="onb-step" data-step="2">
       <div class="onb-icon">🎯</div>
@@ -910,7 +910,7 @@ async function renderHome() {
       const data = await r.json();
       S.stats = data;
     } catch {
-      S.stats = { total: 402, bySubject: [], byYear: [] };
+      S.stats = { total: 702, bySubject: [], byYear: [] };
     }
   }
 
@@ -1205,7 +1205,19 @@ async function renderHome() {
 }
 
 // ===== STUDY PAGE =====
-function renderStudy() {
+async function renderStudy() {
+  // Ensure stats loaded
+  if (!S.stats) {
+    try {
+      const r = await fetch('/api/stats');
+      S.stats = await r.json();
+    } catch { S.stats = { total: 702, bySubject: [], byYear: [] }; }
+  }
+  const subjMap = {};
+  (S.stats?.bySubject || []).forEach(r => { subjMap[r.subject] = r.cnt; });
+  const cnt = (s) => subjMap[s] || 0;
+  const total = S.stats?.total || 702;
+
   document.getElementById('main').innerHTML = \`
 <div class="section-title"><i class="fas fa-book-open"></i>カテゴリ別学習</div>
 <p style="font-size:14px;color:var(--sub);margin-bottom:16px">分野を選んで集中学習。解説付きで理解を深めましょう</p>
@@ -1217,7 +1229,7 @@ function renderStudy() {
       <div class="feature-icon" style="background:var(--grad)"><i class="fas fa-star"></i></div>
       <div>
         <div class="feature-title">全分野ランダム</div>
-        <div class="feature-desc">全402問からランダムに出題。本番同様の幅広い知識を確認</div>
+        <div class="feature-desc">全\${total}問からランダム出題。本番同様の幅広い知識を確認</div>
       </div>
     </div>
   </div>
@@ -1226,8 +1238,8 @@ function renderStudy() {
       <div class="feature-icon" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)"><i class="fas fa-balance-scale"></i></div>
       <div>
         <div class="feature-title">権利関係</div>
-        <div class="feature-desc">民法・借地借家法・区分所有法・不動産登記法（14問/50問）</div>
-        <div class="badge badge-purple" style="margin-top:6px">140問収録</div>
+        <div class="feature-desc">民法・借地借家法・区分所有法・不動産登記法（本試験14問/50問）</div>
+        <div class="badge badge-purple" style="margin-top:6px">\${cnt('rights')}問収録</div>
       </div>
     </div>
   </div>
@@ -1236,8 +1248,8 @@ function renderStudy() {
       <div class="feature-icon" style="background:linear-gradient(135deg,#059669,#0d9488)"><i class="fas fa-building"></i></div>
       <div>
         <div class="feature-title">宅建業法</div>
-        <div class="feature-desc">宅建業の免許・宅建士・重要事項・報酬制限（20問/50問）</div>
-        <div class="badge badge-green" style="margin-top:6px">140問収録</div>
+        <div class="feature-desc">宅建業の免許・宅建士・重要事項・報酬制限（本試験20問/50問）</div>
+        <div class="badge badge-green" style="margin-top:6px">\${cnt('businessLaw')}問収録</div>
       </div>
     </div>
   </div>
@@ -1246,8 +1258,8 @@ function renderStudy() {
       <div class="feature-icon" style="background:linear-gradient(135deg,#dc2626,#b91c1c)"><i class="fas fa-map-marked-alt"></i></div>
       <div>
         <div class="feature-title">法令上の制限</div>
-        <div class="feature-desc">都市計画法・建築基準法・農地法・国土利用計画法（8問/50問）</div>
-        <div class="badge badge-red" style="margin-top:6px">80問収録</div>
+        <div class="feature-desc">都市計画法・建築基準法・農地法・国土利用計画法（本試験8問/50問）</div>
+        <div class="badge badge-red" style="margin-top:6px">\${cnt('restrictions')}問収録</div>
       </div>
     </div>
   </div>
@@ -1256,8 +1268,8 @@ function renderStudy() {
       <div class="feature-icon" style="background:linear-gradient(135deg,#d97706,#b45309)"><i class="fas fa-yen-sign"></i></div>
       <div>
         <div class="feature-title">税・その他</div>
-        <div class="feature-desc">不動産取得税・固定資産税・所得税・鑑定評価（8問/50問）</div>
-        <div class="badge badge-yellow" style="margin-top:6px">42問収録</div>
+        <div class="feature-desc">不動産取得税・固定資産税・所得税・鑑定評価（本試験8問/50問）</div>
+        <div class="badge badge-yellow" style="margin-top:6px">\${cnt('taxOther')}問収録</div>
       </div>
     </div>
   </div>
@@ -2358,7 +2370,7 @@ function initCubeLogo() {
       ctx.shadowBlur = 0;
       ctx.font = 'bold 28px "Noto Sans JP",Arial';
       ctx.fillStyle = '#fde047';
-      ctx.fillText('v10', 256, 360);
+      ctx.fillText('702問', 256, 360);
     } else if (i === 2 || i === 3) {
       ctx.font = 'bold 140px "Noto Sans JP",Arial';
       ctx.fillText(i === 2 ? '宅' : '建', 256, 256);
