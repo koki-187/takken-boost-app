@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { secureHeaders } from 'hono/secure-headers'
 import studyRoutes from './study-api-fixed'
 import authRoutes from './auth-api-fixed'
 import mockExamRoutes from './mock-exam-complete'
@@ -12,6 +13,24 @@ export type Bindings = {
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
+
+// Security headers (CSP, X-Frame-Options, etc.) — Cloudflare無料枠で動作
+app.use('*', secureHeaders({
+  contentSecurityPolicy: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+    styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', 'https://fonts.googleapis.com'],
+    fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdn.jsdelivr.net'],
+    imgSrc: ["'self'", 'data:', 'blob:'],
+    connectSrc: ["'self'"],
+    workerSrc: ["'self'", 'blob:'],
+    objectSrc: ["'none'"],
+    frameAncestors: ["'none'"],
+  },
+  xFrameOptions: 'DENY',
+  xContentTypeOptions: 'nosniff',
+  referrerPolicy: 'strict-origin-when-cross-origin',
+}))
 
 app.use('/api/*', cors({
   origin: '*',
@@ -50,7 +69,13 @@ app.get('/api/stats', async (c) => {
 // 過去問年度別取得API
 app.get('/api/past-exam/:year', async (c) => {
   try {
-    const year = parseInt(c.req.param('year'))
+    const yearParam = c.req.param('year')
+    const year = parseInt(yearParam)
+    // Validation
+    if (!Number.isInteger(year) || year < 2000 || year > 2099) {
+      return c.json({ success: false, error: 'Invalid year. Must be 2000-2099.' }, 400)
+    }
+    if (!c.env?.DB) return c.json({ success: false, error: 'DB not bound' }, 500)
     const { DB } = c.env
     const result = await DB.prepare(
       'SELECT * FROM questions WHERE year = ? ORDER BY id'
@@ -165,7 +190,6 @@ const mainHTML = `<!DOCTYPE html>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -534,6 +558,89 @@ button,[onclick]{touch-action:manipulation}
   .btn:active{transform:scale(.97);opacity:.88}
   .feature-card:active{transform:scale(.98);border-color:var(--c1)}
 }
+
+/* ===== REDUCED MOTION ===== */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:0.01ms!important;
+  }
+  .cube-glow{animation:none!important}
+  .particle{display:none!important}
+  .answer-flash{display:none!important}
+}
+
+/* ===== BOTTOM NAV LABELS (readability) ===== */
+.nav-item{font-size:11px;padding-bottom:6px}
+.nav-item i{font-size:22px;margin-bottom:2px}
+
+/* ===== ONBOARDING ===== */
+#onboarding{
+  position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.92);
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(8px);
+}
+#onboarding.show{display:flex;animation:fadeIn .3s ease}
+.onb-card{
+  background:var(--card);border-radius:24px;max-width:420px;width:100%;
+  padding:32px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.onb-step{display:none}
+.onb-step.active{display:block;animation:fadeIn .25s ease}
+.onb-icon{
+  width:80px;height:80px;border-radius:50%;background:var(--grad);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:36px;margin:0 auto 16px;
+  box-shadow:0 8px 24px rgba(124,58,237,.4);
+}
+.onb-title{font-size:20px;font-weight:900;margin-bottom:12px;color:var(--text)}
+.onb-body{font-size:14px;line-height:1.7;color:var(--sub);margin-bottom:20px}
+.onb-dots{display:flex;justify-content:center;gap:8px;margin-bottom:20px}
+.onb-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--border);
+  transition:.2s;
+}
+.onb-dot.active{background:var(--c1);width:24px;border-radius:4px}
+.onb-actions{display:flex;gap:12px}
+
+/* ===== iOS INSTALL GUIDE ===== */
+.ios-step{
+  display:flex;gap:12px;padding:12px;background:rgba(124,58,237,.08);
+  border-radius:12px;margin-bottom:10px;align-items:center;
+}
+.ios-step-num{
+  width:28px;height:28px;border-radius:50%;background:var(--c1);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:13px;flex-shrink:0;
+}
+.ios-step-text{font-size:13px;line-height:1.5}
+
+/* ===== CUBE CLICK SCALE (anime.js replacement) ===== */
+#logo-3d-container{transition:transform .4s cubic-bezier(0.34,1.56,0.64,1)}
+#logo-3d-container.bump{transform:scale(1.15)}
+
+/* ===== WEAK SUBJECT RECOMMENDATION ===== */
+.weak-card{
+  background:linear-gradient(135deg,#fef3c7,#fde68a);
+  border-radius:16px;padding:16px;margin-bottom:16px;
+  border-left:4px solid #f59e0b;
+}
+body.dark .weak-card{
+  background:linear-gradient(135deg,#422006,#451a03);
+  border-left-color:#fbbf24;color:#fde68a;
+}
+.weak-title{font-weight:800;font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.weak-body{font-size:13px;line-height:1.6;margin-bottom:10px}
+
+/* ===== WRONG ANSWER LINK IN RESULT ===== */
+.wrong-item{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;
+  background:rgba(239,68,68,.08);border-radius:10px;margin-bottom:6px;
+  cursor:pointer;transition:.15s;border:1px solid transparent;
+}
+.wrong-item:active{transform:scale(.99);border-color:var(--danger)}
+body.dark .wrong-item{background:rgba(239,68,68,.15)}
 </style>
 </head>
 <body>
@@ -576,6 +683,41 @@ button,[onclick]{touch-action:manipulation}
     <i class="fas fa-redo"></i>復習
   </button>
 </nav>
+
+<!-- ===== ONBOARDING ===== -->
+<div id="onboarding">
+  <div class="onb-card">
+    <div class="onb-step active" data-step="1">
+      <div class="onb-icon">📚</div>
+      <div class="onb-title">宅建BOOSTへようこそ</div>
+      <div class="onb-body">宅地建物取引士試験合格をサポートする学習アプリ。<br><strong>452問</strong>の練習問題に詳細な解説付き。スキマ時間で着実に合格力を養成しましょう。</div>
+    </div>
+    <div class="onb-step" data-step="2">
+      <div class="onb-icon">🎯</div>
+      <div class="onb-title">2つの学習モード</div>
+      <div class="onb-body" style="text-align:left">
+        <strong style="color:var(--c1)">📖 カテゴリ別学習</strong><br>
+        <span style="font-size:12px">分野ごとに1問ずつ解いて解説を確認。基礎固めに最適。</span><br><br>
+        <strong style="color:var(--success)">📝 模擬試験</strong><br>
+        <span style="font-size:12px">50問・120分の本番形式。実力測定と時間配分の訓練に。</span>
+      </div>
+    </div>
+    <div class="onb-step" data-step="3">
+      <div class="onb-icon">🔥</div>
+      <div class="onb-title">間違えても大丈夫</div>
+      <div class="onb-body">誤答した問題は<strong>「復習」タブ</strong>に自動保存。詳細な法的根拠付きの解説で「なぜ間違えたか」を理解すれば、次回の正答率が確実に上がります。</div>
+    </div>
+    <div class="onb-dots">
+      <div class="onb-dot active"></div>
+      <div class="onb-dot"></div>
+      <div class="onb-dot"></div>
+    </div>
+    <div class="onb-actions">
+      <button class="btn btn-outline btn-block" onclick="closeOnboarding()">スキップ</button>
+      <button class="btn btn-primary btn-block" id="onb-next" onclick="onbNext()">次へ →</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===== TOAST ===== -->
 <div id="toast"></div>
@@ -682,18 +824,17 @@ async function renderHome() {
   const years = (S.stats?.byYear || []).map(r => r.year).filter(Boolean).sort((a,b)=>b-a);
 
   document.getElementById('main').innerHTML = \`
-<!-- ===== 3D CUBE MONUMENT ===== -->
-<div class="cube-hero fade-in-up">
-  <div class="cube-glow"></div>
-  <div id="logo-3d-container"></div>
-</div>
-
-<div class="card-grad fade-in-up fade-delay-1" style="position:relative;overflow:hidden">
+<!-- ===== UNIFIED HERO (cube + stats) ===== -->
+<div class="card-grad fade-in-up" style="position:relative;overflow:hidden;padding-top:12px">
   <div class="particle-bg" id="hero-particles"></div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;position:relative;z-index:2">
+  <div class="cube-hero" style="height:180px;margin-bottom:8px;position:relative;z-index:2">
+    <div class="cube-glow"></div>
+    <div id="logo-3d-container" style="width:160px;height:160px"></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;z-index:2">
     <div>
-      <div style="font-size:13px;opacity:.8">宅地建物取引士試験</div>
-      <div style="font-size:24px;font-weight:900">合格への最速ルート</div>
+      <div style="font-size:12px;opacity:.85;letter-spacing:.5px">宅地建物取引士試験</div>
+      <div style="font-size:20px;font-weight:900;margin-top:2px">合格への最速ルート</div>
     </div>
     \${streak > 0 ? \`<div class="streak-badge"><i class="fas fa-fire"></i>\${streak}日連続</div>\` : ''}
   </div>
@@ -1373,16 +1514,19 @@ function renderResult() {
 </div>
 
 <div class="card" style="margin-bottom:16px">
-  <div class="section-title" style="font-size:15px"><i class="fas fa-list"></i>問題別結果</div>
-  <div style="max-height:300px;overflow-y:auto">
+  <div class="section-title" style="font-size:15px"><i class="fas fa-list"></i>問題別結果 <span style="font-size:11px;font-weight:400;color:var(--sub);margin-left:auto">誤答をタップで解説</span></div>
+  <div style="max-height:340px;overflow-y:auto">
     \${(results||[]).map((r, i) => \`
-      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div class="\${r.isCorrect?'':'wrong-item'}" \${r.isCorrect?'':\`onclick="showExplanationFor(\${i})"\`}
+        style="display:flex;align-items:center;gap:12px;padding:10px 8px;\${r.isCorrect?'border-bottom:1px solid var(--border)':''}">
         <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
           background:\${r.isCorrect?'var(--success)':'var(--danger)'};color:#fff;font-size:12px;font-weight:700;flex-shrink:0">
           \${i+1}
         </div>
-        <div style="flex:1;font-size:13px;color:var(--sub)" class="text-truncate">\${r.question_text?.slice(0,50)||'...'}...</div>
-        <span class="badge \${r.isCorrect?'badge-green':'badge-red'}">\${r.isCorrect?'○':'✗'}</span>
+        <div style="flex:1;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\${r.question_text?.slice(0,60)||'...'}...</div>
+        \${r.isCorrect
+          ? '<span class="badge badge-green"><i class="fas fa-check"></i></span>'
+          : '<span class="badge badge-red" style="display:flex;align-items:center;gap:4px"><i class="fas fa-book-open"></i>解説</span>'}
       </div>
     \`).join('')}
   </div>
@@ -1549,8 +1693,27 @@ function renderProgress() {
     last7.push({ date: dateStr, count: dayItems.length, correct: dayItems.filter(h=>h.correct).length });
   }
 
+  // Weak subject detection (lowest accuracy among subjects with 3+ attempts)
+  const weakSub = Object.entries(bySubject)
+    .filter(([s, d]) => d.total >= 3)
+    .map(([s, d]) => ({s, acc: d.correct/d.total, total: d.total}))
+    .sort((a,b) => a.acc - b.acc)[0];
+
+  const subLabelMap = { rights:'権利関係', businessLaw:'宅建業法', restrictions:'法令制限', taxOther:'税・その他' };
+  const subjectAct = { rights:'rights', businessLaw:'businessLaw', restrictions:'restrictions', taxOther:'taxOther' };
+
+  const weakHTML = weakSub && weakSub.acc < 0.7 ? \`
+    <div class="weak-card">
+      <div class="weak-title"><i class="fas fa-lightbulb"></i>あなたの苦手分野</div>
+      <div class="weak-body">「<strong>\${subLabelMap[weakSub.s]||weakSub.s}</strong>」の正答率が \${Math.round(weakSub.acc*100)}%（\${weakSub.total}問中）。集中して取り組めば全体スコアが大きく伸びます。</div>
+      <button class="btn btn-primary btn-sm" onclick="nav('category',{subject:'\${subjectAct[weakSub.s]||weakSub.s}'})"><i class="fas fa-play"></i>この分野を学習</button>
+    </div>
+  \` : '';
+
   document.getElementById('main').innerHTML = \`
 <div class="section-title"><i class="fas fa-chart-line"></i>学習進捗</div>
+
+\${weakHTML}
 
 <canvas id="progress-chart" style="max-height:240px;margin-bottom:16px"></canvas>
 
@@ -1930,13 +2093,15 @@ function initCubeLogo() {
   });
   container.addEventListener('click', () => {
     isRotating = !isRotating;
-    if (typeof anime !== 'undefined') {
-      anime({targets: cube.scale, x:[1,1.2,1], y:[1,1.2,1], z:[1,1.2,1], duration:600, easing:'easeOutElastic(1,.5)'});
-    }
+    // CSS-based bump (replaces anime.js)
+    container.classList.add('bump');
+    setTimeout(() => container.classList.remove('bump'), 400);
   });
 
+  let _paused = false;
   function animate() {
     rafId = requestAnimationFrame(animate);
+    if (_paused) return;
     if (isRotating) { cube.rotation.x += .005; cube.rotation.y += .01; }
     cube.rotation.x += (my*.5 - cube.rotation.x)*.05;
     cube.rotation.y += (mx*.5 - cube.rotation.y)*.05;
@@ -1946,6 +2111,8 @@ function initCubeLogo() {
   animate();
 
   _cube3D = {
+    pause() { _paused = true; },
+    resume() { _paused = false; },
     dispose() {
       if (rafId) cancelAnimationFrame(rafId);
       renderer.dispose();
@@ -1972,10 +2139,151 @@ function createHeroParticles() {
   }
 }
 
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (document.getElementById('onboarding')?.classList.contains('show')) return;
+
+  // 1-4: select answer
+  if (['1','2','3','4'].includes(e.key)) {
+    const btn = document.querySelector('.option-btn[data-answer="'+e.key+'"]:not([disabled])');
+    if (btn) { btn.click(); e.preventDefault(); return; }
+    // exam mode
+    const examBtn = document.querySelectorAll('#exam-options .option-btn')[parseInt(e.key)-1];
+    if (examBtn) { examBtn.click(); e.preventDefault(); return; }
+  }
+  // Space/Enter: next question
+  if ((e.key === ' ' || e.key === 'Enter') && document.getElementById('nav-area')?.style.display === 'flex') {
+    document.querySelector('.sticky-next button')?.click();
+    e.preventDefault();
+  }
+  // Arrow keys: prev/next in exam
+  if (S.exam.active && e.key === 'ArrowRight') { moveExamQ(1); e.preventDefault(); }
+  if (S.exam.active && e.key === 'ArrowLeft') { moveExamQ(-1); e.preventDefault(); }
+});
+
+// ===== SWIPE GESTURES =====
+let _swipeStartX = 0, _swipeStartY = 0;
+document.addEventListener('touchstart', (e) => {
+  _swipeStartX = e.touches[0].clientX;
+  _swipeStartY = e.touches[0].clientY;
+}, {passive: true});
+document.addEventListener('touchend', (e) => {
+  if (!S.exam.active) return;
+  const dx = e.changedTouches[0].clientX - _swipeStartX;
+  const dy = e.changedTouches[0].clientY - _swipeStartY;
+  if (Math.abs(dx) > 60 && Math.abs(dy) < 40) {
+    if (dx < 0) moveExamQ(1); else moveExamQ(-1);
+  }
+}, {passive: true});
+
+// ===== VISIBILITY (battery saver for Three.js) =====
+let _cubePaused = false;
+document.addEventListener('visibilitychange', () => {
+  if (!_cube3D) return;
+  if (document.hidden) { _cube3D.pause?.(); _cubePaused = true; }
+  else if (_cubePaused) { _cube3D.resume?.(); _cubePaused = false; }
+});
+
+// ===== ONBOARDING =====
+let _onbStep = 1;
+function showOnboarding() {
+  _onbStep = 1;
+  document.getElementById('onboarding')?.classList.add('show');
+  updateOnbStep();
+}
+function closeOnboarding() {
+  document.getElementById('onboarding')?.classList.remove('show');
+  LS.set('onb_done', true);
+}
+function onbNext() {
+  if (_onbStep >= 3) { closeOnboarding(); maybeShowIOSInstall(); return; }
+  _onbStep++;
+  updateOnbStep();
+}
+function updateOnbStep() {
+  document.querySelectorAll('.onb-step').forEach(el => el.classList.toggle('active', parseInt(el.dataset.step) === _onbStep));
+  document.querySelectorAll('.onb-dot').forEach((d, i) => d.classList.toggle('active', i+1 === _onbStep));
+  const btn = document.getElementById('onb-next');
+  if (btn) btn.innerHTML = _onbStep >= 3 ? '<i class="fas fa-rocket"></i>はじめる' : '次へ →';
+}
+
+// ===== iOS INSTALL GUIDE =====
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+function isStandalone() {
+  return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+}
+function maybeShowIOSInstall() {
+  if (!isIOS() || isStandalone() || LS.get('ios_install_dismissed', false)) return;
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = \`<div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div style="text-align:center;padding:8px 8px 16px">
+      <div style="font-size:36px;margin-bottom:8px">📱</div>
+      <div style="font-size:17px;font-weight:800;margin-bottom:4px">ホーム画面に追加</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:20px">いつでもアプリのように使えます</div>
+      <div style="text-align:left">
+        <div class="ios-step"><div class="ios-step-num">1</div><div class="ios-step-text">Safariの<strong>共有ボタン</strong>（□↑）をタップ</div></div>
+        <div class="ios-step"><div class="ios-step-num">2</div><div class="ios-step-text">「<strong>ホーム画面に追加</strong>」を選択</div></div>
+        <div class="ios-step"><div class="ios-step-num">3</div><div class="ios-step-text">右上の「<strong>追加</strong>」をタップ</div></div>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:16px" onclick="this.closest('.modal-overlay').remove();LS.set('ios_install_dismissed',true)">わかりました</button>
+    </div>
+  </div>\`;
+  document.body.appendChild(modal);
+}
+
+// ===== RESULT WRONG ANSWER EXPLANATION MODAL =====
+function showExplanationFor(idx) {
+  const r = S.exam.results?.[idx];
+  if (!r) return;
+  let options = [];
+  try { options = typeof r.options === 'string' ? JSON.parse(r.options) : (r.options || []); } catch {}
+  const correctText = options[r.correct_answer-1] || '';
+  const selectedText = r.selected ? (options[r.selected-1] || '未回答') : '未回答';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = \`<div class="modal-sheet" style="max-height:90vh">
+    <div class="modal-handle"></div>
+    <div style="padding:0 4px 8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span class="badge badge-red"><i class="fas fa-times"></i> 不正解</span>
+        <span style="font-size:13px;color:var(--sub)">問\${idx+1}</span>
+      </div>
+      <div style="font-weight:700;font-size:15px;line-height:1.7;padding:14px;background:rgba(124,58,237,.08);border-radius:12px;border-left:4px solid var(--c1);margin-bottom:14px">
+        \${r.question_text}
+      </div>
+      <div style="font-size:13px;margin-bottom:6px"><strong>あなたの回答:</strong> \${r.selected ? '選択肢'+r.selected : '未回答'}</div>
+      <div style="background:#fee2e2;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:#991b1b">\${selectedText}</div>
+      <div style="font-size:13px;margin-bottom:6px"><strong style="color:var(--success)">正解:</strong> 選択肢\${r.correct_answer}</div>
+      <div style="background:#d1fae5;border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#065f46">\${correctText}</div>
+      <div class="exp-card">
+        <div class="exp-header">
+          <div class="exp-header-icon">📖</div>
+          <div><div class="exp-header-title" style="color:#065f46">詳しい解説</div></div>
+        </div>
+        <div class="exp-body" style="line-height:1.9">\${r.explanation || '解説は準備中です。'}</div>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:16px" onclick="this.closest('.modal-overlay').remove()">閉じる</button>
+    </div>
+  </div>\`;
+  document.body.appendChild(modal);
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   initDarkMode();
   nav('home');
+  // First-time onboarding
+  if (!LS.get('onb_done', false)) {
+    setTimeout(showOnboarding, 800);
+  } else {
+    setTimeout(maybeShowIOSInstall, 1500);
+  }
 });
 </script>
 </body>
