@@ -89,18 +89,32 @@ app.get('/api/past-exam/:year', async (c) => {
 // Service Worker
 app.get('/service-worker.js', (c) => {
   const sw = `
-const CACHE_NAME = 'takken-boost-v12';
-const STATIC_CACHE = 'takken-boost-static-v12';
+const CACHE_NAME = 'takken-boost-v13';
+const STATIC_CACHE = 'takken-boost-static-v13';
+const CDN_CACHE = 'takken-boost-cdn-v13';
 
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
 ];
 
+const CDN_ASSETS = [
+  'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js',
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
+];
+
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(STATIC_CACHE).then(cache => cache.addAll(STATIC_ASSETS))
-  );
+  e.waitUntil(Promise.all([
+    caches.open(STATIC_CACHE).then(cache => cache.addAll(STATIC_ASSETS)),
+    // Precache CDN scripts for offline reliability
+    caches.open(CDN_CACHE).then(cache =>
+      Promise.all(CDN_ASSETS.map(url =>
+        fetch(url, {mode: 'cors', credentials: 'omit'})
+          .then(r => r.ok ? cache.put(url, r) : null)
+          .catch(() => null)
+      ))
+    )
+  ]));
   self.skipWaiting();
 });
 
@@ -108,7 +122,7 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then(names =>
       Promise.all(names
-        .filter(n => n !== CACHE_NAME && n !== STATIC_CACHE)
+        .filter(n => n !== CACHE_NAME && n !== STATIC_CACHE && n !== CDN_CACHE)
         .map(n => caches.delete(n))
       )
     )
@@ -118,6 +132,20 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
+
+  // CDN scripts - cache first (precached at install)
+  if (url.hostname === 'cdn.jsdelivr.net') {
+    e.respondWith(
+      caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+        if (res.ok) {
+          const clone = res.clone();
+          caches.open(CDN_CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match(e.request)))
+    );
+    return;
+  }
 
   if (url.pathname === '/' || url.pathname === '/index.html') {
     e.respondWith(
@@ -178,6 +206,38 @@ const mainHTML = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>宅建BOOST - 宅建試験合格アプリ</title>
 <meta name="description" content="宅地建物取引士試験合格に特化したPWA学習アプリ。702問完全収録（過去5年本試験モデル+令和8年AI予測模試）・AI弱点分析・模擬試験。">
+<!-- OpenGraph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="宅建BOOST - 宅建試験合格アプリ">
+<meta property="og:description" content="702問完全収録。過去5年本試験モデル+令和8年AI予測模試。詳細な法令解説で次回の正答率UP。完全無料・登録不要。">
+<meta property="og:image" content="https://takken-boost.pages.dev/icons/icon-512x512.png">
+<meta property="og:url" content="https://takken-boost.pages.dev/">
+<meta property="og:site_name" content="宅建BOOST">
+<meta property="og:locale" content="ja_JP">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="宅建BOOST - 宅建試験合格アプリ">
+<meta name="twitter:description" content="702問完全収録の宅建試験対策PWA。AI予測模試+詳細法令解説。">
+<meta name="twitter:image" content="https://takken-boost.pages.dev/icons/icon-512x512.png">
+<!-- JSON-LD: LearningResource -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "name": "宅建BOOST",
+  "description": "宅地建物取引士試験合格をサポートするPWA学習アプリ。702問・詳細法令解説・AI予測模試付き。",
+  "url": "https://takken-boost.pages.dev/",
+  "inLanguage": "ja-JP",
+  "learningResourceType": "Practice Quiz",
+  "educationalLevel": "Professional Certification",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "宅地建物取引士試験受験者"
+  },
+  "teaches": "宅地建物取引業法・民法・借地借家法・区分所有法・不動産登記法・都市計画法・建築基準法・税法",
+  "isAccessibleForFree": true
+}
+</script>
 <meta name="theme-color" content="#7c3aed">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -188,8 +248,12 @@ const mainHTML = `<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+        integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
+        integrity="sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O"
+        crossorigin="anonymous"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -737,6 +801,77 @@ body.dark .skeleton{
   background:linear-gradient(90deg,#334155 0%,#475569 50%,#334155 100%);
 }
 @keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ===== LOGO SUBTITLE 12px ===== */
+.logo span{font-size:12px;opacity:.8;margin-left:6px;font-weight:500}
+
+/* ===== HERO COMPACT ON SCROLL ===== */
+.cube-hero{transition:height .3s ease,margin .3s ease}
+.cube-hero.compact{height:80px!important;margin-bottom:0!important}
+.cube-hero.compact #logo-3d-container{width:72px!important;height:72px!important}
+.cube-hero.compact .cube-glow{width:120px!important;height:120px!important}
+
+/* ===== FONT SIZE CONTROLS ===== */
+html[data-font="sm"]{font-size:14px}
+html[data-font="md"]{font-size:16px}
+html[data-font="lg"]{font-size:18px}
+html[data-font="xl"]{font-size:20px}
+.font-controls{display:flex;gap:4px;align-items:center;padding:0 4px}
+.font-controls button{
+  width:28px;height:28px;border-radius:50%;border:none;
+  background:rgba(255,255,255,.15);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:13px;font-weight:700;
+}
+.font-controls button:active{transform:scale(.92)}
+.font-controls .fc-current{
+  background:rgba(255,255,255,.3);padding:0 6px;border-radius:12px;
+  font-size:11px;color:#fff;
+}
+
+/* ===== TTS SPEED CONTROL ===== */
+.tts-speed{
+  display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;
+}
+.tts-speed-btn{
+  padding:4px 8px;border-radius:50px;border:1px solid var(--border);
+  background:var(--card);font-size:11px;font-weight:600;
+  cursor:pointer;color:var(--text);
+}
+.tts-speed-btn.active{background:var(--c1);color:#fff;border-color:var(--c1)}
+
+/* ===== SPACED REPETITION SCHEDULE ===== */
+.sr-schedule{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+  margin-bottom:16px;
+}
+.sr-day{
+  background:var(--card);border-radius:12px;padding:10px 6px;
+  text-align:center;border:2px solid var(--border);
+}
+.sr-day.due{border-color:#dc2626;background:rgba(220,38,38,.05)}
+.sr-day.today{border-color:var(--c1);background:rgba(124,58,237,.08)}
+.sr-day-label{font-size:10px;color:var(--sub);font-weight:600}
+.sr-day-count{font-size:20px;font-weight:900;color:var(--c1);line-height:1.2;margin:3px 0}
+.sr-day.due .sr-day-count{color:#dc2626}
+.sr-day-unit{font-size:10px;color:var(--sub)}
+
+/* ===== STREAK WARNING TOAST ===== */
+.streak-warning{
+  background:linear-gradient(135deg,#f59e0b,#dc2626);color:#fff;
+  border-radius:14px;padding:12px 14px;margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.streak-warning i{font-size:22px;animation:pulse 1.5s infinite}
+
+/* ===== PARTIAL RESET ===== */
+.reset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.reset-btn-sub{
+  padding:10px;border-radius:10px;background:rgba(220,38,38,.08);
+  border:1px solid rgba(220,38,38,.3);color:#dc2626;font-size:12px;
+  font-weight:600;cursor:pointer;
+}
+body.dark .reset-btn-sub{background:rgba(220,38,38,.15);color:#fca5a5}
 </style>
 </head>
 <body>
@@ -748,13 +883,17 @@ body.dark .skeleton{
       宅建BOOST <span>合格アプリ</span>
     </a>
     <div class="header-actions">
-      <button class="hbtn" onclick="nav('help')" title="使い方ガイド">
+      <div class="font-controls">
+        <button onclick="adjustFontSize(-1)" title="文字を小さく" aria-label="文字を小さく">A−</button>
+        <button onclick="adjustFontSize(1)" title="文字を大きく" aria-label="文字を大きく">A+</button>
+      </div>
+      <button class="hbtn" onclick="nav('help')" title="使い方ガイド" aria-label="使い方ガイド">
         <i class="fas fa-question-circle"></i>
       </button>
-      <button class="hbtn" onclick="toggleDark()" title="ダークモード" id="themeBtn">
+      <button class="hbtn" onclick="toggleDark()" title="ダークモード" id="themeBtn" aria-label="ダークモード切替">
         <i class="fas fa-moon"></i>
       </button>
-      <button class="hbtn" onclick="showInstallBanner()" title="インストール" id="installHeaderBtn">
+      <button class="hbtn" onclick="showInstallBanner()" title="インストール" id="installHeaderBtn" aria-label="アプリインストール">
         <i class="fas fa-download"></i>
       </button>
     </div>
@@ -806,8 +945,27 @@ body.dark .skeleton{
       <div class="onb-title">間違えても大丈夫</div>
       <div class="onb-body">誤答した問題は<strong>「復習」タブ</strong>に自動保存。詳細な法的根拠付きの解説で「なぜ間違えたか」を理解すれば、次回の正答率が確実に上がります。</div>
     </div>
+    <div class="onb-step" data-step="4">
+      <div class="onb-icon">🤖</div>
+      <div class="onb-title">「AI予測模試」って？</div>
+      <div class="onb-body" style="text-align:left">
+        過去5年(令和3〜7年)の本試験で頻出した論点と、<strong>最新の法改正</strong>（区分所有法・盛土規制法・省エネ義務化等）を分析したAIが、<strong>令和8年に出題確率の高い50問</strong>を予測したオリジナル問題集です。<br><br>
+        <span style="color:var(--sub);font-size:12px">※カンニングではなく、的中率を高めた予想問題です</span>
+      </div>
+    </div>
+    <div class="onb-step" data-step="5">
+      <div class="onb-icon">🎓</div>
+      <div class="onb-title">「5点免除」って？</div>
+      <div class="onb-body" style="text-align:left">
+        宅建業に従事している方が「登録講習」を修了すると、本試験で<strong>5問が免除</strong>（45問・90分試験）になる制度です。<br><br>
+        例年、合格率が <strong style="color:#f59e0b">約10%以上UP</strong> する強力な特典。詳細はホーム下部「5点免除」セクションでご確認ください。<br><br>
+        <span style="color:var(--sub);font-size:12px">※受講対象は宅建業者の従業者のみ</span>
+      </div>
+    </div>
     <div class="onb-dots">
       <div class="onb-dot active"></div>
+      <div class="onb-dot"></div>
+      <div class="onb-dot"></div>
       <div class="onb-dot"></div>
       <div class="onb-dot"></div>
     </div>
@@ -850,10 +1008,15 @@ const S = {
   review: { questions: [] }
 };
 
-// localStorage ラッパー
+// localStorage ラッパー (idle writes for non-blocking UI)
+const _idleSet = (fn) => {
+  if ('requestIdleCallback' in window) requestIdleCallback(fn, {timeout: 1000});
+  else setTimeout(fn, 0);
+};
 const LS = {
   get: (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def } catch { return def } },
-  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} },
+  set: (k, v) => { _idleSet(() => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} }); },
+  setSync: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} },
 };
 
 // ===== ROUTER =====
@@ -957,6 +1120,26 @@ async function renderHome() {
     </div>
   </div>
 </div>
+
+\${(() => {
+  // Streak warning: if no study today and streak > 0 and after 21:00
+  const hist = LS.get('study_history', []);
+  const todayStr = today();
+  const studiedToday = hist.some(h => h.date === todayStr);
+  const hour = new Date().getHours();
+  const streak2 = calcStreak();
+  if (!studiedToday && streak2 > 0 && hour >= 21) {
+    return \`<div class="streak-warning" onclick="nav('study')">
+      <i class="fas fa-fire"></i>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:14px">\${streak2}日連続記録が途切れます！</div>
+        <div style="font-size:12px;opacity:.9">今日まだ1問も解いていません。1問だけでもOK！</div>
+      </div>
+      <i class="fas fa-chevron-right"></i>
+    </div>\`;
+  }
+  return '';
+})()}
 
 \${(() => {
   const m = getDailyMission();
@@ -1427,6 +1610,9 @@ function selectAnswer(selected, correct, explanation) {
       <button class="exp-action-btn" data-tts onclick="speakText(\\\`\${ttsText}\\\`, this)"><i class="fas fa-volume-up"></i>読み上げ</button>
       \${q?.id ? \`<button class="exp-action-btn \${bookmarked?'active':''}" onclick="toggleBookmark('\${q.id}', this)"><i class="fas fa-bookmark"></i>保存</button>\` : ''}
       <button class="exp-action-btn" onclick="copyExplanation(\\\`\${copyText}\\\`)"><i class="fas fa-copy"></i>コピー</button>
+    </div>
+    <div class="tts-speed">
+      \${[0.8,1.0,1.5,2.0].map(r => \`<button class="tts-speed-btn \${getTTSRate()===r?'active':''}" data-rate="\${r}" onclick="setTTSRate(\${r})">\${r}x</button>\`).join('')}
     </div>
   </div>\`;
 
@@ -2108,7 +2294,13 @@ function renderProgress() {
 \` : ''}
 
 <div style="margin-top:16px;text-align:center">
-  <button class="btn btn-outline btn-sm" onclick="confirmResetData()">
+  <div class="reset-grid">
+    <button class="reset-btn-sub" onclick="resetSubject('rights')">権利関係のみ</button>
+    <button class="reset-btn-sub" onclick="resetSubject('businessLaw')">宅建業法のみ</button>
+    <button class="reset-btn-sub" onclick="resetSubject('restrictions')">法令制限のみ</button>
+    <button class="reset-btn-sub" onclick="resetSubject('taxOther')">税その他のみ</button>
+  </div>
+  <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="confirmResetData()">
     <i class="fas fa-trash"></i>データをリセット
   </button>
 </div>
@@ -2162,13 +2354,65 @@ function renderReview() {
 
   const sorted = [...wrong].sort((a, b) => (b.wrongCount || 1) - (a.wrongCount || 1));
 
+  // Spaced Repetition schedule visualization
+  const now = Date.now();
+  const intervalsMs = [1, 3, 7, 14].map(d => d*24*60*60*1000);
+  const schedule = {today: 0, d1: 0, d3: 0, d7: 0, d14: 0};
+  wrong.forEach(w => {
+    const lastSeen = w.lastSeen || 0;
+    const level = w.srLevel || 0;
+    const interval = intervalsMs[Math.min(level, intervalsMs.length-1)] || intervalsMs[0];
+    const dueAt = lastSeen + interval;
+    const daysUntil = (dueAt - now) / (24*60*60*1000);
+    if (daysUntil <= 0) schedule.today++;
+    else if (daysUntil <= 1) schedule.d1++;
+    else if (daysUntil <= 3) schedule.d3++;
+    else if (daysUntil <= 7) schedule.d7++;
+    else schedule.d14++;
+  });
+
   document.getElementById('main').innerHTML = \`
 <div class="section-title"><i class="fas fa-sync-alt"></i>弱点復習</div>
 <p style="font-size:14px;color:var(--sub);margin-bottom:12px">\${wrong.length}問の復習問題があります</p>
 
-<button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="startReviewSession()">
+<!-- 間隔反復スケジュール -->
+<div style="font-size:12px;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:6px">
+  <i class="fas fa-calendar-alt" style="color:var(--c1)"></i>間隔反復スケジュール（科学的に最適な復習日）
+</div>
+<div class="sr-schedule">
+  <div class="sr-day \${schedule.today>0?'due today':''}">
+    <div class="sr-day-label">今すぐ</div>
+    <div class="sr-day-count">\${schedule.today}</div>
+    <div class="sr-day-unit">問</div>
+  </div>
+  <div class="sr-day">
+    <div class="sr-day-label">明日</div>
+    <div class="sr-day-count">\${schedule.d1}</div>
+    <div class="sr-day-unit">問</div>
+  </div>
+  <div class="sr-day">
+    <div class="sr-day-label">3日後</div>
+    <div class="sr-day-count">\${schedule.d3}</div>
+    <div class="sr-day-unit">問</div>
+  </div>
+  <div class="sr-day">
+    <div class="sr-day-label">7日後</div>
+    <div class="sr-day-count">\${schedule.d7}</div>
+    <div class="sr-day-unit">問</div>
+  </div>
+  <div class="sr-day">
+    <div class="sr-day-label">14日後+</div>
+    <div class="sr-day-count">\${schedule.d14}</div>
+    <div class="sr-day-unit">問</div>
+  </div>
+</div>
+
+<button class="btn btn-primary btn-block" style="margin-bottom:8px" onclick="startReviewSession()">
   <i class="fas fa-play"></i>全問を復習する（\${wrong.length}問）
 </button>
+\${schedule.today > 0 ? \`<button class="btn btn-danger btn-block" style="margin-bottom:16px" onclick="startDueReview()">
+  <i class="fas fa-fire"></i>今すぐ復習が必要（\${schedule.today}問）
+</button>\` : '<div style="height:8px"></div>'}
 
 <div class="card">
   <div class="section-title" style="font-size:15px"><i class="fas fa-exclamation-triangle" style="color:var(--warn)"></i>間違えた問題</div>
@@ -2191,6 +2435,19 @@ function startReviewSession() {
   S.study.idx = 0;
   S.study.correct = 0;
   S.study.total = 0;
+  S.study.answered = false;
+  S.study.category = 'review';
+  renderQuestion();
+}
+
+function startDueReview() {
+  const due = getDueReviewQuestions();
+  if (!due.length) { toast('今すぐ復習が必要な問題はありません'); return; }
+  S.study.questions = due.slice(0, 20);
+  S.study.idx = 0;
+  S.study.correct = 0;
+  S.study.total = 0;
+  S.study.answered = false;
   S.study.category = 'review';
   renderQuestion();
 }
@@ -2223,6 +2480,16 @@ function calcStreak() {
 function resetData() {
   localStorage.clear();
   toast('データをリセットしました');
+  nav('progress');
+}
+
+function resetSubject(subject) {
+  const subLabelMap = { rights:'権利関係', businessLaw:'宅建業法', restrictions:'法令制限', taxOther:'税その他' };
+  const hist = LS.get('study_history', []).filter(h => h.subject !== subject);
+  const wrong = LS.get('wrong_questions', []).filter(w => w.subject !== subject);
+  LS.setSync('study_history', hist);
+  LS.setSync('wrong_questions', wrong);
+  toast(\`\${subLabelMap[subject]}の履歴をリセットしました\`);
   nav('progress');
 }
 
@@ -2712,7 +2979,7 @@ function closeOnboarding() {
   LS.set('onb_done', true);
 }
 function onbNext() {
-  if (_onbStep >= 3) { closeOnboarding(); maybeShowIOSInstall(); return; }
+  if (_onbStep >= 5) { closeOnboarding(); maybeShowIOSInstall(); return; }
   _onbStep++;
   updateOnbStep();
 }
@@ -2720,7 +2987,7 @@ function updateOnbStep() {
   document.querySelectorAll('.onb-step').forEach(el => el.classList.toggle('active', parseInt(el.dataset.step) === _onbStep));
   document.querySelectorAll('.onb-dot').forEach((d, i) => d.classList.toggle('active', i+1 === _onbStep));
   const btn = document.getElementById('onb-next');
-  if (btn) btn.innerHTML = _onbStep >= 3 ? '<i class="fas fa-rocket"></i>はじめる' : '次へ →';
+  if (btn) btn.innerHTML = _onbStep >= 5 ? '<i class="fas fa-rocket"></i>はじめる' : '次へ →';
 }
 
 // ===== iOS INSTALL GUIDE =====
@@ -2751,9 +3018,21 @@ function maybeShowIOSInstall() {
   document.body.appendChild(modal);
 }
 
-// ===== TEXT-TO-SPEECH =====
+// ===== TEXT-TO-SPEECH (with speed control & debounce) =====
 let _ttsUtterance = null;
+let _ttsLastClick = 0;
+function getTTSRate() { return parseFloat(LS.get('tts_rate', 1.0)) || 1.0; }
+function setTTSRate(rate) {
+  LS.set('tts_rate', rate);
+  document.querySelectorAll('.tts-speed-btn').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.rate) === rate));
+  toast('読み上げ速度: ' + rate + 'x');
+}
 function speakText(text, btnEl) {
+  // Debounce rapid clicks (300ms)
+  const now = Date.now();
+  if (now - _ttsLastClick < 300) return;
+  _ttsLastClick = now;
+
   if (!('speechSynthesis' in window)) { toast('音声機能が利用できません'); return; }
   if (speechSynthesis.speaking) {
     speechSynthesis.cancel();
@@ -2761,7 +3040,7 @@ function speakText(text, btnEl) {
     return;
   }
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ja-JP'; u.rate = 1.0; u.pitch = 1.0;
+  u.lang = 'ja-JP'; u.rate = getTTSRate(); u.pitch = 1.0;
   const voices = speechSynthesis.getVoices();
   const ja = voices.find(v => v.lang.startsWith('ja'));
   if (ja) u.voice = ja;
@@ -2770,6 +3049,21 @@ function speakText(text, btnEl) {
   btnEl?.classList.add('active');
   _ttsUtterance = u;
   speechSynthesis.speak(u);
+}
+
+// ===== FONT SIZE CONTROL =====
+const FONT_SIZES = ['sm','md','lg','xl'];
+function adjustFontSize(delta) {
+  const cur = LS.get('font_size', 'md');
+  const idx = FONT_SIZES.indexOf(cur);
+  const next = FONT_SIZES[Math.max(0, Math.min(FONT_SIZES.length-1, idx + delta))];
+  document.documentElement.setAttribute('data-font', next);
+  LS.set('font_size', next);
+  toast('文字サイズ: ' + ({sm:'小',md:'標準',lg:'大',xl:'特大'})[next]);
+}
+function applyFontSize() {
+  const saved = LS.get('font_size', 'md');
+  document.documentElement.setAttribute('data-font', saved);
 }
 
 // ===== BOOKMARK =====
@@ -2901,6 +3195,7 @@ function showExplanationFor(idx) {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+  applyFontSize();
   initDarkMode();
   nav('home');
   // First-time onboarding

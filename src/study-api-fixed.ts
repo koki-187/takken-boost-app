@@ -26,7 +26,13 @@ const CATEGORY_MAPPING: Record<string, string[]> = {
 studyRoutes.get('/questions', async (c) => {
   try {
     const { DB } = c.env
-    const { category, difficulty, limit = 20 } = c.req.query()
+    const { category, difficulty, limit: limitParam = '20' } = c.req.query()
+    // Validate limit: must be 1-100 to prevent DoS
+    const limitNum = parseInt(String(limitParam))
+    if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > 100) {
+      return c.json({ success: false, error: 'limit must be 1-100' }, 400)
+    }
+    const limit = limitNum
 
     let query = 'SELECT * FROM questions WHERE 1=1'
     const params: any[] = []
