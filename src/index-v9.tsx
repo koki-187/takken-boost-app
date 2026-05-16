@@ -748,6 +748,9 @@ body.dark .skeleton{
       宅建BOOST <span>合格アプリ</span>
     </a>
     <div class="header-actions">
+      <button class="hbtn" onclick="nav('help')" title="使い方ガイド">
+        <i class="fas fa-question-circle"></i>
+      </button>
       <button class="hbtn" onclick="toggleDark()" title="ダークモード" id="themeBtn">
         <i class="fas fa-moon"></i>
       </button>
@@ -884,6 +887,7 @@ function nav(page, params = {}) {
     progress: renderProgress, review: renderReview,
     category: renderCategory, question: renderQuestion,
     'past-exam': renderPastExam, result: renderResult, 'past-result': renderPastResult,
+    help: renderHelp,
   };
 
   Object.assign(S, { currentParams: params });
@@ -2444,6 +2448,198 @@ function createHeroParticles() {
     p.style.animation = \`particleFloat \${5+Math.random()*5}s linear \${Math.random()*5}s infinite\`;
     container.appendChild(p);
   }
+}
+
+// ===== HELP / GUIDE PAGE =====
+function detectOS() {
+  const ua = navigator.userAgent;
+  if (/iPad|iPhone|iPod/.test(ua)) return 'ios';
+  if (/Android/.test(ua)) return 'android';
+  if (/Mac/.test(ua)) return 'mac';
+  if (/Windows/.test(ua)) return 'windows';
+  return 'other';
+}
+
+function renderHelp() {
+  const os = detectOS();
+  const installGuide = {
+    ios: {icon:'🍎', title:'iPhone / iPad', steps:['Safariでアプリを開く（Chrome等不可）','下部の共有ボタン <i class="fas fa-share-square"></i> をタップ','「ホーム画面に追加」を選択','右上の「追加」をタップ → 完了']},
+    android: {icon:'🤖', title:'Android', steps:['Chromeでアプリを開く','右上のメニュー（︙）をタップ','「アプリをインストール」または「ホーム画面に追加」を選択','「インストール」をタップ → 完了']},
+    windows: {icon:'🖥️', title:'Windows PC', steps:['Chrome または Edge でアプリを開く','アドレスバー右のインストールアイコン <i class="fas fa-download"></i> をクリック','「インストール」をクリック','スタートメニューに追加されます']},
+    mac: {icon:'💻', title:'Mac', steps:['Safari 17以降 または Chrome でアプリを開く','Safari: ファイル→「Dock に追加」 / Chrome: アドレスバー右のインストールアイコン','「追加」または「インストール」をクリック','Launchpadから起動可能']},
+    other: {icon:'🌐', title:'その他のブラウザ', steps:['ブラウザのメニューから「ホーム画面に追加」または「インストール」を選択','PWA非対応ブラウザではブックマーク追加で代用','オフライン機能は使用できない場合あり']},
+  };
+
+  const features = [
+    {icon:'📖', title:'カテゴリ別学習', desc:'権利関係・宅建業法・法令制限・税その他の4分野に分けて1問ずつ学習。各問題に法令条文付き詳細解説。', color:'#7c3aed'},
+    {icon:'📝', title:'本番形式 模擬試験', desc:'50問・制限時間120分の本番同様の形式。スコア表示・分野別成績・誤答解説まで完備。', color:'#10b981'},
+    {icon:'📜', title:'過去問チャレンジ 5年分', desc:'令和3〜令和7年の本試験モデル250問。出題傾向・分野配分を完全踏襲。', color:'#dc2626'},
+    {icon:'🤖', title:'令和8年AI予測模試', desc:'過去5年トレンド分析+最新法改正でAIが予測した50問。各解説に【AI予測の根拠】記載。', color:'#f59e0b'},
+    {icon:'🔄', title:'弱点集中復習 + 間隔反復', desc:'誤答問題を1日/3日/7日/14日の最適間隔で再出題。4回正解で習得認定。', color:'#ea580c'},
+    {icon:'📊', title:'学習進捗・統計', desc:'分野別レーダーチャート・直近7日学習グラフ・模試履歴・苦手分野自動推薦。', color:'#2563eb'},
+    {icon:'🔊', title:'音声読み上げ（TTS）', desc:'解説をブラウザの音声合成で読み上げ。通勤・家事中もイヤホンで学習可能。', color:'#8b5cf6'},
+    {icon:'🔖', title:'ブックマーク・コピー', desc:'重要な解説を保存。コピーで外部メモにも転記可能。', color:'#06b6d4'},
+    {icon:'🌙', title:'ダークモード', desc:'夜間学習でも目が疲れにくい配色。ヘッダーの月アイコンで切替。', color:'#475569'},
+    {icon:'📱', title:'PWA・オフライン対応', desc:'ホーム画面に追加でアプリ化。一度開いた問題はオフラインでも閲覧可能。', color:'#10b981'},
+  ];
+
+  const updates = [
+    {date:'2026-05', title:'過去5年本試験モデル+AI予測模試', desc:'令和3〜7年250問追加。令和8年AI予測模試50問を新規搭載。'},
+    {date:'2026-05', title:'5点免除・受験申込スケジュール案内', desc:'登録講習の案内、受験申込期間、年間タイムラインをホーム画面に追加。'},
+    {date:'2026-05', title:'全403問の汎用解説を詳細化', desc:'条文番号・判例引用・他選択肢の誤り理由まで含む詳細解説に更新。'},
+    {date:'2026-05', title:'100点目標UI/UX大改善', desc:'TTS音声読み上げ・ブックマーク・コピー・コンフェッティ・今日のミッション・間隔反復追加。'},
+    {date:'2026-05', title:'マルチOS対応強化', desc:'iOS/Android/Windows/Mac対応、reduced-motion、キーボードショートカット、スワイプジェスチャー。'},
+    {date:'2026-05', title:'初回オンボーディング', desc:'初めての方向け3ステップガイド。学習モードの違いと復習ループを説明。'},
+  ];
+
+  const osGuide = installGuide[os] || installGuide.other;
+
+  document.getElementById('main').innerHTML = \`
+<button class="back-btn" onclick="nav('home')"><i class="fas fa-chevron-left"></i>ホームへ戻る</button>
+
+<!-- WELCOME -->
+<div class="card-grad" style="margin-bottom:16px;text-align:center;padding:24px">
+  <div style="font-size:32px;margin-bottom:8px">📚</div>
+  <div style="font-size:20px;font-weight:900;margin-bottom:6px">宅建BOOST 使い方ガイド</div>
+  <div style="font-size:13px;opacity:.85;line-height:1.6">宅地建物取引士試験合格をサポートする学習PWA<br>702問の練習問題に詳細な法令解説付き</div>
+</div>
+
+<!-- 全機能紹介 -->
+<div style="margin-bottom:10px"><span class="section-chip"><i class="fas fa-star"></i>全機能紹介</span></div>
+<div style="display:grid;gap:10px;margin-bottom:20px">
+  \${features.map(f => \`
+    <div class="card-sm" style="display:flex;gap:12px;align-items:flex-start">
+      <div style="width:44px;height:44px;border-radius:12px;background:\${f.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">\${f.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px;margin-bottom:3px">\${f.title}</div>
+        <div style="font-size:12px;color:var(--sub);line-height:1.5">\${f.desc}</div>
+      </div>
+    </div>
+  \`).join('')}
+</div>
+
+<!-- 最新アップデート -->
+<div style="margin-bottom:10px"><span class="section-chip" style="background:#dc2626"><i class="fas fa-bullhorn"></i>最新アップデート</span></div>
+<div class="card" style="margin-bottom:20px">
+  <div style="position:relative;padding-left:18px">
+    <div style="position:absolute;left:5px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--c1),#f59e0b)"></div>
+    \${updates.map((u, i) => \`
+      <div style="margin-bottom:\${i===updates.length-1?'0':'14px'};position:relative">
+        <div style="position:absolute;left:-19px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--c1);box-shadow:0 0 0 3px var(--card)"></div>
+        <div style="font-size:11px;color:var(--c1);font-weight:700">\${u.date}</div>
+        <div style="font-weight:700;font-size:13px;margin:2px 0">\${u.title}</div>
+        <div style="font-size:12px;color:var(--sub);line-height:1.5">\${u.desc}</div>
+      </div>
+    \`).join('')}
+  </div>
+</div>
+
+<!-- インストール手順 (OS別) -->
+<div style="margin-bottom:10px"><span class="section-chip" style="background:#10b981"><i class="fas fa-mobile-alt"></i>インストール手順</span></div>
+<div class="card" style="margin-bottom:14px;border-left:4px solid #10b981">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <span style="font-size:24px">\${osGuide.icon}</span>
+    <div>
+      <div style="font-weight:700;font-size:15px">\${osGuide.title}</div>
+      <div style="font-size:11px;color:var(--sub)">お使いのデバイスを自動検出</div>
+    </div>
+  </div>
+  <ol style="margin:0;padding-left:0;list-style:none;counter-reset:step">
+    \${osGuide.steps.map(s => \`
+      <li style="counter-increment:step;display:flex;gap:10px;padding:8px 0;font-size:13px;line-height:1.5">
+        <div style="width:24px;height:24px;border-radius:50%;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">\${osGuide.steps.indexOf(s)+1}</div>
+        <div style="flex:1">\${s}</div>
+      </li>
+    \`).join('')}
+  </ol>
+</div>
+
+<!-- その他OSも見る -->
+<details style="margin-bottom:20px">
+  <summary style="cursor:pointer;padding:10px;background:var(--card);border-radius:12px;font-size:13px;font-weight:600">▼ 他のOSの手順も見る</summary>
+  <div style="display:grid;gap:10px;margin-top:10px">
+    \${Object.entries(installGuide).filter(([k]) => k !== os).map(([k, g]) => \`
+      <div class="card-sm">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:20px">\${g.icon}</span>
+          <strong style="font-size:13px">\${g.title}</strong>
+        </div>
+        <ol style="margin:0;padding-left:18px;font-size:12px;line-height:1.7;color:var(--sub)">
+          \${g.steps.map(s => '<li>'+s+'</li>').join('')}
+        </ol>
+      </div>
+    \`).join('')}
+  </div>
+</details>
+
+<!-- 使い方の流れ -->
+<div style="margin-bottom:10px"><span class="section-chip" style="background:#f59e0b"><i class="fas fa-route"></i>合格までの使い方</span></div>
+<div class="card" style="margin-bottom:20px">
+  \${[
+    {step:1, title:'まずカテゴリ別学習', desc:'4分野を1問ずつ解いて基礎固め。解説の条文番号を確認。', icon:'📖'},
+    {step:2, title:'弱点が見えたら復習タブ', desc:'誤答は自動蓄積。間隔反復で1日/3日/7日/14日に再出題。', icon:'🔄'},
+    {step:3, title:'過去5年でレベル確認', desc:'令和3〜7年の本試験モデルで実力測定。', icon:'📜'},
+    {step:4, title:'模擬試験で時間配分訓練', desc:'50問120分の本番形式。72%(36点)以上で合格圏。', icon:'⏱️'},
+    {step:5, title:'最後にAI予測模試で総仕上げ', desc:'令和8年予測50問で最新トレンド対応。', icon:'🤖'},
+  ].map(s => \`
+    <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="width:40px;height:40px;border-radius:12px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">\${s.icon}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px"><span style="color:var(--c1)">STEP \${s.step}</span> — \${s.title}</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:2px;line-height:1.5">\${s.desc}</div>
+      </div>
+    </div>
+  \`).join('')}
+</div>
+
+<!-- ショートカット -->
+<div style="margin-bottom:10px"><span class="section-chip" style="background:#475569"><i class="fas fa-keyboard"></i>便利な操作</span></div>
+<div class="card" style="margin-bottom:20px">
+  <div style="display:grid;gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px">選択肢を選ぶ</span>
+      <span style="font-family:monospace;background:var(--bg);padding:3px 8px;border-radius:6px;font-size:12px">1 / 2 / 3 / 4</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px">次の問題へ</span>
+      <span style="font-family:monospace;background:var(--bg);padding:3px 8px;border-radius:6px;font-size:12px">Space / Enter</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px">模試で前後の問題</span>
+      <span style="font-family:monospace;background:var(--bg);padding:3px 8px;border-radius:6px;font-size:12px">← / →</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+      <span style="font-size:13px">スマホで前後の問題</span>
+      <span style="font-size:12px;color:var(--sub)">左右スワイプ</span>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div style="margin-bottom:10px"><span class="section-chip" style="background:#06b6d4"><i class="fas fa-question"></i>よくある質問</span></div>
+<div class="card" style="margin-bottom:24px">
+  \${[
+    {q:'費用はかかりますか？', a:'完全無料です。広告も無く、ログイン不要でお使いいただけます。'},
+    {q:'オフラインで使えますか？', a:'ホーム画面に追加（PWAインストール）すると、一度開いた問題はオフラインで閲覧可能です。'},
+    {q:'データは安全ですか？', a:'学習履歴は端末内のlocalStorageに保存されます。サーバーには個人情報は送信されません。'},
+    {q:'本試験問題ではないのですか？', a:'著作権配慮のため、各年度の出題傾向・分野配分を完全踏襲した「本試験モデル問題」です。条文・判例も正確で合格力養成に直結します。'},
+    {q:'5点免除の登録講習はどこで受けられますか？', a:'ホーム画面下部「5点免除」セクションから国土交通省の登録講習実施機関一覧へリンクがあります。'},
+    {q:'学習履歴をリセットしたい', a:'「進捗」タブ最下部の「データをリセット」ボタンから可能です。'},
+  ].map((f, i) => \`
+    <details style="border-bottom:\${i===5?'none':'1px solid var(--border)'};padding:10px 0">
+      <summary style="cursor:pointer;font-weight:600;font-size:13px;list-style:none;display:flex;justify-content:space-between;align-items:center">
+        <span><i class="fas fa-circle-question" style="color:var(--c1);margin-right:6px"></i>\${f.q}</span>
+        <i class="fas fa-chevron-down" style="font-size:11px;color:var(--sub)"></i>
+      </summary>
+      <div style="padding:10px 0 0 22px;font-size:12px;line-height:1.6;color:var(--sub)">\${f.a}</div>
+    </details>
+  \`).join('')}
+</div>
+
+<button class="btn btn-primary btn-block btn-lg" onclick="nav('home')" style="margin-bottom:20px">
+  <i class="fas fa-rocket"></i>学習を始める
+</button>
+\`;
 }
 
 // ===== KEYBOARD SHORTCUTS =====
