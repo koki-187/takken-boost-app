@@ -3052,11 +3052,35 @@ function initCubeLogo() {
     mx = ((e.clientX - rect.left)/rect.width)*2 - 1;
     my = -((e.clientY - rect.top)/rect.height)*2 + 1;
   });
-  container.addEventListener('click', () => {
-    isRotating = !isRotating;
-    // CSS-based bump (replaces anime.js)
+  // Touch support for mobile - cube rotates with finger
+  container.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    const rect = container.getBoundingClientRect();
+    mx = ((t.clientX - rect.left)/rect.width)*2 - 1;
+    my = -((t.clientY - rect.top)/rect.height)*2 + 1;
+  }, {passive: false});
+  container.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    // Add spin boost on touch
+    cube.rotation.y += 0.5;
     container.classList.add('bump');
     setTimeout(() => container.classList.remove('bump'), 400);
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(20);
+  }, {passive: false});
+  container.addEventListener('click', () => {
+    isRotating = !isRotating;
+    container.classList.add('bump');
+    setTimeout(() => container.classList.remove('bump'), 400);
+    // Quick spin burst on click
+    const startRotY = cube.rotation.y;
+    let progress = 0;
+    const burst = setInterval(() => {
+      progress += 0.05;
+      if (progress >= 1) { clearInterval(burst); return; }
+      cube.rotation.y = startRotY + Math.PI * 2 * (1 - Math.pow(1 - progress, 3));
+    }, 16);
   });
 
   let _paused = false;
