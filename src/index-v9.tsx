@@ -89,9 +89,9 @@ app.get('/api/past-exam/:year', async (c) => {
 // Service Worker
 app.get('/service-worker.js', (c) => {
   const sw = `
-const CACHE_NAME = 'takken-boost-v13';
-const STATIC_CACHE = 'takken-boost-static-v13';
-const CDN_CACHE = 'takken-boost-cdn-v13';
+const CACHE_NAME = 'takken-boost-v14';
+const STATIC_CACHE = 'takken-boost-static-v14';
+const CDN_CACHE = 'takken-boost-cdn-v14';
 
 const STATIC_ASSETS = [
   '/',
@@ -549,26 +549,42 @@ html{scroll-behavior:smooth}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--c1);border-radius:2px}
 
-/* ===== 3D CUBE MONUMENT ===== */
+/* ===== 3D CUBE MONUMENT (brand identity hero) ===== */
 .cube-hero{
-  position:relative;width:100%;height:220px;
+  position:relative;width:100%;height:260px;
   display:flex;align-items:center;justify-content:center;
   margin-bottom:8px;cursor:pointer;
+  background:
+    radial-gradient(ellipse at center,rgba(168,85,247,.18) 0%,transparent 60%);
 }
 #logo-3d-container{
-  width:200px;height:200px;position:relative;z-index:2;
-  filter:drop-shadow(0 12px 32px rgba(124,58,237,.4));
+  width:220px;height:220px;position:relative;z-index:3;
+  filter:drop-shadow(0 16px 48px rgba(124,58,237,.55));
 }
 .cube-glow{
-  position:absolute;width:280px;height:280px;border-radius:50%;
-  background:radial-gradient(circle,rgba(168,85,247,.35) 0%,rgba(124,58,237,.15) 40%,transparent 70%);
+  position:absolute;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(168,85,247,.45) 0%,rgba(124,58,237,.2) 40%,transparent 70%);
   z-index:1;pointer-events:none;
   animation:cubeGlowPulse 3s ease-in-out infinite;
+}
+.cube-hero::before,.cube-hero::after{
+  content:'';position:absolute;border-radius:50%;
+  border:1px dashed rgba(168,85,247,.3);
+  z-index:2;pointer-events:none;
+}
+.cube-hero::before{
+  width:240px;height:240px;
+  animation:cubeRingSpin 30s linear infinite;
+}
+.cube-hero::after{
+  width:280px;height:280px;border-style:dotted;border-color:rgba(124,58,237,.25);
+  animation:cubeRingSpin 45s linear infinite reverse;
 }
 @keyframes cubeGlowPulse{
   0%,100%{transform:scale(1);opacity:.7}
   50%{transform:scale(1.1);opacity:1}
 }
+@keyframes cubeRingSpin{to{transform:rotate(360deg)}}
 
 /* ===== FLOATING PARTICLES ===== */
 .particle-bg{
@@ -1404,10 +1420,10 @@ async function renderHome() {
   const years = (S.stats?.byYear || []).map(r => r.year).filter(Boolean).sort((a,b)=>b-a);
 
   document.getElementById('main').innerHTML = \`
-<!-- ===== 3D CUBE MONUMENT (standalone, prominent) ===== -->
-<div class="cube-hero fade-in-up" style="height:220px;margin-bottom:12px">
+<!-- ===== 3D CUBE MONUMENT (brand hero) ===== -->
+<div class="cube-hero fade-in-up" style="margin-bottom:14px">
   <div class="cube-glow"></div>
-  <div id="logo-3d-container" style="width:200px;height:200px"></div>
+  <div id="logo-3d-container"></div>
 </div>
 
 <!-- ===== HERO STATS CARD ===== -->
@@ -3070,7 +3086,7 @@ function renderLP() {
 <div class="lp-container">
   <div class="lp-stars"></div>
 
-  <!-- HERO (Page 1) -->
+  <!-- HERO (Page 1) — 3Dキューブをブランド主役に -->
   <div class="lp-section">
     <div class="lp-hero">
       <div class="lp-eyebrow">AI × PWA × マルチOS対応</div>
@@ -3101,7 +3117,6 @@ function renderLP() {
         <div class="device device-laptop"><div class="device-screen">
           <div style="font-size:8px;color:#22d3ee;font-weight:900;margin-bottom:4px">📊 学習分析</div>
           <div class="mini-bar full"></div><div class="mini-bar s80"></div><div class="mini-bar s60"></div><div class="mini-bar s40"></div>
-          <div style="margin-top:6px;display:flex;gap:2px"><div class="mini-bar full" style="width:40%"></div><div class="mini-bar full" style="width:30%;background:#22d3ee"></div></div>
         </div></div>
       </div>
     </div>
