@@ -1151,6 +1151,198 @@ body.lp-mode .nav-pill{background:#60a5fa}
   box-shadow:0 16px 48px rgba(34,211,238,.15);
 }
 
+/* ===== HOME ICON HERO (PDF page 1 reproduction) ===== */
+.lp-house-stage{
+  position:relative;margin:24px 0 20px;height:200px;
+  display:flex;align-items:center;justify-content:center;
+}
+.lp-network-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(34,211,238,.15) 0%, transparent 8%),
+    radial-gradient(circle at 80% 25%, rgba(96,165,250,.15) 0%, transparent 8%),
+    radial-gradient(circle at 25% 75%, rgba(167,139,250,.15) 0%, transparent 8%),
+    radial-gradient(circle at 75% 80%, rgba(34,211,238,.15) 0%, transparent 8%);
+}
+.lp-network-bg::before,.lp-network-bg::after{
+  content:'';position:absolute;inset:10% 15%;
+  border:1px dashed rgba(96,165,250,.2);border-radius:50%;
+}
+.lp-network-bg::after{
+  inset:25% 30%;border-color:rgba(34,211,238,.3);
+  animation:cubeRingSpin 25s linear infinite;
+}
+.lp-house{
+  position:relative;width:120px;height:120px;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(34,211,238,.35) 0%,rgba(34,211,238,.1) 50%,transparent 70%);
+  z-index:3;
+}
+.lp-house-icon{
+  font-size:64px;color:#22d3ee;
+  filter:drop-shadow(0 0 24px rgba(34,211,238,.7));
+}
+.lp-category-tag{
+  position:absolute;background:rgba(15,23,42,.85);
+  border:1px solid rgba(96,165,250,.4);border-radius:50px;
+  padding:5px 12px;font-size:10px;font-weight:700;color:#bfdbfe;
+  backdrop-filter:blur(8px);box-shadow:0 4px 16px rgba(0,0,0,.4);
+  white-space:nowrap;z-index:4;
+}
+.lp-category-tag::before{
+  content:'';position:absolute;left:50%;top:50%;
+  width:1px;height:60px;background:linear-gradient(to bottom,rgba(96,165,250,.6),transparent);
+  transform-origin:top center;z-index:-1;
+}
+.lp-cat-1{top:10%;left:8%;transform:rotate(-2deg)}
+.lp-cat-2{top:10%;right:8%;transform:rotate(2deg)}
+.lp-cat-3{bottom:15%;left:5%;transform:rotate(2deg)}
+.lp-cat-4{bottom:15%;right:5%;transform:rotate(-2deg)}
+
+/* ===== SIDE BENEFITS (Page 2 right column) ===== */
+.lp-benefits-strip{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+  margin:24px 0;
+}
+@media(min-width:600px){.lp-benefits-strip{grid-template-columns:repeat(4,1fr)}}
+.lp-benefit{
+  background:rgba(15,23,42,.6);border:1px solid rgba(96,165,250,.25);
+  border-radius:16px;padding:14px 10px;text-align:center;
+  backdrop-filter:blur(10px);
+}
+.lp-benefit-icon{
+  width:48px;height:48px;border-radius:50%;
+  background:radial-gradient(circle,rgba(34,211,238,.25) 0%,transparent 70%);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 6px;font-size:22px;
+  border:1px solid rgba(34,211,238,.4);
+  filter:drop-shadow(0 0 8px rgba(34,211,238,.4));
+}
+.lp-benefit-title{font-size:11px;font-weight:700;color:#fff;line-height:1.3}
+
+/* ===== PAGE 3: Old vs New 3-column ===== */
+.lp-vs-grid{
+  display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:24px;
+}
+@media(min-width:768px){.lp-vs-grid{grid-template-columns:1fr 1.2fr 1fr}}
+.lp-vs-col{
+  background:rgba(15,23,42,.6);border-radius:18px;padding:18px;
+  border:1px solid rgba(96,165,250,.2);
+}
+.lp-vs-old{border-color:rgba(148,163,184,.3)}
+.lp-vs-new{border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.05)}
+.lp-vs-label{
+  display:inline-block;padding:4px 12px;border-radius:50px;
+  font-size:11px;font-weight:800;letter-spacing:1px;margin-bottom:12px;
+}
+.lp-vs-old .lp-vs-label{background:rgba(148,163,184,.2);color:#94a3b8}
+.lp-vs-new .lp-vs-label{background:linear-gradient(135deg,#22d3ee,#60a5fa);color:#0a0e27}
+.lp-vs-item{
+  display:flex;gap:10px;align-items:flex-start;padding:8px 0;
+  border-bottom:1px solid rgba(96,165,250,.1);font-size:12px;
+}
+.lp-vs-item:last-child{border-bottom:none}
+.lp-vs-item-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.lp-vs-old .lp-vs-item-icon{color:#64748b}
+.lp-vs-new .lp-vs-item-icon{color:#22d3ee}
+.lp-vs-item-text{color:#cbd5e1;line-height:1.5}
+.lp-vs-old .lp-vs-item-text{color:#94a3b8}
+
+/* AI brain center for Page 3 middle col */
+.lp-ai-brain{
+  position:relative;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:280px;
+}
+.lp-ai-brain-orb{
+  width:110px;height:110px;border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, #67e8f9, #22d3ee 40%, #1e3a8a 80%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:900;color:#fff;
+  box-shadow:0 0 60px rgba(34,211,238,.5),inset -8px -16px 32px rgba(0,0,0,.3);
+  z-index:3;position:relative;
+}
+.lp-ai-brain-orb::before{
+  content:'';position:absolute;inset:-20px;border-radius:50%;
+  border:1px solid rgba(34,211,238,.3);animation:cubeRingSpin 15s linear infinite;
+}
+.lp-ai-brain-orb::after{
+  content:'';position:absolute;inset:-40px;border-radius:50%;
+  border:1px dashed rgba(96,165,250,.25);animation:cubeRingSpin 25s linear infinite reverse;
+}
+.lp-ai-tag{
+  position:absolute;background:rgba(15,23,42,.9);
+  border:1px solid rgba(96,165,250,.4);border-radius:50px;
+  padding:4px 10px;font-size:10px;font-weight:700;color:#bfdbfe;
+  backdrop-filter:blur(8px);white-space:nowrap;
+}
+.lp-ai-tag-1{top:10%;left:5%}
+.lp-ai-tag-2{top:10%;right:5%}
+.lp-ai-tag-3{bottom:10%;left:5%}
+.lp-ai-tag-4{bottom:10%;right:5%}
+
+/* ===== STEP PHONE MOCKUPS (Page 4) ===== */
+.lp-step-phones{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  margin-bottom:24px;
+}
+.lp-step-phone{
+  background:#0a0e27;border-radius:16px;
+  border:2px solid rgba(96,165,250,.3);
+  padding:8px;position:relative;
+  box-shadow:0 12px 32px rgba(0,0,0,.5);
+  aspect-ratio:9/16;display:flex;flex-direction:column;
+}
+.lp-step-phone-screen{
+  flex:1;background:linear-gradient(180deg,#1e1b4b,#0a0e27);
+  border-radius:10px;padding:8px;
+  display:flex;flex-direction:column;gap:4px;
+  overflow:hidden;font-size:9px;
+}
+.lp-step-badge{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#22d3ee,#60a5fa);
+  color:#0a0e27;padding:3px 10px;border-radius:50px;
+  font-size:10px;font-weight:900;letter-spacing:1px;
+  box-shadow:0 4px 12px rgba(34,211,238,.4);z-index:2;
+}
+.lp-mockline{height:6px;background:rgba(96,165,250,.3);border-radius:3px;margin:2px 0}
+.lp-mockline.l{width:80%}
+.lp-mockline.s{width:50%}
+.lp-mockcircle{
+  width:36px;height:36px;border-radius:50%;border:2px solid #22d3ee;
+  margin:6px auto;display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:900;color:#22d3ee;
+}
+
+/* ===== QR CODE MOCK (CSS-only checker pattern) ===== */
+.lp-qr-mock{
+  width:80px;height:80px;background:#fff;border-radius:8px;
+  padding:8px;margin:0 auto 8px;position:relative;
+  background-image:
+    linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%),
+    linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%);
+  background-size:8px 8px;
+  background-position:0 0,4px 4px;
+}
+.lp-qr-mock::before{
+  content:'';position:absolute;top:8px;left:8px;width:16px;height:16px;
+  background:#fff;border:3px solid #000;
+}
+.lp-qr-mock::after{
+  content:'';position:absolute;top:8px;right:8px;width:16px;height:16px;
+  background:#fff;border:3px solid #000;
+}
+
+/* Page 3 VERSION UP badge */
+.lp-version-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#22d3ee,#60a5fa);
+  color:#0a0e27;padding:6px 14px;border-radius:50px;
+  font-size:11px;font-weight:900;letter-spacing:2px;
+  box-shadow:0 4px 16px rgba(34,211,238,.4);
+}
+
 /* ===== FLASHCARD FLIP ===== */
 .flashcard-container{
   perspective:1000px;width:100%;max-width:500px;margin:0 auto;
@@ -3147,6 +3339,18 @@ function renderLP() {
         <i class="fas fa-rocket"></i>無料で学習を始める
       </button>
 
+      <!-- House icon hero (PDF page 1 reproduction) -->
+      <div class="lp-house-stage">
+        <div class="lp-network-bg"></div>
+        <div class="lp-category-tag lp-cat-1">🏛️ 宅建業法</div>
+        <div class="lp-category-tag lp-cat-2">⚖️ 権利関係</div>
+        <div class="lp-category-tag lp-cat-3">📐 法令上の制限</div>
+        <div class="lp-category-tag lp-cat-4">💰 税その他</div>
+        <div class="lp-house">
+          <i class="fas fa-home lp-house-icon"></i>
+        </div>
+      </div>
+
       <!-- Device mockups -->
       <div class="lp-devices">
         <div class="lp-house-glow"></div>
@@ -3190,22 +3394,93 @@ function renderLP() {
         </div>
       \`).join('')}
     </div>
-  </div>
 
-  <!-- Page 3: VERSION UP — AI orbit -->
-  <div class="lp-section">
-    <div class="lp-section-title">"覚える"から、<br><em>"最適化して受かる"</em>へ。</div>
-    <div class="lp-section-sub">AIがあなたの学習を伴走し、合格まで導く</div>
-
-    <div class="lp-ai-orbit">
-      <div class="lp-ai-orbit-ring"></div>
-      <div class="lp-ai-center">AI</div>
-      <div class="lp-orbit-item">🎯 苦手分析</div>
-      <div class="lp-orbit-item">🧠 理解度予測</div>
-      <div class="lp-orbit-item">📈 最適レコメンド</div>
-      <div class="lp-orbit-item">⚡ 効率最大化</div>
+    <!-- 4 circular benefits (Page 2 right column reproduction) -->
+    <div class="lp-benefits-strip">
+      <div class="lp-benefit">
+        <div class="lp-benefit-icon">⏱️</div>
+        <div class="lp-benefit-title">スキマ時間で<br>効率学習</div>
+      </div>
+      <div class="lp-benefit">
+        <div class="lp-benefit-icon">🧠</div>
+        <div class="lp-benefit-title">AI最適化の<br>学習体験</div>
+      </div>
+      <div class="lp-benefit">
+        <div class="lp-benefit-icon">📈</div>
+        <div class="lp-benefit-title">データ・成績を<br>可視化</div>
+      </div>
+      <div class="lp-benefit">
+        <div class="lp-benefit-icon">🌐</div>
+        <div class="lp-benefit-title">いつでもどこでも<br>継続学習</div>
+      </div>
     </div>
 
+    <div style="text-align:center;background:rgba(34,211,238,.06);border-radius:14px;padding:14px;margin-bottom:24px;font-size:13px;color:#bfdbfe">
+      💡 宅建試験の合格に必要なすべてを、<strong style="color:#22d3ee">ひとつのアプリ</strong>に。<br>
+      AIがあなたの学習を伴走し、合格までサポートします。
+    </div>
+  </div>
+
+  <!-- Page 3: VERSION UP — 3-column Old vs AI Brain vs New -->
+  <div class="lp-section">
+    <div style="text-align:center;margin-bottom:8px">
+      <span class="lp-version-badge">VERSION UP / 宅建BOOST アップデート</span>
+    </div>
+    <div class="lp-section-title">"覚える"から、<br><em>"最適化して受かる"</em>へ。</div>
+    <div class="lp-section-sub">AIがあなたの学習を分析し、新しい宅建BOOSTへ。</div>
+
+    <div class="lp-vs-grid">
+      <!-- 旧バージョン -->
+      <div class="lp-vs-col lp-vs-old">
+        <div class="lp-vs-label">従来の宅建BOOST</div>
+        \${[
+          ['📝','単体の問題演習中心'],
+          ['📱','スマホ中心の学習環境'],
+          ['📚','一般的な学習サポート'],
+          ['📊','進捗の可視化が限定的'],
+          ['💭','暗記中心の学習体験'],
+        ].map(([i,t]) => \`
+          <div class="lp-vs-item">
+            <div class="lp-vs-item-icon">\${i}</div>
+            <div class="lp-vs-item-text">\${t}</div>
+          </div>
+        \`).join('')}
+      </div>
+
+      <!-- 中央: AI Brain -->
+      <div class="lp-vs-col" style="background:transparent;border:none">
+        <div class="lp-ai-brain">
+          <div class="lp-ai-tag lp-ai-tag-1">🎯 苦手分析</div>
+          <div class="lp-ai-tag lp-ai-tag-2">🧠 理解度予測</div>
+          <div class="lp-ai-tag lp-ai-tag-3">⚡ 最適レコメンド</div>
+          <div class="lp-ai-tag lp-ai-tag-4">📈 効率最大化</div>
+          <div class="lp-ai-brain-orb">AI</div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px">
+          AIが学習を最適化<br>あなた専用の学習エンジン
+        </div>
+      </div>
+
+      <!-- 新バージョン -->
+      <div class="lp-vs-col lp-vs-new">
+        <div class="lp-vs-label">新・宅建BOOST</div>
+        \${[
+          ['🤖','AI学習最適化エンジン'],
+          ['📲','PWA × マルチOS対応'],
+          ['✨','進化したUI/UX'],
+          ['📡','リアルタイム進捗分析'],
+          ['📖','理解を深める学習体験'],
+          ['☁️','デバイス間同期'],
+        ].map(([i,t]) => \`
+          <div class="lp-vs-item">
+            <div class="lp-vs-item-icon">\${i}</div>
+            <div class="lp-vs-item-text">\${t}</div>
+          </div>
+        \`).join('')}
+      </div>
+    </div>
+
+    <!-- 進化のポイント比較表 (PDF下部) -->
     <div class="lp-compare">
       <div class="lp-compare-row lp-compare-header">
         <div class="lp-old">旧バージョン</div><div></div><div class="lp-new">新バージョン</div>
@@ -3228,9 +3503,44 @@ function renderLP() {
 
   <!-- Page 4: 3 STEP INSTALL -->
   <div class="lp-section">
+    <div style="text-align:center;font-size:12px;color:#22d3ee;font-weight:700;margin-bottom:8px;letter-spacing:1px">
+      インストール不要。すぐ始められる宅建AI。
+    </div>
     <div class="lp-section-title">たった<em>3ステップ</em>で、<br>すぐにアプリ化。</div>
-    <div class="lp-section-sub">PWA対応で、インストール不要のアプリ体験</div>
+    <div class="lp-section-sub">宅建BOOSTはPWA (Progressive Web App)。<br>ブラウザからアクセスで、アプリのように快適にご利用いただけます。</div>
 
+    <!-- Phone mockup STEPs -->
+    <div class="lp-step-phones">
+      <div class="lp-step-phone">
+        <div class="lp-step-badge">STEP 1</div>
+        <div class="lp-step-phone-screen">
+          <div style="text-align:center;color:#22d3ee;font-weight:900;font-size:9px;margin-top:20%">ブラウザで<br>アクセス</div>
+          <div class="lp-mockcircle">🌐</div>
+          <div style="font-size:7px;color:#94a3b8;text-align:center">takken-boost.pages.dev</div>
+        </div>
+      </div>
+      <div class="lp-step-phone">
+        <div class="lp-step-badge">STEP 2</div>
+        <div class="lp-step-phone-screen">
+          <div style="text-align:center;color:#22d3ee;font-weight:900;font-size:9px;margin-top:10%">ホーム画面に追加</div>
+          <div class="lp-mockline l"></div>
+          <div class="lp-mockline s"></div>
+          <div class="lp-mockline l"></div>
+          <div style="background:rgba(34,211,238,.2);border-radius:4px;padding:4px;text-align:center;color:#22d3ee;font-size:8px;margin-top:4px">📲 ホーム画面に追加</div>
+          <div class="lp-mockline s"></div>
+        </div>
+      </div>
+      <div class="lp-step-phone">
+        <div class="lp-step-badge">STEP 3</div>
+        <div class="lp-step-phone-screen">
+          <div style="text-align:center;color:#22d3ee;font-weight:900;font-size:9px;margin-top:10%">アプリ化完了！</div>
+          <div style="text-align:center;font-size:24px;margin-top:8%">🚀</div>
+          <div style="text-align:center;color:#fde047;font-size:7px;margin-top:4px;font-weight:700">タップで<br>すぐ起動！</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text steps below mockups -->
     <div class="lp-step">
       <div class="lp-step-num">1</div>
       <div>
@@ -3264,15 +3574,19 @@ function renderLP() {
       <div class="lp-os"><div class="lp-os-icon">💻</div><div class="lp-os-name">Mac</div></div>
     </div>
 
-    <!-- URL cards -->
+    <!-- URL cards with QR-like visual -->
     <div style="display:flex;gap:10px;margin-bottom:24px">
       <div class="lp-qr-card primary">
-        <div class="lp-qr-label">最新版はこちら</div>
+        <div class="lp-qr-label">📱 最新版はこちら</div>
+        <div class="lp-qr-mock"></div>
         <div class="lp-qr-url">takken-boost.pages.dev</div>
+        <div style="font-size:10px;color:#22d3ee;margin-top:6px;font-weight:700">最新のAIと学習を体験</div>
       </div>
       <div class="lp-qr-card">
-        <div class="lp-qr-label">旧バージョン</div>
+        <div class="lp-qr-label">📦 旧バージョン</div>
+        <div class="lp-qr-mock" style="opacity:.6"></div>
         <div class="lp-qr-url">takken-boost-v9.pages.dev</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:6px">従来の宅建BOOSTを利用</div>
       </div>
     </div>
 
