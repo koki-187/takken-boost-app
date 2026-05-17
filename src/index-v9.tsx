@@ -849,23 +849,22 @@ body.dark .quick-secondary{background:#1e293b;color:#a78bfa;border-color:rgba(16
 .cube-hero.compact #logo-3d-container{width:72px!important;height:72px!important}
 .cube-hero.compact .cube-glow{width:120px!important;height:120px!important}
 
-/* ===== FONT SIZE CONTROLS ===== */
-html[data-font="sm"]{font-size:14px}
-html[data-font="md"]{font-size:16px}
-html[data-font="lg"]{font-size:18px}
-html[data-font="xl"]{font-size:20px}
-.font-controls{display:flex;gap:4px;align-items:center;padding:0 4px}
-.font-controls button{
-  width:28px;height:28px;border-radius:50%;border:none;
-  background:rgba(255,255,255,.15);color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:13px;font-weight:700;
+/* ===== FONT SIZE CONTROL (zoom-based) ===== */
+html[data-font="sm"] .logo{font-size:18px}
+html[data-font="md"] .logo{font-size:20px}
+html[data-font="lg"] .logo{font-size:22px}
+html[data-font="xl"] .logo{font-size:24px}
+/* Header indicator for current font size */
+#fontSizeBtn::after{
+  content:attr(data-label);
+  position:absolute;bottom:-2px;right:-2px;
+  background:#fde047;color:#854d0e;
+  font-size:8px;font-weight:900;
+  padding:1px 4px;border-radius:8px;
+  border:1px solid rgba(0,0,0,.15);
 }
-.font-controls button:active{transform:scale(.92)}
-.font-controls .fc-current{
-  background:rgba(255,255,255,.3);padding:0 6px;border-radius:12px;
-  font-size:11px;color:#fff;
-}
+#fontSizeBtn{position:relative}
+.header-actions{align-items:center}
 
 /* ===== TTS SPEED CONTROL ===== */
 .tts-speed{
@@ -1234,10 +1233,9 @@ body.dark .reset-btn-sub{background:rgba(220,38,38,.15);color:#fca5a5}
       宅建BOOST <span>合格アプリ</span>
     </a>
     <div class="header-actions">
-      <div class="font-controls">
-        <button onclick="adjustFontSize(-1)" title="文字を小さく" aria-label="文字を小さく">A−</button>
-        <button onclick="adjustFontSize(1)" title="文字を大きく" aria-label="文字を大きく">A+</button>
-      </div>
+      <button class="hbtn" onclick="cycleFontSize()" title="文字サイズ変更" aria-label="文字サイズ変更" id="fontSizeBtn">
+        <i class="fas fa-text-height"></i>
+      </button>
       <button class="hbtn" onclick="nav('help')" title="使い方ガイド" aria-label="使い方ガイド">
         <i class="fas fa-question-circle"></i>
       </button>
@@ -2887,7 +2885,7 @@ function confirmResetData() {
 // ===== DARK MODE =====
 function toggleDark() {
   const isDark = document.body.classList.toggle('dark');
-  LS.set('dark', isDark);
+  LS.setSync('dark', isDark);
   document.getElementById('themeBtn').innerHTML = isDark
     ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 }
@@ -3775,19 +3773,38 @@ function speakText(text, btnEl) {
   speechSynthesis.speak(u);
 }
 
-// ===== FONT SIZE CONTROL =====
+// ===== FONT SIZE CONTROL (zoom-based for actual visible change) =====
 const FONT_SIZES = ['sm','md','lg','xl'];
+const FONT_ZOOM = {sm: 0.9, md: 1.0, lg: 1.15, xl: 1.3};
+const FONT_LABEL = {sm:'小', md:'標準', lg:'大', xl:'特大'};
+function applyFontSize() {
+  const saved = LS.get('font_size', 'md');
+  document.body.style.zoom = FONT_ZOOM[saved] || 1;
+  document.documentElement.setAttribute('data-font', saved);
+  const btn = document.getElementById('fontSizeBtn');
+  if (btn) btn.setAttribute('data-label', FONT_LABEL[saved]);
+}
+function cycleFontSize() {
+  const cur = LS.get('font_size', 'md');
+  const idx = FONT_SIZES.indexOf(cur);
+  const next = FONT_SIZES[(idx + 1) % FONT_SIZES.length];
+  LS.setSync('font_size', next); // immediate sync write to prevent stale reads
+  document.body.style.zoom = FONT_ZOOM[next];
+  document.documentElement.setAttribute('data-font', next);
+  const btn = document.getElementById('fontSizeBtn');
+  if (btn) btn.setAttribute('data-label', FONT_LABEL[next]);
+  toast('文字サイズ: ' + FONT_LABEL[next]);
+}
 function adjustFontSize(delta) {
   const cur = LS.get('font_size', 'md');
   const idx = FONT_SIZES.indexOf(cur);
   const next = FONT_SIZES[Math.max(0, Math.min(FONT_SIZES.length-1, idx + delta))];
+  LS.setSync('font_size', next);
+  document.body.style.zoom = FONT_ZOOM[next];
   document.documentElement.setAttribute('data-font', next);
-  LS.set('font_size', next);
-  toast('文字サイズ: ' + ({sm:'小',md:'標準',lg:'大',xl:'特大'})[next]);
-}
-function applyFontSize() {
-  const saved = LS.get('font_size', 'md');
-  document.documentElement.setAttribute('data-font', saved);
+  const btn = document.getElementById('fontSizeBtn');
+  if (btn) btn.setAttribute('data-label', FONT_LABEL[next]);
+  toast('文字サイズ: ' + FONT_LABEL[next]);
 }
 
 // ===== BOOKMARK =====
@@ -3796,7 +3813,7 @@ function toggleBookmark(qid, btnEl) {
   const idx = bm.indexOf(qid);
   if (idx > -1) { bm.splice(idx, 1); toast('ブックマーク解除'); btnEl?.classList.remove('active'); }
   else { bm.push(qid); toast('ブックマーク保存'); btnEl?.classList.add('active'); }
-  LS.set('bookmarks', bm);
+  LS.setSync('bookmarks', bm);
 }
 function isBookmarked(qid) { return LS.get('bookmarks', []).includes(qid); }
 
