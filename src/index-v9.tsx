@@ -865,95 +865,255 @@ html[data-font="xl"]{font-size:20px}
 }
 .streak-warning i{font-size:22px;animation:pulse 1.5s infinite}
 
-/* ===== LP (Landing Page) ===== */
-.lp-hero{
-  background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4f46e5 100%);
-  color:#fff;border-radius:24px;padding:32px 24px 28px;
-  margin:-16px -16px 20px;position:relative;overflow:hidden;
+/* ===== LP (Landing Page) — PDF design match ===== */
+body.lp-mode{background:#0a0e27;color:#e0e7ff}
+body.lp-mode #app-header{background:rgba(10,14,39,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(96,165,250,.2)}
+body.lp-mode #bottom-nav{background:rgba(10,14,39,.95);backdrop-filter:blur(12px);border-top:1px solid rgba(96,165,250,.2)}
+body.lp-mode .nav-item{color:#94a3b8}
+body.lp-mode .nav-item.active{color:#60a5fa}
+body.lp-mode .nav-pill{background:#60a5fa}
+
+.lp-container{
+  margin:-16px;padding:0;color:#e0e7ff;
+  background:
+    radial-gradient(ellipse at top,rgba(59,130,246,.15) 0%,transparent 50%),
+    radial-gradient(ellipse at bottom right,rgba(124,58,237,.2) 0%,transparent 60%),
+    linear-gradient(180deg,#0a0e27 0%,#1e1b4b 50%,#0a0e27 100%);
+  min-height:100vh;
+  position:relative;overflow:hidden;
 }
-.lp-hero-bg{
-  position:absolute;inset:0;background:
-    radial-gradient(circle at 20% 30%,rgba(167,139,250,.3) 0%,transparent 40%),
-    radial-gradient(circle at 80% 70%,rgba(124,58,237,.4) 0%,transparent 50%);
-  pointer-events:none;
+/* Circuit / starfield background */
+.lp-stars{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%,#60a5fa 0%,transparent 100%),
+    radial-gradient(1px 1px at 60% 70%,#a78bfa 0%,transparent 100%),
+    radial-gradient(2px 2px at 80% 15%,#22d3ee 0%,transparent 100%),
+    radial-gradient(1px 1px at 30% 80%,#60a5fa 0%,transparent 100%),
+    radial-gradient(1px 1px at 90% 50%,#c4b5fd 0%,transparent 100%),
+    radial-gradient(1px 1px at 10% 60%,#67e8f9 0%,transparent 100%);
+  background-size:200px 200px,300px 300px,250px 250px,400px 400px,350px 350px,180px 180px;
+  background-repeat:repeat;
+  opacity:.6;
+  animation:starsDrift 60s linear infinite;
 }
-.lp-tagline{font-size:13px;opacity:.8;margin-bottom:6px;letter-spacing:1px}
-.lp-headline{font-size:28px;font-weight:900;line-height:1.3;margin-bottom:8px}
-.lp-headline em{font-style:normal;color:#fde047}
-.lp-sub{font-size:13px;opacity:.85;line-height:1.6;margin-bottom:20px}
-.lp-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+@keyframes starsDrift{0%{background-position:0 0,0 0,0 0,0 0,0 0,0 0}100%{background-position:200px 200px,-300px -300px,250px -250px,-400px 400px,350px -350px,-180px 180px}}
+
+.lp-section{position:relative;padding:0 20px;z-index:2}
+
+/* HERO */
+.lp-hero{padding:60px 20px 50px;text-align:left;position:relative;z-index:2}
+.lp-eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:3px;font-weight:600;
+  color:#60a5fa;text-transform:uppercase;margin-bottom:12px;
+  border:1px solid rgba(96,165,250,.3);padding:4px 12px;border-radius:50px;
+  background:rgba(59,130,246,.08);
+}
+.lp-headline{
+  font-size:34px;font-weight:900;line-height:1.25;margin-bottom:16px;
+  color:#fff;letter-spacing:-1px;
+}
+.lp-headline em{font-style:normal;color:#22d3ee;text-shadow:0 0 24px rgba(34,211,238,.5)}
+.lp-sub{font-size:14px;line-height:1.7;color:#cbd5e1;margin-bottom:24px;max-width:90%}
+.lp-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
 .lp-badge{
-  background:rgba(255,255,255,.15);padding:5px 12px;border-radius:50px;
-  font-size:11px;font-weight:700;backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,.2);
+  background:linear-gradient(135deg,rgba(96,165,250,.15),rgba(167,139,250,.15));
+  border:1px solid rgba(96,165,250,.3);
+  padding:6px 12px;border-radius:50px;
+  font-size:11px;font-weight:700;color:#bfdbfe;
+  backdrop-filter:blur(8px);
 }
 .lp-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,#22d3ee,#60a5fa);
+  color:#0a0e27;padding:16px 32px;
+  border-radius:50px;font-weight:900;font-size:15px;text-decoration:none;
+  box-shadow:0 8px 32px rgba(34,211,238,.4),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:.2s;border:none;cursor:pointer;
+}
+.lp-cta:active{transform:scale(.97);box-shadow:0 4px 16px rgba(34,211,238,.4)}
+.lp-cta-secondary{
   display:inline-flex;align-items:center;gap:8px;
-  background:#fff;color:var(--c1);padding:14px 28px;
-  border-radius:50px;font-weight:800;font-size:15px;text-decoration:none;
-  box-shadow:0 8px 24px rgba(0,0,0,.3);transition:.2s;border:none;cursor:pointer;
+  background:transparent;color:#60a5fa;padding:14px 28px;
+  border-radius:50px;font-weight:700;font-size:13px;text-decoration:none;
+  border:1px solid rgba(96,165,250,.4);cursor:pointer;margin-left:10px;
 }
-.lp-cta:active{transform:scale(.97)}
 
+/* Device mockup hero */
+.lp-devices{
+  position:relative;height:280px;margin:30px 0 10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.device{
+  position:absolute;border-radius:18px;
+  background:linear-gradient(135deg,#1e293b,#0f172a);
+  box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.1);
+  overflow:hidden;border:2px solid rgba(96,165,250,.2);
+}
+.device-screen{
+  background:linear-gradient(160deg,#1e1b4b,#312e81 60%,#0a0e27);
+  width:100%;height:100%;padding:8px;
+  display:flex;flex-direction:column;
+}
+.device-phone{
+  width:90px;height:180px;left:50%;margin-left:-115px;top:30px;z-index:2;
+  transform:rotate(-8deg);
+}
+.device-tablet{
+  width:130px;height:170px;left:50%;margin-left:-65px;top:55px;z-index:3;
+}
+.device-laptop{
+  width:180px;height:130px;left:50%;margin-left:25px;top:90px;z-index:1;
+  transform:rotate(6deg);
+}
+.mini-ring{
+  width:38px;height:38px;border-radius:50%;border:3px solid #22d3ee;
+  margin:8px auto;display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:900;color:#22d3ee;
+}
+.mini-bar{height:3px;background:#60a5fa;border-radius:2px;margin:2px 0;opacity:.5}
+.mini-bar.full{width:100%}.mini-bar.s60{width:60%}.mini-bar.s80{width:80%}.mini-bar.s40{width:40%}
+.lp-house-glow{
+  position:absolute;width:120px;height:120px;left:50%;top:50%;
+  transform:translate(-50%,-50%);z-index:0;
+  background:radial-gradient(circle,rgba(34,211,238,.3) 0%,transparent 70%);
+  animation:cubeGlowPulse 3s infinite;
+}
+
+/* SECTION TITLE */
 .lp-section-title{
-  font-size:22px;font-weight:900;text-align:center;margin:32px 0 8px;
+  font-size:26px;font-weight:900;text-align:center;
+  margin:50px 0 6px;color:#fff;letter-spacing:-.5px;
 }
-.lp-section-title em{font-style:normal;color:var(--c1)}
-.lp-section-sub{text-align:center;color:var(--sub);font-size:13px;margin-bottom:20px}
+.lp-section-title em{font-style:normal;color:#22d3ee}
+.lp-section-sub{
+  text-align:center;color:#94a3b8;font-size:13px;margin-bottom:28px;line-height:1.6;
+}
 
-.lp-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+/* FEATURES GRID */
+.lp-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:30px}
 @media(min-width:600px){.lp-features{grid-template-columns:repeat(4,1fr)}}
 .lp-feature{
-  background:var(--card);border-radius:16px;padding:14px 12px;
-  text-align:center;border:1px solid var(--border);
-  transition:.2s;
+  background:rgba(15,23,42,.5);border-radius:16px;padding:18px 12px;
+  text-align:center;
+  border:1px solid rgba(96,165,250,.2);
+  backdrop-filter:blur(12px);
+  transition:.25s;position:relative;overflow:hidden;
 }
-.lp-feature:hover{border-color:var(--c1);transform:translateY(-2px)}
+.lp-feature::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(96,165,250,.1),transparent);
+  opacity:0;transition:.25s;
+}
+.lp-feature:hover{border-color:#22d3ee;transform:translateY(-3px);box-shadow:0 12px 32px rgba(34,211,238,.15)}
+.lp-feature:hover::before{opacity:1}
 .lp-feature-icon{
-  font-size:28px;margin-bottom:6px;
+  font-size:28px;margin-bottom:8px;display:block;position:relative;
+  filter:drop-shadow(0 0 8px rgba(96,165,250,.5));
 }
-.lp-feature-title{font-weight:700;font-size:13px;margin-bottom:3px}
-.lp-feature-desc{font-size:11px;color:var(--sub);line-height:1.4}
+.lp-feature-title{font-weight:800;font-size:13px;margin-bottom:4px;color:#fff;position:relative}
+.lp-feature-desc{font-size:11px;color:#94a3b8;line-height:1.5;position:relative}
 
+/* AI ORBIT (PDF page 3 concept) */
+.lp-ai-orbit{
+  position:relative;width:280px;height:280px;margin:30px auto;
+}
+.lp-ai-center{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle,#22d3ee 0%,#3b82f6 50%,#1e3a8a 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;font-weight:900;color:#fff;
+  box-shadow:0 0 60px rgba(34,211,238,.6),inset 0 -8px 16px rgba(0,0,0,.3);
+  z-index:2;
+}
+.lp-ai-orbit-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:1px dashed rgba(96,165,250,.4);
+  animation:orbitSpin 20s linear infinite;
+}
+@keyframes orbitSpin{to{transform:rotate(360deg)}}
+.lp-orbit-item{
+  position:absolute;background:rgba(15,23,42,.8);
+  border:1px solid rgba(96,165,250,.4);border-radius:50px;
+  padding:6px 12px;font-size:11px;font-weight:700;color:#bfdbfe;
+  backdrop-filter:blur(8px);
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+.lp-orbit-item:nth-child(2){top:0;left:50%;transform:translateX(-50%)}
+.lp-orbit-item:nth-child(3){right:0;top:50%;transform:translateY(-50%)}
+.lp-orbit-item:nth-child(4){bottom:0;left:50%;transform:translateX(-50%)}
+.lp-orbit-item:nth-child(5){left:0;top:50%;transform:translateY(-50%)}
+
+/* COMPARE */
 .lp-compare{
-  background:var(--card);border-radius:16px;overflow:hidden;
-  margin-bottom:24px;border:1px solid var(--border);
+  background:rgba(15,23,42,.6);border-radius:20px;overflow:hidden;
+  margin-bottom:30px;border:1px solid rgba(96,165,250,.2);
+  backdrop-filter:blur(12px);
 }
 .lp-compare-row{
-  display:grid;grid-template-columns:1fr auto 1fr;gap:8px;
-  padding:12px 14px;border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:1fr 30px 1fr;gap:10px;
+  padding:14px 16px;border-bottom:1px solid rgba(96,165,250,.1);
   align-items:center;font-size:12px;
 }
 .lp-compare-row:last-child{border-bottom:none}
 .lp-compare-header{
-  background:rgba(124,58,237,.06);font-weight:800;font-size:11px;
-  color:var(--c1);
+  background:linear-gradient(90deg,rgba(96,165,250,.1),rgba(167,139,250,.1));
+  font-weight:800;font-size:11px;letter-spacing:1px;
 }
-.lp-old{color:var(--sub);text-align:right}
-.lp-new{color:var(--text);font-weight:600}
-.lp-arrow{color:var(--c1);font-weight:900}
+.lp-compare-header .lp-old{color:#94a3b8}
+.lp-compare-header .lp-new{color:#22d3ee}
+.lp-old{color:#64748b;text-align:right;font-size:11px}
+.lp-new{color:#e0e7ff;font-weight:600;font-size:12px}
+.lp-arrow{color:#22d3ee;font-weight:900;text-align:center}
 
+/* STEPS */
 .lp-step{
-  background:var(--card);border-radius:16px;padding:18px 16px;
-  margin-bottom:12px;display:flex;gap:14px;align-items:flex-start;
-  border-left:4px solid var(--c1);
+  background:rgba(15,23,42,.6);border-radius:18px;padding:20px 18px;
+  margin-bottom:14px;display:flex;gap:16px;align-items:flex-start;
+  border:1px solid rgba(96,165,250,.2);backdrop-filter:blur(12px);
+  position:relative;
 }
 .lp-step-num{
-  width:44px;height:44px;border-radius:50%;background:var(--grad);
-  color:#fff;display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:18px;flex-shrink:0;
-  box-shadow:0 4px 12px rgba(124,58,237,.3);
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,#22d3ee,#3b82f6);
+  color:#0a0e27;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:20px;flex-shrink:0;
+  box-shadow:0 6px 20px rgba(34,211,238,.4);
 }
-.lp-step-title{font-weight:800;font-size:15px;margin-bottom:4px}
-.lp-step-desc{font-size:12px;color:var(--sub);line-height:1.5}
+.lp-step-title{font-weight:800;font-size:16px;margin-bottom:4px;color:#fff}
+.lp-step-desc{font-size:12px;color:#94a3b8;line-height:1.6}
 
-.lp-os-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px}
+/* OS grid */
+.lp-os-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:28px}
 .lp-os{
-  background:var(--card);border-radius:12px;padding:12px 4px;
-  text-align:center;border:1px solid var(--border);
+  background:rgba(15,23,42,.6);border-radius:14px;padding:14px 6px;
+  text-align:center;border:1px solid rgba(96,165,250,.2);
+  backdrop-filter:blur(12px);
 }
-.lp-os-icon{font-size:24px;margin-bottom:2px}
-.lp-os-name{font-size:10px;font-weight:700;color:var(--sub)}
+.lp-os-icon{font-size:26px;margin-bottom:4px;filter:drop-shadow(0 0 6px rgba(96,165,250,.4))}
+.lp-os-name{font-size:10px;font-weight:700;color:#bfdbfe}
+
+/* QR card */
+.lp-qr-card{
+  background:rgba(15,23,42,.6);border-radius:16px;padding:16px;
+  border:1px solid rgba(96,165,250,.2);
+  text-align:center;flex:1;backdrop-filter:blur(12px);
+}
+.lp-qr-label{font-size:10px;color:#94a3b8;margin-bottom:6px;letter-spacing:1px;font-weight:700}
+.lp-qr-url{font-family:monospace;font-size:11px;color:#22d3ee;word-break:break-all;font-weight:700}
+.lp-qr-card.primary{border-color:#22d3ee;background:rgba(34,211,238,.08)}
+
+/* Final CTA */
+.lp-final-cta{
+  background:
+    linear-gradient(135deg,rgba(34,211,238,.15),rgba(167,139,250,.15)),
+    rgba(15,23,42,.8);
+  border:1px solid rgba(34,211,238,.4);
+  border-radius:24px;padding:32px 24px;text-align:center;
+  margin-bottom:30px;backdrop-filter:blur(16px);
+  box-shadow:0 16px 48px rgba(34,211,238,.15);
+}
 
 /* ===== FLASHCARD FLIP ===== */
 .flashcard-container{
@@ -1183,6 +1343,9 @@ function nav(page, params = {}) {
   if (navEl) navEl.classList.add('active');
 
   window.scrollTo(0, 0);
+
+  // Exit LP mode when navigating away from LP
+  if (page !== 'lp') document.body.classList.remove('lp-mode');
 
   // Dispose 3D cube when leaving home (memory leak prevention)
   if (page !== 'home' && typeof _cube3D !== 'undefined' && _cube3D) {
@@ -2900,119 +3063,175 @@ function createHeroParticles() {
   }
 }
 
-// ===== LANDING PAGE (LP) =====
+// ===== LANDING PAGE (LP) — PDF design match =====
 function renderLP() {
+  document.body.classList.add('lp-mode');
   document.getElementById('main').innerHTML = \`
-<div class="lp-hero">
-  <div class="lp-hero-bg"></div>
-  <div style="position:relative;z-index:2">
-    <div class="lp-tagline">AI × PWA × マルチOS対応 学習プラットフォーム</div>
-    <div class="lp-headline">宅建学習を、<br><em>"AI時代"</em>へ。</div>
-    <div class="lp-sub">過去5年本試験+令和8年AI予測模試 702問完全収録。詳細な法令解説で次回の正答率UP。完全無料・登録不要。</div>
-    <div class="lp-badges">
-      <span class="lp-badge">📚 702問収録</span>
-      <span class="lp-badge">🤖 AI予測模試</span>
-      <span class="lp-badge">🔊 音声学習</span>
-      <span class="lp-badge">📱 PWA対応</span>
+<div class="lp-container">
+  <div class="lp-stars"></div>
+
+  <!-- HERO (Page 1) -->
+  <div class="lp-section">
+    <div class="lp-hero">
+      <div class="lp-eyebrow">AI × PWA × マルチOS対応</div>
+      <div class="lp-headline">宅建学習を、<br><em>"AI時代"</em>へ。</div>
+      <div class="lp-sub">過去5年本試験+令和8年AI予測模試 <strong>702問完全収録</strong>。詳細な法令解説で次回の正答率UP。完全無料・登録不要。</div>
+      <div class="lp-badges">
+        <span class="lp-badge">📚 702問収録</span>
+        <span class="lp-badge">🤖 AI予測模試</span>
+        <span class="lp-badge">🔊 音声学習</span>
+        <span class="lp-badge">📱 PWA対応</span>
+      </div>
+      <button class="lp-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
+        <i class="fas fa-rocket"></i>無料で学習を始める
+      </button>
+
+      <!-- Device mockups -->
+      <div class="lp-devices">
+        <div class="lp-house-glow"></div>
+        <div class="device device-phone"><div class="device-screen">
+          <div class="mini-ring">72%</div>
+          <div class="mini-bar full"></div><div class="mini-bar s80"></div><div class="mini-bar s60"></div><div class="mini-bar s40"></div>
+        </div></div>
+        <div class="device device-tablet"><div class="device-screen">
+          <div style="font-size:9px;color:#22d3ee;font-weight:900;margin-bottom:6px">ダッシュボード</div>
+          <div class="mini-ring">72%</div>
+          <div class="mini-bar full"></div><div class="mini-bar s80"></div><div class="mini-bar s60"></div>
+        </div></div>
+        <div class="device device-laptop"><div class="device-screen">
+          <div style="font-size:8px;color:#22d3ee;font-weight:900;margin-bottom:4px">📊 学習分析</div>
+          <div class="mini-bar full"></div><div class="mini-bar s80"></div><div class="mini-bar s60"></div><div class="mini-bar s40"></div>
+          <div style="margin-top:6px;display:flex;gap:2px"><div class="mini-bar full" style="width:40%"></div><div class="mini-bar full" style="width:30%;background:#22d3ee"></div></div>
+        </div></div>
+      </div>
     </div>
-    <button class="lp-cta" onclick="nav('home')">
-      <i class="fas fa-rocket"></i>無料で学習を始める
-    </button>
   </div>
-</div>
 
-<div class="lp-section-title">"従来の宅建学習"を<em>アップデート</em></div>
-<div class="lp-section-sub">AIと一緒に、宅建試験合格へ。</div>
+  <!-- Page 2: 8 features -->
+  <div class="lp-section">
+    <div class="lp-section-title">"従来の宅建学習"を<br><em>アップデート</em>。</div>
+    <div class="lp-section-sub">AIと一緒に、宅建試験合格へ。</div>
 
-<div class="lp-features">
-  \${[
-    {icon:'📚',title:'豊富な問題演習',desc:'過去5年+令和8年AI予測 702問'},
-    {icon:'🤖',title:'AI学習サポート',desc:'苦手分析・最適レコメンド'},
-    {icon:'📊',title:'進捗の可視化',desc:'レーダーチャート・履歴'},
-    {icon:'📇',title:'暗記カード機能',desc:'flip式・TTS音声・自己評価'},
-    {icon:'🎯',title:'今日のミッション',desc:'デイリー目標+間隔反復'},
-    {icon:'📝',title:'本番形式模試',desc:'50問120分・分野別採点'},
-    {icon:'🔖',title:'ブックマーク',desc:'重要解説を保存'},
-    {icon:'📱',title:'マルチOS対応',desc:'iPhone・Android・PC全対応'},
-  ].map(f => \`
-    <div class="lp-feature">
-      <div class="lp-feature-icon">\${f.icon}</div>
-      <div class="lp-feature-title">\${f.title}</div>
-      <div class="lp-feature-desc">\${f.desc}</div>
+    <div class="lp-features">
+      \${[
+        {icon:'📚',title:'豊富な問題演習',desc:'過去5年+令和8年AI予測 702問'},
+        {icon:'🤖',title:'AI学習サポート',desc:'苦手分析・最適レコメンド'},
+        {icon:'📊',title:'進捗の可視化',desc:'レーダー・履歴・統計'},
+        {icon:'📇',title:'暗記カード機能',desc:'flip式・TTS音声・自己評価'},
+        {icon:'🎯',title:'スケジュール管理',desc:'デイリー目標+間隔反復'},
+        {icon:'📝',title:'本番形式模試',desc:'50問120分・分野別採点'},
+        {icon:'🔖',title:'重要点ブックマーク',desc:'解説を保存・コピー可能'},
+        {icon:'📱',title:'マルチデバイス対応',desc:'iPhone・Android・PC全対応'},
+      ].map(f => \`
+        <div class="lp-feature">
+          <div class="lp-feature-icon">\${f.icon}</div>
+          <div class="lp-feature-title">\${f.title}</div>
+          <div class="lp-feature-desc">\${f.desc}</div>
+        </div>
+      \`).join('')}
     </div>
-  \`).join('')}
-</div>
-
-<div class="lp-section-title">"覚える"から、<em>"最適化して受かる"</em>へ。</div>
-<div class="lp-section-sub">AIがあなたの学習を伴走し、合格まで導く</div>
-
-<div class="lp-compare">
-  <div class="lp-compare-row lp-compare-header">
-    <div>旧バージョン</div><div></div><div>新バージョン</div>
   </div>
-  \${[
-    ['単体学習・暗記中心', 'AI最適化による知識・実戦型学習'],
-    ['スマホ中心の利用環境', 'マルチOS対応（iOS/Android/iPad/Win/Mac）'],
-    ['一般的な解説の提供', 'AIによる個別最適化された学習体験'],
-    ['進捗の可視化が限定的', 'リアルタイム分析+レーダーチャート'],
-    ['画一的な学習サポート', 'AIアシスタントが合格まで伴走'],
-  ].map(([o, n]) => \`
-    <div class="lp-compare-row">
-      <div class="lp-old">\${o}</div>
-      <div class="lp-arrow">▶</div>
-      <div class="lp-new">\${n}</div>
+
+  <!-- Page 3: VERSION UP — AI orbit -->
+  <div class="lp-section">
+    <div class="lp-section-title">"覚える"から、<br><em>"最適化して受かる"</em>へ。</div>
+    <div class="lp-section-sub">AIがあなたの学習を伴走し、合格まで導く</div>
+
+    <div class="lp-ai-orbit">
+      <div class="lp-ai-orbit-ring"></div>
+      <div class="lp-ai-center">AI</div>
+      <div class="lp-orbit-item">🎯 苦手分析</div>
+      <div class="lp-orbit-item">🧠 理解度予測</div>
+      <div class="lp-orbit-item">📈 最適レコメンド</div>
+      <div class="lp-orbit-item">⚡ 効率最大化</div>
     </div>
-  \`).join('')}
-</div>
 
-<div class="lp-section-title">たった<em>3ステップ</em>で、すぐにアプリ化</div>
-<div class="lp-section-sub">PWA対応で、インストール不要のアプリ体験</div>
-
-<div class="lp-step">
-  <div class="lp-step-num">1</div>
-  <div>
-    <div class="lp-step-title">ブラウザでアクセス</div>
-    <div class="lp-step-desc">URLにアクセスして宅建BOOSTを開きます</div>
+    <div class="lp-compare">
+      <div class="lp-compare-row lp-compare-header">
+        <div class="lp-old">旧バージョン</div><div></div><div class="lp-new">新バージョン</div>
+      </div>
+      \${[
+        ['単体学習・暗記中心', 'AI最適化による知識・実戦型学習'],
+        ['スマホ中心の利用環境', 'マルチOS対応（iOS/Android/iPad/Win/Mac）'],
+        ['一般的な解説の提供', 'AIによる個別最適化された学習体験'],
+        ['進捗の可視化が限定的', 'リアルタイム分析+レーダーチャート'],
+        ['画一的な学習サポート', 'AIアシスタントが合格まで伴走'],
+      ].map(([o, n]) => \`
+        <div class="lp-compare-row">
+          <div class="lp-old">\${o}</div>
+          <div class="lp-arrow">▶</div>
+          <div class="lp-new">\${n}</div>
+        </div>
+      \`).join('')}
+    </div>
   </div>
-</div>
-<div class="lp-step">
-  <div class="lp-step-num">2</div>
-  <div>
-    <div class="lp-step-title">ホーム画面に追加</div>
-    <div class="lp-step-desc">ブラウザのメニューから「ホーム画面に追加」をタップ</div>
+
+  <!-- Page 4: 3 STEP INSTALL -->
+  <div class="lp-section">
+    <div class="lp-section-title">たった<em>3ステップ</em>で、<br>すぐにアプリ化。</div>
+    <div class="lp-section-sub">PWA対応で、インストール不要のアプリ体験</div>
+
+    <div class="lp-step">
+      <div class="lp-step-num">1</div>
+      <div>
+        <div class="lp-step-title">ブラウザでアクセス</div>
+        <div class="lp-step-desc">URLにアクセスして宅建BOOSTを開きます</div>
+      </div>
+    </div>
+    <div class="lp-step">
+      <div class="lp-step-num">2</div>
+      <div>
+        <div class="lp-step-title">ホーム画面に追加</div>
+        <div class="lp-step-desc">ブラウザのメニューから「ホーム画面に追加」をタップ</div>
+      </div>
+    </div>
+    <div class="lp-step">
+      <div class="lp-step-num">3</div>
+      <div>
+        <div class="lp-step-title">アプリ化完了！</div>
+        <div class="lp-step-desc">ホーム画面のアイコンから、タップですぐ起動</div>
+      </div>
+    </div>
+
+    <div class="lp-section-title" style="margin-top:40px;font-size:22px">PWAで<em>マルチOS</em>対応</div>
+    <div class="lp-section-sub">どこでも、同じ体験で</div>
+
+    <div class="lp-os-grid">
+      <div class="lp-os"><div class="lp-os-icon">🍎</div><div class="lp-os-name">iPhone</div></div>
+      <div class="lp-os"><div class="lp-os-icon">🤖</div><div class="lp-os-name">Android</div></div>
+      <div class="lp-os"><div class="lp-os-icon">📱</div><div class="lp-os-name">iPad</div></div>
+      <div class="lp-os"><div class="lp-os-icon">🖥️</div><div class="lp-os-name">Windows</div></div>
+      <div class="lp-os"><div class="lp-os-icon">💻</div><div class="lp-os-name">Mac</div></div>
+    </div>
+
+    <!-- URL cards -->
+    <div style="display:flex;gap:10px;margin-bottom:24px">
+      <div class="lp-qr-card primary">
+        <div class="lp-qr-label">最新版はこちら</div>
+        <div class="lp-qr-url">takken-boost.pages.dev</div>
+      </div>
+      <div class="lp-qr-card">
+        <div class="lp-qr-label">旧バージョン</div>
+        <div class="lp-qr-url">takken-boost-v9.pages.dev</div>
+      </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="lp-final-cta">
+      <div style="font-size:32px;margin-bottom:10px">🎓</div>
+      <div style="font-size:20px;font-weight:900;margin-bottom:8px;color:#fff">まずは無料で体験しよう！</div>
+      <div style="font-size:12px;color:#cbd5e1;margin-bottom:20px;line-height:1.6">今すぐアクセスして、<br>AIに最適化された学習を体感してください</div>
+      <button class="lp-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
+        <i class="fas fa-arrow-right"></i>宅建BOOSTで、最短合格へ。
+      </button>
+    </div>
+
+    <div style="text-align:center;padding:0 0 60px">
+      <button class="lp-cta-secondary" onclick="document.body.classList.remove('lp-mode');nav('help')">
+        <i class="fas fa-info-circle"></i>使い方ガイドを見る
+      </button>
+    </div>
   </div>
-</div>
-<div class="lp-step">
-  <div class="lp-step-num">3</div>
-  <div>
-    <div class="lp-step-title">アプリ化完了！</div>
-    <div class="lp-step-desc">ホーム画面のアイコンからすぐに起動できます</div>
-  </div>
-</div>
-
-<div class="lp-section-title">PWAで<em>マルチOS</em>対応</div>
-<div class="lp-section-sub">どこでも、同じ体験で</div>
-
-<div class="lp-os-grid">
-  <div class="lp-os"><div class="lp-os-icon">🍎</div><div class="lp-os-name">iPhone</div></div>
-  <div class="lp-os"><div class="lp-os-icon">🤖</div><div class="lp-os-name">Android</div></div>
-  <div class="lp-os"><div class="lp-os-icon">📱</div><div class="lp-os-name">iPad</div></div>
-  <div class="lp-os"><div class="lp-os-icon">🖥️</div><div class="lp-os-name">Windows</div></div>
-  <div class="lp-os"><div class="lp-os-icon">💻</div><div class="lp-os-name">Mac</div></div>
-</div>
-
-<div style="background:var(--grad);border-radius:20px;padding:24px;text-align:center;color:#fff;margin-bottom:24px;box-shadow:0 12px 32px rgba(124,58,237,.3)">
-  <div style="font-size:28px;margin-bottom:8px">🎓</div>
-  <div style="font-size:18px;font-weight:900;margin-bottom:6px">まずは無料で体験しよう！</div>
-  <div style="font-size:12px;opacity:.85;margin-bottom:16px">今すぐアクセスして、AIに最適化された学習を体感してください</div>
-  <button class="lp-cta" style="background:#fff;color:var(--c1)" onclick="nav('home')">
-    <i class="fas fa-arrow-right"></i>宅建BOOSTで、最短合格へ。
-  </button>
-</div>
-
-<div style="text-align:center;font-size:11px;color:var(--sub);margin-bottom:24px">
-  <div>最新版: <strong>takken-boost.pages.dev</strong></div>
-  <div>旧バージョン: takken-boost-v9.pages.dev</div>
 </div>
 \`;
 }
