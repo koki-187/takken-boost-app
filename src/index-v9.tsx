@@ -1169,6 +1169,23 @@ body.lp-mode .nav-pill{background:#60a5fa}
   box-shadow:0 16px 48px rgba(34,211,238,.15);
 }
 
+/* ===== LP MASTER DESIGN MODE ===== */
+.lp-master-wrap{position:relative;width:100%;max-width:900px;margin:0 auto;display:block}
+.lp-master-img{display:block;width:100%;height:auto;margin:0}
+.lp-overlay-btn{position:absolute;border:none;cursor:pointer;font-family:inherit;font-weight:900;display:flex;align-items:center;justify-content:center;transition:.2s;text-decoration:none;color:transparent}
+.lp-overlay-btn:active{transform:scale(.96)}
+.lp-overlay-btn:hover{background:rgba(34,211,238,.15);outline:2px solid #22d3ee;outline-offset:2px}
+.lp-cta-header{top:0.6%;right:1%;width:13%;height:2.3%;border-radius:50px}
+.lp-cta-hero{top:13.2%;left:7%;width:24%;height:2.4%;border-radius:50px}
+.lp-cta-final{bottom:5.5%;left:14%;width:23%;height:2.2%;border-radius:50px}
+
+.lp-footer{background:#050719;color:#94a3b8;padding:30px 20px;border-top:1px solid rgba(96,165,250,.2);margin-top:0}
+.lp-footer-inner{max-width:900px;margin:0 auto;text-align:center}
+.lp-footer-brand{margin-bottom:14px;font-size:14px}
+.lp-footer-nav{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:11px;margin-bottom:8px}
+.lp-footer-nav a{color:#94a3b8;text-decoration:none;transition:.15s}
+.lp-footer-nav a:hover{color:#22d3ee}
+
 /* ===== PDF PAGE REPRODUCTION MODE ===== */
 .lp-pdf-section{
   position:relative;width:100%;margin:0;
@@ -3365,66 +3382,50 @@ function createHeroParticles() {
 function renderLP() {
   document.body.classList.add('lp-mode');
   document.getElementById('main').innerHTML = \`
-<div class="lp-container" style="background:#0a0e27;margin:-16px">
-  <!-- PDF Page 1: Hero (concept) -->
-  <div class="lp-pdf-section">
+<div class="lp-container" style="background:#0a0e27;margin:-16px;padding:0">
+  <!-- Master LP design image with overlay CTAs -->
+  <div class="lp-master-wrap">
     <picture>
-      <source media="(max-width:768px)" srcset="/lp-assets/pdf-p1-900.webp">
-      <img src="/lp-assets/pdf-p1-1920.webp" alt="宅建BOOST - 宅建学習をAI時代へ" class="lp-pdf-bg" loading="eager">
+      <source media="(max-width:600px)" srcset="/lp-assets/lp-master-600.webp">
+      <img src="/lp-assets/lp-master-1920.webp" alt="宅建BOOST LP - AI時代の宅建学習プラットフォーム" class="lp-master-img" loading="eager">
     </picture>
-    <div class="lp-pdf-overlay">
-      <button class="lp-pdf-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
-        <i class="fas fa-rocket"></i>無料で学習を始める
-      </button>
-    </div>
+
+    <!-- Overlay: Top-right CTA (header 無料で体験する) -->
+    <button class="lp-overlay-btn lp-cta-header" onclick="document.body.classList.remove('lp-mode');nav('home')" aria-label="無料で体験する">
+      無料で体験する
+    </button>
+
+    <!-- Overlay: Hero CTA (まずは無料で体験する) -->
+    <button class="lp-overlay-btn lp-cta-hero" onclick="document.body.classList.remove('lp-mode');nav('home')" aria-label="まずは無料で体験する">
+      <span>🚀 まずは無料で体験する →</span>
+    </button>
+
+    <!-- Overlay: Final CTA (宅建BOOSTで、最短合格へ) -->
+    <button class="lp-overlay-btn lp-cta-final" onclick="document.body.classList.remove('lp-mode');nav('home')" aria-label="宅建BOOSTで最短合格へ">
+      <span>🎓 宅建BOOSTで、最短合格へ。 →</span>
+    </button>
   </div>
 
-  <!-- PDF Page 2: 機能紹介 -->
-  <div class="lp-pdf-section">
-    <picture>
-      <source media="(max-width:768px)" srcset="/lp-assets/pdf-p2-900.webp">
-      <img src="/lp-assets/pdf-p2-1920.webp" alt="従来の宅建学習をアップデート - 8機能紹介" class="lp-pdf-bg" loading="lazy">
-    </picture>
-    <div class="lp-pdf-overlay">
-      <button class="lp-pdf-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
-        <i class="fas fa-arrow-right"></i>機能を試す
-      </button>
+  <!-- Footer -->
+  <footer class="lp-footer">
+    <div class="lp-footer-inner">
+      <div class="lp-footer-brand">
+        <strong style="color:#22d3ee">🚀 宅建BOOST</strong>
+        <span style="font-size:11px;color:#94a3b8;margin-left:8px">合同会社My Agent works 運営</span>
+      </div>
+      <nav class="lp-footer-nav">
+        <a href="#" onclick="document.body.classList.remove('lp-mode');nav('help');return false">使い方</a>
+        <a href="#" onclick="document.body.classList.remove('lp-mode');nav('home');return false">機能紹介</a>
+        <span style="color:#475569">|</span>
+        <a href="#" onclick="alert('利用規約は準備中です');return false">利用規約</a>
+        <a href="#" onclick="alert('プライバシーポリシーは準備中です');return false">プライバシーポリシー</a>
+        <a href="#" onclick="alert('特定商取引法に基づく表記は準備中です');return false">特定商取引法に基づく表記</a>
+      </nav>
+      <div style="font-size:10px;color:#64748b;margin-top:8px;text-align:center">
+        © 2026 宅建BOOST · 完全無料・登録不要 · <strong style="color:#22d3ee">takken-boost.pages.dev</strong>
+      </div>
     </div>
-  </div>
-
-  <!-- PDF Page 3: VERSION UP -->
-  <div class="lp-pdf-section">
-    <picture>
-      <source media="(max-width:768px)" srcset="/lp-assets/pdf-p3-900.webp">
-      <img src="/lp-assets/pdf-p3-1920.webp" alt="VERSION UP - 覚えるから最適化して受かるへ" class="lp-pdf-bg" loading="lazy">
-    </picture>
-    <div class="lp-pdf-overlay">
-      <button class="lp-pdf-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
-        <i class="fas fa-bolt"></i>新バージョンを体験
-      </button>
-    </div>
-  </div>
-
-  <!-- PDF Page 4: インストール -->
-  <div class="lp-pdf-section">
-    <picture>
-      <source media="(max-width:768px)" srcset="/lp-assets/pdf-p4-900.webp">
-      <img src="/lp-assets/pdf-p4-1920.webp" alt="たった3ステップですぐにアプリ化 - PWAマルチOS対応" class="lp-pdf-bg" loading="lazy">
-    </picture>
-    <div class="lp-pdf-overlay" style="flex-direction:column;gap:10px;padding-bottom:6%">
-      <button class="lp-pdf-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
-        <i class="fas fa-graduation-cap"></i>宅建BOOSTで、最短合格へ。
-      </button>
-      <button class="lp-pdf-cta" style="background:transparent;color:#22d3ee;border:1px solid #22d3ee;box-shadow:none" onclick="document.body.classList.remove('lp-mode');nav('help')">
-        <i class="fas fa-info-circle"></i>使い方ガイドを見る
-      </button>
-    </div>
-  </div>
-
-  <div style="padding:24px;text-align:center;font-size:11px;color:#94a3b8;background:#0a0e27">
-    <div style="margin-bottom:6px">© 2026 宅建BOOST · 完全無料・登録不要</div>
-    <div>最新版: <strong style="color:#22d3ee">takken-boost.pages.dev</strong></div>
-  </div>
+  </footer>
 </div>
 \`;
 }
