@@ -822,6 +822,27 @@ body.dark .skeleton{
 /* ===== LOGO SUBTITLE 12px ===== */
 .logo span{font-size:12px;opacity:.8;margin-left:6px;font-weight:500}
 
+/* ===== QUICK START BUTTONS ===== */
+.quick-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.quick-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;padding:22px 12px;border-radius:20px;border:none;cursor:pointer;
+  font-family:inherit;font-weight:800;font-size:15px;
+  transition:.2s;touch-action:manipulation;
+}
+.quick-btn:active{transform:scale(.96)}
+.quick-btn i{font-size:28px}
+.quick-primary{
+  background:linear-gradient(135deg,#7c3aed 0%,#4f46e5 100%);color:#fff;
+  box-shadow:0 8px 24px rgba(124,58,237,.4),inset 0 1px 0 rgba(255,255,255,.2);
+}
+.quick-secondary{
+  background:#fff;color:#7c3aed;
+  box-shadow:0 4px 16px rgba(0,0,0,.1);
+  border:2px solid rgba(124,58,237,.2);
+}
+body.dark .quick-secondary{background:#1e293b;color:#a78bfa;border-color:rgba(168,139,250,.3)}
+
 /* ===== HERO COMPACT ON SCROLL ===== */
 .cube-hero{transition:height .3s ease,margin .3s ease}
 .cube-hero.compact{height:80px!important;margin-bottom:0!important}
@@ -1503,11 +1524,11 @@ async function renderHome() {
 })()}
 
 <div class="section-title"><i class="fas fa-bolt"></i>クイックスタート</div>
-<div class="grid-2" style="margin-bottom:16px">
-  <button class="btn btn-primary btn-lg" onclick="nav('study')" style="border-radius:16px;height:64px">
+<div class="quick-row">
+  <button class="quick-btn quick-primary" onclick="nav('study')">
     <i class="fas fa-book-open"></i>学習開始
   </button>
-  <button class="btn btn-white btn-lg" onclick="startExam()" style="border-radius:16px;height:64px;color:var(--c1)">
+  <button class="quick-btn quick-secondary" onclick="startExam()">
     <i class="fas fa-file-alt"></i>模擬試験
   </button>
 </div>
