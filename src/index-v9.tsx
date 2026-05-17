@@ -912,12 +912,30 @@ body.lp-mode .nav-pill{background:#60a5fa}
 .lp-container{
   margin:-16px;padding:0;color:#e0e7ff;
   background:
-    radial-gradient(ellipse at top,rgba(59,130,246,.15) 0%,transparent 50%),
-    radial-gradient(ellipse at bottom right,rgba(124,58,237,.2) 0%,transparent 60%),
+    linear-gradient(180deg,rgba(10,14,39,.85) 0%,rgba(30,27,75,.92) 50%,rgba(10,14,39,.98) 100%),
+    url('/lp-assets/hero-bg-1920.webp') center top / cover no-repeat,
     linear-gradient(180deg,#0a0e27 0%,#1e1b4b 50%,#0a0e27 100%);
   min-height:100vh;
   position:relative;overflow:hidden;
 }
+@media(max-width:768px){
+  .lp-container{
+    background:
+      linear-gradient(180deg,rgba(10,14,39,.88) 0%,rgba(30,27,75,.94) 50%,rgba(10,14,39,.99) 100%),
+      url('/lp-assets/hero-bg-768.webp') center top / cover no-repeat,
+      linear-gradient(180deg,#0a0e27 0%,#1e1b4b 50%,#0a0e27 100%);
+  }
+}
+.lp-hero{
+  position:relative;
+}
+.lp-hero::before{
+  content:'';position:absolute;top:-60px;left:-20px;right:-20px;height:600px;
+  background:url('/lp-assets/hero-bg-1920.webp') center top / cover no-repeat;
+  opacity:.7;z-index:0;mask-image:linear-gradient(180deg,#000 60%,transparent);
+  -webkit-mask-image:linear-gradient(180deg,#000 60%,transparent);
+}
+.lp-hero > *{position:relative;z-index:2}
 /* Circuit / starfield background */
 .lp-stars{
   position:absolute;inset:0;pointer-events:none;
