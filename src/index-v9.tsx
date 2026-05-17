@@ -1169,22 +1169,83 @@ body.lp-mode .nav-pill{background:#60a5fa}
   box-shadow:0 16px 48px rgba(34,211,238,.15);
 }
 
-/* ===== LP MASTER DESIGN MODE ===== */
-.lp-master-wrap{position:relative;width:100%;max-width:900px;margin:0 auto;display:block}
-.lp-master-img{display:block;width:100%;height:auto;margin:0}
-.lp-overlay-btn{position:absolute;border:none;cursor:pointer;font-family:inherit;font-weight:900;display:flex;align-items:center;justify-content:center;transition:.2s;text-decoration:none;color:transparent}
-.lp-overlay-btn:active{transform:scale(.96)}
-.lp-overlay-btn:hover{background:rgba(34,211,238,.15);outline:2px solid #22d3ee;outline-offset:2px}
-.lp-cta-header{top:0.6%;right:1%;width:13%;height:2.3%;border-radius:50px}
-.lp-cta-hero{top:13.2%;left:7%;width:24%;height:2.4%;border-radius:50px}
-.lp-cta-final{bottom:5.5%;left:14%;width:23%;height:2.2%;border-radius:50px}
-
-.lp-footer{background:#050719;color:#94a3b8;padding:30px 20px;border-top:1px solid rgba(96,165,250,.2);margin-top:0}
+/* ===== LP 5-SECTION STRUCTURE (ChatGPT指示書準拠) ===== */
+.lp-container{width:100%;color:#e0e7ff;background:#0a0e27;overflow-x:hidden;margin:-16px}
+.lp-sec{position:relative;padding:60px 20px;overflow:hidden}
+.lp-sec-inner{max-width:1100px;margin:0 auto;position:relative;z-index:2}
+.lp-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.45}
+.lp-bg-faint{opacity:.2}
+.lp-hero-sec{padding:80px 20px;min-height:80vh;display:flex;align-items:center}
+.lp-hero-inner{text-align:center}
+.lp-hero-logo{width:120px;height:auto;margin:0 auto 20px;display:block;border-radius:24px;box-shadow:0 12px 48px rgba(34,211,238,.3)}
+.lp-hero-title{font-size:42px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:18px;letter-spacing:-1px}
+.lp-hero-title em{font-style:normal;color:#22d3ee;text-shadow:0 0 32px rgba(34,211,238,.6)}
+.lp-hero-sub{font-size:15px;color:#bfdbfe;margin-bottom:14px;line-height:1.6}
+.lp-hero-lead{font-size:13px;color:#94a3b8;margin-bottom:24px;line-height:1.7}
+.lp-hero-badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px}
+.lp-badge{background:linear-gradient(135deg,rgba(96,165,250,.18),rgba(167,139,250,.18));border:1px solid rgba(96,165,250,.35);padding:6px 12px;border-radius:50px;font-size:11px;font-weight:700;color:#bfdbfe;backdrop-filter:blur(8px)}
+@media(max-width:600px){.lp-hero-title{font-size:30px}.lp-hero-sec{padding:50px 16px}}
+.lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;border-radius:50px;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:15px;text-decoration:none;transition:.2s}
+.lp-btn:active{transform:scale(.97)}
+.lp-btn-primary{background:linear-gradient(135deg,#22d3ee,#60a5fa);color:#0a0e27;box-shadow:0 8px 24px rgba(34,211,238,.45)}
+.lp-btn-primary:hover{box-shadow:0 12px 32px rgba(34,211,238,.6);transform:translateY(-1px)}
+.lp-btn-xl{padding:18px 42px;font-size:17px}
+.lp-sec-num{display:inline-block;font-size:42px;font-weight:900;color:#22d3ee;line-height:1;margin-bottom:8px;letter-spacing:-2px;text-shadow:0 0 24px rgba(34,211,238,.4)}
+.lp-sec-title{font-size:30px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:12px;letter-spacing:-.5px}
+.lp-sec-title em{font-style:normal;color:#22d3ee}
+.lp-sec-lead{font-size:14px;color:#bfdbfe;margin-bottom:20px;line-height:1.6}
+@media(max-width:600px){.lp-sec-title{font-size:24px}.lp-sec-num{font-size:34px}}
+.lp-2col{display:grid;grid-template-columns:1fr;gap:30px;align-items:center}
+@media(min-width:800px){.lp-2col{grid-template-columns:1fr 1fr;gap:50px}}
+.lp-2col-img img{width:100%;height:auto;border-radius:18px;box-shadow:0 16px 48px rgba(0,0,0,.5);display:block}
+.lp-feat-list{list-style:none;padding:0;margin:0}
+.lp-feat-list li{padding:12px 0;border-bottom:1px solid rgba(96,165,250,.15);display:flex;gap:12px;font-size:13px;color:#cbd5e1;line-height:1.6}
+.lp-feat-list li:last-child{border-bottom:none}
+.lp-feat-list li span:first-child{font-size:22px;flex-shrink:0}
+.lp-feat-list li strong{color:#fff;font-size:14px;display:block;margin-bottom:2px}
+.lp-version-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#22d3ee,#60a5fa);color:#0a0e27;padding:5px 14px;border-radius:50px;font-size:10px;font-weight:900;letter-spacing:1.5px;box-shadow:0 4px 16px rgba(34,211,238,.4);margin-bottom:12px}
+.lp-update-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}
+.lp-update-card{background:rgba(15,23,42,.6);border:1px solid rgba(96,165,250,.25);border-radius:14px;padding:14px 12px;text-align:center;backdrop-filter:blur(8px)}
+.lp-update-icon{width:48px;height:48px;margin:0 auto 8px;display:block;border-radius:50%}
+.lp-update-emoji{font-size:36px;margin-bottom:8px;display:block}
+.lp-update-card strong{display:block;font-size:13px;color:#fff;margin-bottom:3px}
+.lp-update-card span{font-size:11px;color:#94a3b8;line-height:1.4}
+.lp-compare-table{width:100%;border-collapse:collapse;background:rgba(15,23,42,.5);border-radius:14px;overflow:hidden;border:1px solid rgba(96,165,250,.2)}
+.lp-compare-table th,.lp-compare-table td{padding:10px;font-size:12px;border-bottom:1px solid rgba(96,165,250,.1);text-align:center}
+.lp-compare-table th{background:linear-gradient(90deg,rgba(96,165,250,.15),rgba(167,139,250,.15));font-weight:800;color:#22d3ee;font-size:11px}
+.lp-compare-table td:first-child{color:#94a3b8}
+.lp-compare-table td:nth-child(2){color:#22d3ee;font-weight:900}
+.lp-compare-table tr:last-child td{border-bottom:none}
+.lp-steps{display:grid;grid-template-columns:1fr;gap:14px;margin:24px auto;max-width:600px}
+@media(min-width:600px){.lp-steps{grid-template-columns:repeat(3,1fr);max-width:none}}
+.lp-step-item{background:rgba(15,23,42,.7);border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:18px;text-align:center;backdrop-filter:blur(10px)}
+.lp-step-num{display:inline-block;background:linear-gradient(135deg,#22d3ee,#60a5fa);color:#0a0e27;font-weight:900;font-size:11px;letter-spacing:1.5px;padding:4px 12px;border-radius:50px;margin-bottom:10px}
+.lp-step-title{font-weight:800;font-size:15px;color:#fff;margin-bottom:6px}
+.lp-step-desc{font-size:12px;color:#94a3b8;line-height:1.5}
+.lp-step-desc code{background:rgba(34,211,238,.1);color:#22d3ee;padding:2px 6px;border-radius:4px;font-size:11px}
+.lp-os-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;max-width:600px;margin:24px auto 0}
+.lp-os-item{background:rgba(15,23,42,.6);border:1px solid rgba(96,165,250,.25);border-radius:12px;padding:12px 6px;text-align:center;font-size:11px;font-weight:700;color:#bfdbfe}
+.lp-os-item span{display:block;font-size:24px;margin-bottom:4px}
+.lp-cta-sec{background:linear-gradient(135deg,rgba(34,211,238,.1),rgba(167,139,250,.1)),#0a0e27;padding:70px 20px}
+.lp-cta-inner{text-align:center;max-width:700px;margin:0 auto}
+.lp-cta-brain{width:100px;height:auto;margin:0 auto 20px;display:block;filter:drop-shadow(0 0 24px rgba(167,139,250,.5))}
+.lp-cta-title{font-size:34px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:14px}
+.lp-cta-title em{font-style:normal;color:#22d3ee}
+.lp-cta-lead{font-size:14px;color:#cbd5e1;margin-bottom:26px}
+.lp-url-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:30px}
+.lp-url-card{background:rgba(15,23,42,.7);border:1px solid rgba(96,165,250,.3);border-radius:14px;padding:14px;text-align:center;backdrop-filter:blur(8px)}
+.lp-url-primary{border-color:#22d3ee;background:rgba(34,211,238,.08)}
+.lp-url-label{font-size:10px;color:#94a3b8;font-weight:700;letter-spacing:1px;margin-bottom:6px}
+.lp-url-value{font-family:monospace;font-size:11px;color:#22d3ee;font-weight:900;word-break:break-all}
+@media(max-width:600px){.lp-cta-title{font-size:26px}}
+.lp-footer{background:#050719;padding:30px 20px;border-top:1px solid rgba(96,165,250,.2)}
 .lp-footer-inner{max-width:900px;margin:0 auto;text-align:center}
 .lp-footer-brand{margin-bottom:14px;font-size:14px}
-.lp-footer-nav{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:11px;margin-bottom:8px}
+.lp-footer-brand span{font-size:11px;color:#94a3b8;margin-left:8px}
+.lp-footer-nav{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:11px;margin-bottom:10px}
 .lp-footer-nav a{color:#94a3b8;text-decoration:none;transition:.15s}
 .lp-footer-nav a:hover{color:#22d3ee}
+.lp-footer-copyright{font-size:10px;color:#64748b}
 
 /* ===== PDF PAGE REPRODUCTION MODE ===== */
 .lp-pdf-section{
@@ -3383,51 +3444,191 @@ function renderLP() {
   document.body.classList.add('lp-mode');
   document.getElementById('main').innerHTML = \`
 <div class="lp-container" style="background:#0a0e27;margin:-16px;padding:0">
-  <!-- Master LP design image with overlay CTAs -->
-  <div class="lp-master-wrap">
+
+  <!-- === SECTION 1: HERO === -->
+  <section class="lp-sec lp-hero-sec" id="hero">
     <picture>
-      <source media="(max-width:600px)" srcset="/lp-assets/lp-master-600.webp">
-      <img src="/lp-assets/lp-master-1920.webp" alt="宅建BOOST LP - AI時代の宅建学習プラットフォーム" class="lp-master-img" loading="eager">
+      <source media="(max-width:600px)" srcset="/lp-assets/hero-mobile.webp">
+      <img src="/lp-assets/hero-desktop.webp" alt="" class="lp-bg-img" loading="eager">
     </picture>
+    <div class="lp-sec-inner lp-hero-inner">
+      <img src="/lp-assets/logo-desktop.webp" alt="宅建BOOST ロゴ" class="lp-hero-logo" loading="eager">
+      <h1 class="lp-hero-title">宅建学習を、<br><em>"AI時代"</em>へ。</h1>
+      <p class="lp-hero-sub">宅建BOOST — AI × PWA × マルチOS対応<br>学習プラットフォーム</p>
+      <p class="lp-hero-lead">702問完全収録。過去5年本試験モデル + 令和8年AI予測模試。<br>詳細解説とAI分析で、あなたの弱点を克服。</p>
+      <div class="lp-hero-badges">
+        <span class="lp-badge">📚 702問収録</span>
+        <span class="lp-badge">🤖 AI予測模試</span>
+        <span class="lp-badge">🔊 音声学習</span>
+        <span class="lp-badge">📱 PWA対応</span>
+      </div>
+      <button class="lp-btn lp-btn-primary" onclick="document.body.classList.remove('lp-mode');nav('home')">
+        <i class="fas fa-rocket"></i>無料で学習を始める
+      </button>
+    </div>
+  </section>
 
-    <!-- Overlay: Top-right CTA (header 無料で体験する) -->
-    <button class="lp-overlay-btn lp-cta-header" onclick="document.body.classList.remove('lp-mode');nav('home')" aria-label="無料で体験する">
-      無料で体験する
-    </button>
+  <!-- === SECTION 2: FEATURES === -->
+  <section class="lp-sec lp-features-sec" id="features">
+    <div class="lp-sec-inner lp-2col">
+      <div class="lp-2col-text">
+        <div class="lp-sec-num">01</div>
+        <h2 class="lp-sec-title">"従来の宅建学習"を<br><em>アップデート</em>。</h2>
+        <p class="lp-sec-lead">AIと一緒に、宅建試験合格へ。</p>
+        <ul class="lp-feat-list">
+          <li><span>📚</span><strong>702問完全収録</strong><br>過去5年の本試験モデル + 令和8年AI予測模試</li>
+          <li><span>🎯</span><strong>カテゴリ別学習</strong><br>権利関係・宅建業法・法令制限・税その他の4分野</li>
+          <li><span>📝</span><strong>模擬試験モード</strong><br>50問・120分の本番形式で実力測定</li>
+          <li><span>📊</span><strong>進捗ダッシュボード</strong><br>レーダーチャートで弱点を可視化</li>
+          <li><span>🔥</span><strong>連続学習日数トラッキング</strong><br>総解答数・正答率も自動記録</li>
+          <li><span>🔄</span><strong>弱点復習モード</strong><br>間違えた問題を間隔反復で克服</li>
+        </ul>
+      </div>
+      <div class="lp-2col-img">
+        <picture>
+          <source media="(max-width:600px)" srcset="/lp-assets/features-mobile.webp">
+          <img src="/lp-assets/features-desktop.webp" alt="従来機能紹介" loading="lazy">
+        </picture>
+      </div>
+    </div>
+  </section>
 
-    <!-- Overlay: Hero CTA (まずは無料で体験する) -->
-    <button class="lp-overlay-btn lp-cta-hero" onclick="document.body.classList.remove('lp-mode');nav('home')" aria-label="まずは無料で体験する">
-      <span>🚀 まずは無料で体験する →</span>
-    </button>
+  <!-- === SECTION 3: UPDATE / VERSION UP === -->
+  <section class="lp-sec lp-update-sec" id="update">
+    <div class="lp-sec-inner lp-2col lp-2col-reverse">
+      <div class="lp-2col-img">
+        <picture>
+          <source media="(max-width:600px)" srcset="/lp-assets/update-mobile.webp">
+          <img src="/lp-assets/update-desktop.webp" alt="アップデート紹介" loading="lazy">
+        </picture>
+      </div>
+      <div class="lp-2col-text">
+        <div class="lp-sec-num">02</div>
+        <span class="lp-version-badge">VERSION UP / 宅建BOOST アップデート</span>
+        <h2 class="lp-sec-title">"覚える"から、<br><em>"最適化して受かる"</em>へ。</h2>
+        <p class="lp-sec-lead">AIがあなたの学習を分析し、最短ルートへ。</p>
+        <div class="lp-update-grid">
+          <div class="lp-update-card">
+            <img src="/lp-assets/aibrain-desktop.webp" alt="" class="lp-update-icon">
+            <strong>AI学習支援</strong>
+            <span>学習最適化・苦手分析・自動レコメンド</span>
+          </div>
+          <div class="lp-update-card">
+            <span class="lp-update-emoji">📲</span>
+            <strong>PWA × マルチOS</strong>
+            <span>インストール不要・iOS/Android/Win/Mac/iPad対応</span>
+          </div>
+          <div class="lp-update-card">
+            <span class="lp-update-emoji">✨</span>
+            <strong>UI/UX刷新</strong>
+            <span>高速化・ミニマルUI・学習導線改善</span>
+          </div>
+          <div class="lp-update-card">
+            <span class="lp-update-emoji">☁️</span>
+            <strong>デバイス同期</strong>
+            <span>複数デバイス間で進捗が自動同期</span>
+          </div>
+        </div>
 
-    <!-- Overlay: Final CTA (宅建BOOSTで、最短合格へ) -->
-    <button class="lp-overlay-btn lp-cta-final" onclick="document.body.classList.remove('lp-mode');nav('home')" aria-label="宅建BOOSTで最短合格へ">
-      <span>🎓 宅建BOOSTで、最短合格へ。 →</span>
-    </button>
-  </div>
+        <table class="lp-compare-table">
+          <thead><tr><th>従来</th><th></th><th>新バージョン</th></tr></thead>
+          <tbody>
+            <tr><td>単体学習</td><td>▶</td><td><strong>AI最適化</strong></td></tr>
+            <tr><td>スマホ中心</td><td>▶</td><td><strong>マルチOS</strong></td></tr>
+            <tr><td>一般的UI</td><td>▶</td><td><strong>近未来UI</strong></td></tr>
+            <tr><td>暗記中心</td><td>▶</td><td><strong>分析型学習</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
-  <!-- Footer -->
+  <!-- === SECTION 4: INSTALL / PWA === -->
+  <section class="lp-sec lp-install-sec" id="install">
+    <picture>
+      <source media="(max-width:600px)" srcset="/lp-assets/install-mobile.webp">
+      <img src="/lp-assets/install-desktop.webp" alt="" class="lp-bg-img lp-bg-faint" loading="lazy">
+    </picture>
+    <div class="lp-sec-inner">
+      <div class="lp-sec-num">03</div>
+      <h2 class="lp-sec-title" style="text-align:center">インストール不要。<br>たった<em>3ステップ</em>で、すぐにアプリ化。</h2>
+      <p class="lp-sec-lead" style="text-align:center">宅建BOOSTは PWA (Progressive Web App)。<br>ブラウザからアクセスして即利用、アプリのように快適。</p>
+
+      <div class="lp-steps">
+        <div class="lp-step-item">
+          <div class="lp-step-num">STEP 1</div>
+          <div class="lp-step-title">ブラウザでアクセス</div>
+          <div class="lp-step-desc"><code>takken-boost.pages.dev</code> を開く</div>
+        </div>
+        <div class="lp-step-item">
+          <div class="lp-step-num">STEP 2</div>
+          <div class="lp-step-title">ホーム画面に追加</div>
+          <div class="lp-step-desc">ブラウザメニューから「ホーム画面に追加」をタップ</div>
+        </div>
+        <div class="lp-step-item">
+          <div class="lp-step-num">STEP 3</div>
+          <div class="lp-step-title">インストール完了</div>
+          <div class="lp-step-desc">アプリのように、いつでも快適に学習</div>
+        </div>
+      </div>
+
+      <div class="lp-os-grid">
+        <div class="lp-os-item"><span>🍎</span>iPhone</div>
+        <div class="lp-os-item"><span>🤖</span>Android</div>
+        <div class="lp-os-item"><span>📱</span>iPad</div>
+        <div class="lp-os-item"><span>🖥️</span>Windows</div>
+        <div class="lp-os-item"><span>💻</span>Mac</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === SECTION 5: CTA === -->
+  <section class="lp-sec lp-cta-sec" id="cta">
+    <div class="lp-sec-inner lp-cta-inner">
+      <img src="/lp-assets/aibrain-desktop.webp" alt="" class="lp-cta-brain" loading="lazy">
+      <h2 class="lp-cta-title">今すぐ<em>無料で体験</em>。</h2>
+      <p class="lp-cta-lead">AI時代の宅建学習OSを、あなたの手元へ。</p>
+      <button class="lp-btn lp-btn-primary lp-btn-xl" onclick="document.body.classList.remove('lp-mode');nav('home')">
+        <i class="fas fa-rocket"></i>宅建BOOSTで、最短合格へ。
+      </button>
+      <div class="lp-url-row">
+        <div class="lp-url-card lp-url-primary">
+          <div class="lp-url-label">📱 最新版はこちら</div>
+          <div class="lp-url-value">takken-boost.pages.dev</div>
+        </div>
+        <div class="lp-url-card">
+          <div class="lp-url-label">📦 旧バージョン</div>
+          <div class="lp-url-value">takken-boost-v9.pages.dev</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === FOOTER === -->
   <footer class="lp-footer">
     <div class="lp-footer-inner">
       <div class="lp-footer-brand">
         <strong style="color:#22d3ee">🚀 宅建BOOST</strong>
-        <span style="font-size:11px;color:#94a3b8;margin-left:8px">合同会社My Agent works 運営</span>
+        <span>合同会社My Agent works 運営</span>
       </div>
       <nav class="lp-footer-nav">
-        <a href="#" onclick="document.body.classList.remove('lp-mode');nav('help');return false">使い方</a>
-        <a href="#" onclick="document.body.classList.remove('lp-mode');nav('home');return false">機能紹介</a>
+        <a href="#features" onclick="document.querySelector('#features')?.scrollIntoView({behavior:'smooth'});return false">機能紹介</a>
+        <a href="#update" onclick="document.querySelector('#update')?.scrollIntoView({behavior:'smooth'});return false">アップデート</a>
+        <a href="#install" onclick="document.querySelector('#install')?.scrollIntoView({behavior:'smooth'});return false">使い方</a>
+        <a href="#" onclick="document.body.classList.remove('lp-mode');nav('help');return false">対応環境</a>
         <span style="color:#475569">|</span>
         <a href="#" onclick="alert('利用規約は準備中です');return false">利用規約</a>
         <a href="#" onclick="alert('プライバシーポリシーは準備中です');return false">プライバシーポリシー</a>
         <a href="#" onclick="alert('特定商取引法に基づく表記は準備中です');return false">特定商取引法に基づく表記</a>
       </nav>
-      <div style="font-size:10px;color:#64748b;margin-top:8px;text-align:center">
+      <div class="lp-footer-copyright">
         © 2026 宅建BOOST · 完全無料・登録不要 · <strong style="color:#22d3ee">takken-boost.pages.dev</strong>
       </div>
     </div>
   </footer>
 </div>
 \`;
+}
 }
 
 // ===== FLASHCARD MODE =====
