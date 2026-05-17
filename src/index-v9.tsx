@@ -1888,14 +1888,16 @@ function renderQuestion() {
 
 <div id="explanation-area"></div>
 
-<div class="question-nav" id="nav-area" style="display:none">
-  <div style="display:flex;align-items:center;gap:8px">
+<div id="nav-area" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px">
     <span id="q-result-badge"></span>
     <span style="font-size:13px;color:var(--sub)">正答率: <strong id="acc-display">\${S.study.total > 0 ? Math.round(S.study.correct/S.study.total*100) : 0}%</strong></span>
   </div>
-  <button class="btn btn-primary" onclick="nextQuestion()">
-    \${idx+1 < questions.length ? '次の問題 <i class="fas fa-chevron-right"></i>' : '結果を見る <i class="fas fa-flag-checkered"></i>'}
-  </button>
+  <div class="sticky-next">
+    <button class="btn btn-primary btn-block btn-lg" onclick="nextQuestion()" style="border-radius:16px">
+      \${idx+1 < questions.length ? '<i class="fas fa-arrow-right"></i> 次の問題' : '<i class="fas fa-flag-checkered"></i> 結果を見る'}
+    </button>
+  </div>
 </div>
 \`;
 
