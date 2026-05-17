@@ -1169,6 +1169,33 @@ body.lp-mode .nav-pill{background:#60a5fa}
   box-shadow:0 16px 48px rgba(34,211,238,.15);
 }
 
+/* ===== PDF PAGE REPRODUCTION MODE ===== */
+.lp-pdf-section{
+  position:relative;width:100%;margin:0;
+  display:block;background:#0a0e27;
+  overflow:hidden;
+}
+.lp-pdf-section img.lp-pdf-bg{
+  display:block;width:100%;height:auto;
+  margin:0;
+}
+.lp-pdf-overlay{
+  position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:3%;pointer-events:none;
+}
+.lp-pdf-overlay > *{pointer-events:auto}
+.lp-pdf-cta{
+  background:linear-gradient(135deg,#22d3ee,#60a5fa);
+  color:#0a0e27;padding:12px 28px;border-radius:50px;
+  font-weight:900;font-size:14px;text-decoration:none;cursor:pointer;
+  border:none;display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 8px 24px rgba(34,211,238,.5);transition:.2s;
+}
+.lp-pdf-cta:active{transform:scale(.96)}
+@media(max-width:768px){
+  .lp-pdf-cta{font-size:12px;padding:10px 20px}
+}
+
 /* ===== HOME ICON HERO (PDF page 1 reproduction) ===== */
 .lp-house-stage{
   position:relative;margin:24px 0 20px;height:200px;
@@ -3338,291 +3365,65 @@ function createHeroParticles() {
 function renderLP() {
   document.body.classList.add('lp-mode');
   document.getElementById('main').innerHTML = \`
-<div class="lp-container">
-  <div class="lp-stars"></div>
-
-  <!-- HERO (Page 1) — 3Dキューブをブランド主役に -->
-  <div class="lp-section">
-    <div class="lp-hero">
-      <div class="lp-eyebrow">AI × PWA × マルチOS対応</div>
-      <div class="lp-headline">宅建学習を、<br><em>"AI時代"</em>へ。</div>
-      <div class="lp-sub">過去5年本試験+令和8年AI予測模試 <strong>702問完全収録</strong>。詳細な法令解説で次回の正答率UP。完全無料・登録不要。</div>
-      <div class="lp-badges">
-        <span class="lp-badge">📚 702問収録</span>
-        <span class="lp-badge">🤖 AI予測模試</span>
-        <span class="lp-badge">🔊 音声学習</span>
-        <span class="lp-badge">📱 PWA対応</span>
-      </div>
-      <button class="lp-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
+<div class="lp-container" style="background:#0a0e27;margin:-16px">
+  <!-- PDF Page 1: Hero (concept) -->
+  <div class="lp-pdf-section">
+    <picture>
+      <source media="(max-width:768px)" srcset="/lp-assets/pdf-p1-900.webp">
+      <img src="/lp-assets/pdf-p1-1920.webp" alt="宅建BOOST - 宅建学習をAI時代へ" class="lp-pdf-bg" loading="eager">
+    </picture>
+    <div class="lp-pdf-overlay">
+      <button class="lp-pdf-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
         <i class="fas fa-rocket"></i>無料で学習を始める
       </button>
-
-      <!-- House icon hero (PDF page 1 reproduction) -->
-      <div class="lp-house-stage">
-        <div class="lp-network-bg"></div>
-        <div class="lp-category-tag lp-cat-1">🏛️ 宅建業法</div>
-        <div class="lp-category-tag lp-cat-2">⚖️ 権利関係</div>
-        <div class="lp-category-tag lp-cat-3">📐 法令上の制限</div>
-        <div class="lp-category-tag lp-cat-4">💰 税その他</div>
-        <div class="lp-house">
-          <i class="fas fa-home lp-house-icon"></i>
-        </div>
-      </div>
-
-      <!-- Device mockups -->
-      <div class="lp-devices">
-        <div class="lp-house-glow"></div>
-        <div class="device device-phone"><div class="device-screen">
-          <div class="mini-ring">72%</div>
-          <div class="mini-bar full"></div><div class="mini-bar s80"></div><div class="mini-bar s60"></div><div class="mini-bar s40"></div>
-        </div></div>
-        <div class="device device-tablet"><div class="device-screen">
-          <div style="font-size:9px;color:#22d3ee;font-weight:900;margin-bottom:6px">ダッシュボード</div>
-          <div class="mini-ring">72%</div>
-          <div class="mini-bar full"></div><div class="mini-bar s80"></div><div class="mini-bar s60"></div>
-        </div></div>
-        <div class="device device-laptop"><div class="device-screen">
-          <div style="font-size:8px;color:#22d3ee;font-weight:900;margin-bottom:4px">📊 学習分析</div>
-          <div class="mini-bar full"></div><div class="mini-bar s80"></div><div class="mini-bar s60"></div><div class="mini-bar s40"></div>
-        </div></div>
-      </div>
     </div>
   </div>
 
-  <!-- Page 2: 8 features -->
-  <div class="lp-section">
-    <div class="lp-section-title">"従来の宅建学習"を<br><em>アップデート</em>。</div>
-    <div class="lp-section-sub">AIと一緒に、宅建試験合格へ。</div>
-
-    <div class="lp-features">
-      \${[
-        {icon:'📚',title:'豊富な問題演習',desc:'過去5年+令和8年AI予測 702問'},
-        {icon:'🤖',title:'AI学習サポート',desc:'苦手分析・最適レコメンド'},
-        {icon:'📊',title:'進捗の可視化',desc:'レーダー・履歴・統計'},
-        {icon:'📇',title:'暗記カード機能',desc:'flip式・TTS音声・自己評価'},
-        {icon:'🎯',title:'スケジュール管理',desc:'デイリー目標+間隔反復'},
-        {icon:'📝',title:'本番形式模試',desc:'50問120分・分野別採点'},
-        {icon:'🔖',title:'重要点ブックマーク',desc:'解説を保存・コピー可能'},
-        {icon:'📱',title:'マルチデバイス対応',desc:'iPhone・Android・PC全対応'},
-      ].map(f => \`
-        <div class="lp-feature">
-          <div class="lp-feature-icon">\${f.icon}</div>
-          <div class="lp-feature-title">\${f.title}</div>
-          <div class="lp-feature-desc">\${f.desc}</div>
-        </div>
-      \`).join('')}
-    </div>
-
-    <!-- 4 circular benefits (Page 2 right column reproduction) -->
-    <div class="lp-benefits-strip">
-      <div class="lp-benefit">
-        <div class="lp-benefit-icon">⏱️</div>
-        <div class="lp-benefit-title">スキマ時間で<br>効率学習</div>
-      </div>
-      <div class="lp-benefit">
-        <div class="lp-benefit-icon">🧠</div>
-        <div class="lp-benefit-title">AI最適化の<br>学習体験</div>
-      </div>
-      <div class="lp-benefit">
-        <div class="lp-benefit-icon">📈</div>
-        <div class="lp-benefit-title">データ・成績を<br>可視化</div>
-      </div>
-      <div class="lp-benefit">
-        <div class="lp-benefit-icon">🌐</div>
-        <div class="lp-benefit-title">いつでもどこでも<br>継続学習</div>
-      </div>
-    </div>
-
-    <div style="text-align:center;background:rgba(34,211,238,.06);border-radius:14px;padding:14px;margin-bottom:24px;font-size:13px;color:#bfdbfe">
-      💡 宅建試験の合格に必要なすべてを、<strong style="color:#22d3ee">ひとつのアプリ</strong>に。<br>
-      AIがあなたの学習を伴走し、合格までサポートします。
-    </div>
-  </div>
-
-  <!-- Page 3: VERSION UP — 3-column Old vs AI Brain vs New -->
-  <div class="lp-section">
-    <div style="text-align:center;margin-bottom:8px">
-      <span class="lp-version-badge">VERSION UP / 宅建BOOST アップデート</span>
-    </div>
-    <div class="lp-section-title">"覚える"から、<br><em>"最適化して受かる"</em>へ。</div>
-    <div class="lp-section-sub">AIがあなたの学習を分析し、新しい宅建BOOSTへ。</div>
-
-    <div class="lp-vs-grid">
-      <!-- 旧バージョン -->
-      <div class="lp-vs-col lp-vs-old">
-        <div class="lp-vs-label">従来の宅建BOOST</div>
-        \${[
-          ['📝','単体の問題演習中心'],
-          ['📱','スマホ中心の学習環境'],
-          ['📚','一般的な学習サポート'],
-          ['📊','進捗の可視化が限定的'],
-          ['💭','暗記中心の学習体験'],
-        ].map(([i,t]) => \`
-          <div class="lp-vs-item">
-            <div class="lp-vs-item-icon">\${i}</div>
-            <div class="lp-vs-item-text">\${t}</div>
-          </div>
-        \`).join('')}
-      </div>
-
-      <!-- 中央: AI Brain -->
-      <div class="lp-vs-col" style="background:transparent;border:none">
-        <div class="lp-ai-brain">
-          <div class="lp-ai-tag lp-ai-tag-1">🎯 苦手分析</div>
-          <div class="lp-ai-tag lp-ai-tag-2">🧠 理解度予測</div>
-          <div class="lp-ai-tag lp-ai-tag-3">⚡ 最適レコメンド</div>
-          <div class="lp-ai-tag lp-ai-tag-4">📈 効率最大化</div>
-          <div class="lp-ai-brain-orb">AI</div>
-        </div>
-        <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px">
-          AIが学習を最適化<br>あなた専用の学習エンジン
-        </div>
-      </div>
-
-      <!-- 新バージョン -->
-      <div class="lp-vs-col lp-vs-new">
-        <div class="lp-vs-label">新・宅建BOOST</div>
-        \${[
-          ['🤖','AI学習最適化エンジン'],
-          ['📲','PWA × マルチOS対応'],
-          ['✨','進化したUI/UX'],
-          ['📡','リアルタイム進捗分析'],
-          ['📖','理解を深める学習体験'],
-          ['☁️','デバイス間同期'],
-        ].map(([i,t]) => \`
-          <div class="lp-vs-item">
-            <div class="lp-vs-item-icon">\${i}</div>
-            <div class="lp-vs-item-text">\${t}</div>
-          </div>
-        \`).join('')}
-      </div>
-    </div>
-
-    <!-- 進化のポイント比較表 (PDF下部) -->
-    <div class="lp-compare">
-      <div class="lp-compare-row lp-compare-header">
-        <div class="lp-old">旧バージョン</div><div></div><div class="lp-new">新バージョン</div>
-      </div>
-      \${[
-        ['単体学習・暗記中心', 'AI最適化による知識・実戦型学習'],
-        ['スマホ中心の利用環境', 'マルチOS対応（iOS/Android/iPad/Win/Mac）'],
-        ['一般的な解説の提供', 'AIによる個別最適化された学習体験'],
-        ['進捗の可視化が限定的', 'リアルタイム分析+レーダーチャート'],
-        ['画一的な学習サポート', 'AIアシスタントが合格まで伴走'],
-      ].map(([o, n]) => \`
-        <div class="lp-compare-row">
-          <div class="lp-old">\${o}</div>
-          <div class="lp-arrow">▶</div>
-          <div class="lp-new">\${n}</div>
-        </div>
-      \`).join('')}
-    </div>
-  </div>
-
-  <!-- Page 4: 3 STEP INSTALL -->
-  <div class="lp-section">
-    <div style="text-align:center;font-size:12px;color:#22d3ee;font-weight:700;margin-bottom:8px;letter-spacing:1px">
-      インストール不要。すぐ始められる宅建AI。
-    </div>
-    <div class="lp-section-title">たった<em>3ステップ</em>で、<br>すぐにアプリ化。</div>
-    <div class="lp-section-sub">宅建BOOSTはPWA (Progressive Web App)。<br>ブラウザからアクセスで、アプリのように快適にご利用いただけます。</div>
-
-    <!-- Phone mockup STEPs -->
-    <div class="lp-step-phones">
-      <div class="lp-step-phone">
-        <div class="lp-step-badge">STEP 1</div>
-        <div class="lp-step-phone-screen">
-          <div style="text-align:center;color:#22d3ee;font-weight:900;font-size:9px;margin-top:20%">ブラウザで<br>アクセス</div>
-          <div class="lp-mockcircle">🌐</div>
-          <div style="font-size:7px;color:#94a3b8;text-align:center">takken-boost.pages.dev</div>
-        </div>
-      </div>
-      <div class="lp-step-phone">
-        <div class="lp-step-badge">STEP 2</div>
-        <div class="lp-step-phone-screen">
-          <div style="text-align:center;color:#22d3ee;font-weight:900;font-size:9px;margin-top:10%">ホーム画面に追加</div>
-          <div class="lp-mockline l"></div>
-          <div class="lp-mockline s"></div>
-          <div class="lp-mockline l"></div>
-          <div style="background:rgba(34,211,238,.2);border-radius:4px;padding:4px;text-align:center;color:#22d3ee;font-size:8px;margin-top:4px">📲 ホーム画面に追加</div>
-          <div class="lp-mockline s"></div>
-        </div>
-      </div>
-      <div class="lp-step-phone">
-        <div class="lp-step-badge">STEP 3</div>
-        <div class="lp-step-phone-screen">
-          <div style="text-align:center;color:#22d3ee;font-weight:900;font-size:9px;margin-top:10%">アプリ化完了！</div>
-          <div style="text-align:center;font-size:24px;margin-top:8%">🚀</div>
-          <div style="text-align:center;color:#fde047;font-size:7px;margin-top:4px;font-weight:700">タップで<br>すぐ起動！</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Text steps below mockups -->
-    <div class="lp-step">
-      <div class="lp-step-num">1</div>
-      <div>
-        <div class="lp-step-title">ブラウザでアクセス</div>
-        <div class="lp-step-desc">URLにアクセスして宅建BOOSTを開きます</div>
-      </div>
-    </div>
-    <div class="lp-step">
-      <div class="lp-step-num">2</div>
-      <div>
-        <div class="lp-step-title">ホーム画面に追加</div>
-        <div class="lp-step-desc">ブラウザのメニューから「ホーム画面に追加」をタップ</div>
-      </div>
-    </div>
-    <div class="lp-step">
-      <div class="lp-step-num">3</div>
-      <div>
-        <div class="lp-step-title">アプリ化完了！</div>
-        <div class="lp-step-desc">ホーム画面のアイコンから、タップですぐ起動</div>
-      </div>
-    </div>
-
-    <div class="lp-section-title" style="margin-top:40px;font-size:22px">PWAで<em>マルチOS</em>対応</div>
-    <div class="lp-section-sub">どこでも、同じ体験で</div>
-
-    <div class="lp-os-grid">
-      <div class="lp-os"><div class="lp-os-icon">🍎</div><div class="lp-os-name">iPhone</div></div>
-      <div class="lp-os"><div class="lp-os-icon">🤖</div><div class="lp-os-name">Android</div></div>
-      <div class="lp-os"><div class="lp-os-icon">📱</div><div class="lp-os-name">iPad</div></div>
-      <div class="lp-os"><div class="lp-os-icon">🖥️</div><div class="lp-os-name">Windows</div></div>
-      <div class="lp-os"><div class="lp-os-icon">💻</div><div class="lp-os-name">Mac</div></div>
-    </div>
-
-    <!-- URL cards with QR-like visual -->
-    <div style="display:flex;gap:10px;margin-bottom:24px">
-      <div class="lp-qr-card primary">
-        <div class="lp-qr-label">📱 最新版はこちら</div>
-        <div class="lp-qr-mock"></div>
-        <div class="lp-qr-url">takken-boost.pages.dev</div>
-        <div style="font-size:10px;color:#22d3ee;margin-top:6px;font-weight:700">最新のAIと学習を体験</div>
-      </div>
-      <div class="lp-qr-card">
-        <div class="lp-qr-label">📦 旧バージョン</div>
-        <div class="lp-qr-mock" style="opacity:.6"></div>
-        <div class="lp-qr-url">takken-boost-v9.pages.dev</div>
-        <div style="font-size:10px;color:#94a3b8;margin-top:6px">従来の宅建BOOSTを利用</div>
-      </div>
-    </div>
-
-    <!-- Final CTA -->
-    <div class="lp-final-cta">
-      <div style="font-size:32px;margin-bottom:10px">🎓</div>
-      <div style="font-size:20px;font-weight:900;margin-bottom:8px;color:#fff">まずは無料で体験しよう！</div>
-      <div style="font-size:12px;color:#cbd5e1;margin-bottom:20px;line-height:1.6">今すぐアクセスして、<br>AIに最適化された学習を体感してください</div>
-      <button class="lp-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
-        <i class="fas fa-arrow-right"></i>宅建BOOSTで、最短合格へ。
+  <!-- PDF Page 2: 機能紹介 -->
+  <div class="lp-pdf-section">
+    <picture>
+      <source media="(max-width:768px)" srcset="/lp-assets/pdf-p2-900.webp">
+      <img src="/lp-assets/pdf-p2-1920.webp" alt="従来の宅建学習をアップデート - 8機能紹介" class="lp-pdf-bg" loading="lazy">
+    </picture>
+    <div class="lp-pdf-overlay">
+      <button class="lp-pdf-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
+        <i class="fas fa-arrow-right"></i>機能を試す
       </button>
     </div>
+  </div>
 
-    <div style="text-align:center;padding:0 0 60px">
-      <button class="lp-cta-secondary" onclick="document.body.classList.remove('lp-mode');nav('help')">
+  <!-- PDF Page 3: VERSION UP -->
+  <div class="lp-pdf-section">
+    <picture>
+      <source media="(max-width:768px)" srcset="/lp-assets/pdf-p3-900.webp">
+      <img src="/lp-assets/pdf-p3-1920.webp" alt="VERSION UP - 覚えるから最適化して受かるへ" class="lp-pdf-bg" loading="lazy">
+    </picture>
+    <div class="lp-pdf-overlay">
+      <button class="lp-pdf-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
+        <i class="fas fa-bolt"></i>新バージョンを体験
+      </button>
+    </div>
+  </div>
+
+  <!-- PDF Page 4: インストール -->
+  <div class="lp-pdf-section">
+    <picture>
+      <source media="(max-width:768px)" srcset="/lp-assets/pdf-p4-900.webp">
+      <img src="/lp-assets/pdf-p4-1920.webp" alt="たった3ステップですぐにアプリ化 - PWAマルチOS対応" class="lp-pdf-bg" loading="lazy">
+    </picture>
+    <div class="lp-pdf-overlay" style="flex-direction:column;gap:10px;padding-bottom:6%">
+      <button class="lp-pdf-cta" onclick="document.body.classList.remove('lp-mode');nav('home')">
+        <i class="fas fa-graduation-cap"></i>宅建BOOSTで、最短合格へ。
+      </button>
+      <button class="lp-pdf-cta" style="background:transparent;color:#22d3ee;border:1px solid #22d3ee;box-shadow:none" onclick="document.body.classList.remove('lp-mode');nav('help')">
         <i class="fas fa-info-circle"></i>使い方ガイドを見る
       </button>
     </div>
+  </div>
+
+  <div style="padding:24px;text-align:center;font-size:11px;color:#94a3b8;background:#0a0e27">
+    <div style="margin-bottom:6px">© 2026 宅建BOOST · 完全無料・登録不要</div>
+    <div>最新版: <strong style="color:#22d3ee">takken-boost.pages.dev</strong></div>
   </div>
 </div>
 \`;
