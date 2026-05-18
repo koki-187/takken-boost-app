@@ -1,76 +1,66 @@
-宅建ブースト_構築ファイル.zip
-整理済み宅建ブースト.zip
-**/index.html
-**/Archive/
-**/過去問_RAW_TXT/
 
-
-
-
+# *.zip (already covered by specific zip files)
+# Application specific temporary files
+# Build artifacts
+# Google Drive specific files (if any are generated locally)
+# IDEs and editors
+# Node.js
 # OS generated files
+# Other temporary files
+# Python
+# Sensitive information (example, adjust as needed)
+# Wrangler temporary files
+# Zip files
+**/Archive/
+**/index.html
+**/過去問_RAW_TXT/
+*.bak
+*.db
+*.env
+*.log
+*.njsproj
+*.ntvsps
+*.pyc
+*.pyd
+*.pyo
+*.sln
+*.sqlite3
+*.suo
+*.swo
+*.swp
+*.temp
+*.tmp
+*~
 .DS_Store
 .DS_Store?
-._*
+.Python
 .Spotlight-V100
 .Trashes
-EhThumbs.db
-Thumbs.db
-
-# IDEs and editors
-.idea/
-.vscode/
-*.suo
-*.ntvsps
-*.njsproj
-*.sln
-*.bak
-
-# Build artifacts
-build/
-dist/
-*.log
-*.tmp
-*.temp
-
-# Wrangler temporary files
-.wrangler/
-
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-
-# Zip files
-# *.zip (already covered by specific zip files)
-
-# Other temporary files
-*.swp
-*.swo
-*~
-
-# Google Drive specific files (if any are generated locally)
+._*
+.env
+.env
+.env.*
+.env.development.local
+.env.local
+.env.production.local
+.env.test.local
 .gdoc
 .gsheet
 .gslides
-
-# Application specific temporary files
-*.sqlite3
-*.db
-
-# Sensitive information (example, adjust as needed)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
+.idea/
+.vscode/
+.wrangler/
+BOOST_LP*
+EhThumbs.db
+Thumbs.db
+__pycache__/
+build/
+dist/
+env/
+node_modules/
+npm-debug.log*
+venv/
+yarn-debug.log*
+yarn-error.log*
+宅建ブースト_構築ファイル.zip
+整理済み宅建ブースト.zip
