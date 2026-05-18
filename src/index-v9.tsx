@@ -1173,9 +1173,10 @@ body.lp-mode .nav-pill{background:#60a5fa}
 .lp-container{width:100%;color:#e0e7ff;background:#0a0e27;overflow-x:hidden;margin:-16px}
 .lp-sec{position:relative;padding:60px 20px;overflow:hidden}
 .lp-sec-inner{max-width:1100px;margin:0 auto;position:relative;z-index:2}
-.lp-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.45}
-.lp-bg-faint{opacity:.2}
-.lp-hero-sec{padding:80px 20px;min-height:80vh;display:flex;align-items:center}
+.lp-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.18;filter:blur(2px) saturate(1.2)}
+.lp-bg-faint{opacity:.08}
+.lp-hero-sec{padding:80px 20px;min-height:80vh;display:flex;align-items:center;background:radial-gradient(ellipse at top,#1e1b4b 0%,#0a0e27 60%,#020617 100%)}
+.lp-hero-sec::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,14,39,.55) 0%,rgba(10,14,39,.85) 100%);z-index:1;pointer-events:none}
 .lp-hero-inner{text-align:center}
 .lp-hero-logo{width:120px;height:auto;margin:0 auto 20px;display:block;border-radius:24px;box-shadow:0 12px 48px rgba(34,211,238,.3)}
 .lp-hero-title{font-size:42px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:18px;letter-spacing:-1px}
@@ -3629,7 +3630,6 @@ function renderLP() {
 </div>
 \`;
 }
-}
 
 // ===== FLASHCARD MODE =====
 let _fcDeck = [];
@@ -4273,7 +4273,8 @@ function showExplanationFor(idx) {
 document.addEventListener('DOMContentLoaded', () => {
   applyFontSize();
   initDarkMode();
-  nav('home');
+  const _initPage = new URLSearchParams(location.search).get('page') || 'home';
+  nav(_initPage);
   // First-time onboarding
   if (!LS.get('onb_done', false)) {
     setTimeout(showOnboarding, 800);
