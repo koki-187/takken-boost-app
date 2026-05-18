@@ -1171,6 +1171,41 @@ body.lp-mode .nav-pill{background:#60a5fa}
 
 /* ===== LP 5-SECTION STRUCTURE (ChatGPT指示書準拠) ===== */
 .lp-container{width:100%;color:#e0e7ff;background:#0a0e27;overflow-x:hidden;margin:-16px}
+
+/* TOP NAV */
+.lp-topnav{position:sticky;top:0;z-index:100;background:rgba(10,14,39,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(34,211,238,.18)}
+.lp-topnav-inner{max-width:1200px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.lp-topnav-brand{display:inline-flex;align-items:center;gap:8px;color:#fff;font-weight:900;font-size:17px;letter-spacing:.4px;text-decoration:none;white-space:nowrap}
+.lp-topnav-logo{width:30px;height:30px;border-radius:7px;box-shadow:0 2px 10px rgba(34,211,238,.4)}
+.lp-topnav-links{display:flex;gap:18px}
+.lp-topnav-links a{color:#cbd5e1;text-decoration:none;font-size:13px;font-weight:600;transition:.15s}
+.lp-topnav-links a:hover{color:#22d3ee}
+.lp-btn-sm{padding:8px 18px;font-size:13px}
+@media(max-width:820px){.lp-topnav-links{display:none}.lp-topnav-inner{padding:8px 14px}}
+
+/* FEATURE GRID (Section 01) */
+.lp-sec-head{text-align:center;margin-bottom:36px}
+.lp-feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:36px}
+.lp-feat-card{background:rgba(255,255,255,.03);border:1px solid rgba(96,165,250,.18);border-radius:16px;padding:22px 18px;backdrop-filter:blur(8px);transition:.2s}
+.lp-feat-card:hover{border-color:rgba(34,211,238,.45);transform:translateY(-2px)}
+.lp-feat-card strong{display:block;color:#fff;font-size:15px;font-weight:800;margin:10px 0 6px}
+.lp-feat-card span{display:block;color:#94a3b8;font-size:12px;line-height:1.6}
+.lp-feat-icon{font-size:22px;color:#22d3ee;text-shadow:0 0 16px rgba(34,211,238,.6)}
+.lp-feat-hero{margin:0 auto;max-width:780px}
+.lp-feat-hero img{width:100%;height:auto;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.5);border:1px solid rgba(34,211,238,.15)}
+@media(max-width:900px){.lp-feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.lp-feat-grid{grid-template-columns:1fr}}
+
+/* UPDATE CARDS (Section 02) */
+.lp-update-fa{font-size:26px;color:#22d3ee;text-shadow:0 0 20px rgba(34,211,238,.55);display:block;margin-bottom:8px}
+
+/* QR ROW (Section 03) */
+.lp-qr-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.lp-qr-card{background:rgba(255,255,255,.04);border:1px solid rgba(96,165,250,.22);border-radius:18px;padding:18px;text-align:center;width:200px;backdrop-filter:blur(8px)}
+.lp-qr-primary{border-color:rgba(34,211,238,.55);box-shadow:0 8px 28px rgba(34,211,238,.18)}
+.lp-qr-img{width:160px;height:160px;border-radius:10px;display:block;margin:0 auto 10px;background:#fff;padding:6px}
+.lp-qr-label{color:#22d3ee;font-weight:800;font-size:12px;margin-bottom:4px}
+.lp-qr-url{color:#cbd5e1;font-size:11px;font-family:'SF Mono',Consolas,monospace;word-break:break-all}
 .lp-sec{position:relative;padding:60px 20px;overflow:hidden}
 .lp-sec-inner{max-width:1100px;margin:0 auto;position:relative;z-index:2}
 .lp-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.18;filter:blur(2px) saturate(1.2)}
@@ -3448,6 +3483,25 @@ function renderLP() {
   document.getElementById('main').innerHTML = \`
 <div class="lp-container" style="background:#0a0e27;margin:-16px;padding:0">
 
+  <!-- === TOP NAV BAR === -->
+  <header class="lp-topnav">
+    <div class="lp-topnav-inner">
+      <a href="#hero" class="lp-topnav-brand" onclick="document.querySelector('#hero')?.scrollIntoView({behavior:'smooth'});return false">
+        <img src="/lp-assets/logo-desktop.webp" alt="" class="lp-topnav-logo">
+        <span>宅建BOOST</span>
+      </a>
+      <nav class="lp-topnav-links">
+        <a href="#features" onclick="document.querySelector('#features')?.scrollIntoView({behavior:'smooth'});return false">機能</a>
+        <a href="#update" onclick="document.querySelector('#update')?.scrollIntoView({behavior:'smooth'});return false">アップデート</a>
+        <a href="#install" onclick="document.querySelector('#install')?.scrollIntoView({behavior:'smooth'});return false">インストール</a>
+        <a href="#cta" onclick="document.querySelector('#cta')?.scrollIntoView({behavior:'smooth'});return false">FAQ</a>
+      </nav>
+      <button class="lp-btn lp-btn-primary lp-btn-sm" onclick="document.body.classList.remove('lp-mode');nav('home')">
+        今すぐ始める
+      </button>
+    </div>
+  </header>
+
   <!-- === SECTION 1: HERO === -->
   <section class="lp-sec lp-hero-sec" id="hero">
     <picture>
@@ -3476,21 +3530,21 @@ function renderLP() {
 
   <!-- === SECTION 2: FEATURES === -->
   <section class="lp-sec lp-features-sec" id="features">
-    <div class="lp-sec-inner lp-2col">
-      <div class="lp-2col-text">
+    <div class="lp-sec-inner">
+      <div class="lp-sec-head">
         <div class="lp-sec-num">01</div>
         <h2 class="lp-sec-title">"従来の宅建学習"を<br><em>アップデート</em>。</h2>
-        <p class="lp-sec-lead">AIと一緒に、宅建試験合格へ。</p>
-        <ul class="lp-feat-list">
-          <li><span>📚</span><strong>702問完全収録</strong><br>過去5年の本試験モデル + 令和8年AI予測模試</li>
-          <li><span>🎯</span><strong>カテゴリ別学習</strong><br>権利関係・宅建業法・法令制限・税その他の4分野</li>
-          <li><span>📝</span><strong>模擬試験モード</strong><br>50問・120分の本番形式で実力測定</li>
-          <li><span>📊</span><strong>進捗ダッシュボード</strong><br>レーダーチャートで弱点を可視化</li>
-          <li><span>🔥</span><strong>連続学習日数トラッキング</strong><br>総解答数・正答率も自動記録</li>
-          <li><span>🔄</span><strong>弱点復習モード</strong><br>間違えた問題を間隔反復で克服</li>
-        </ul>
+        <p class="lp-sec-lead">AIと一緒に、宅建試験合格へ。6 つの主要機能で合格を最短化。</p>
       </div>
-      <div class="lp-2col-img">
+      <div class="lp-feat-grid">
+        <div class="lp-feat-card"><i class="fas fa-book lp-feat-icon"></i><strong>702問完全収録</strong><span>過去5年の本試験モデル + 令和8年AI予測模試</span></div>
+        <div class="lp-feat-card"><i class="fas fa-bullseye lp-feat-icon"></i><strong>カテゴリ別学習</strong><span>権利関係・宅建業法・法令制限・税その他の 4 分野</span></div>
+        <div class="lp-feat-card"><i class="fas fa-file-pen lp-feat-icon"></i><strong>模擬試験モード</strong><span>50 問・120 分の本番形式で実力測定</span></div>
+        <div class="lp-feat-card"><i class="fas fa-chart-radar lp-feat-icon"></i><strong>進捗ダッシュボード</strong><span>レーダーチャートで弱点を可視化</span></div>
+        <div class="lp-feat-card"><i class="fas fa-fire lp-feat-icon"></i><strong>連続学習日数トラッキング</strong><span>総解答数・正答率も自動記録</span></div>
+        <div class="lp-feat-card"><i class="fas fa-rotate lp-feat-icon"></i><strong>弱点復習モード</strong><span>間違えた問題を間隔反復で克服</span></div>
+      </div>
+      <div class="lp-feat-hero">
         <picture>
           <source media="(max-width:600px)" srcset="/lp-assets/features-mobile.webp">
           <img src="/lp-assets/features-desktop.webp" alt="従来機能紹介" loading="lazy">
@@ -3516,23 +3570,33 @@ function renderLP() {
         <div class="lp-update-grid">
           <div class="lp-update-card">
             <img src="/lp-assets/aibrain-desktop.webp" alt="" class="lp-update-icon">
-            <strong>AI学習支援</strong>
-            <span>学習最適化・苦手分析・自動レコメンド</span>
+            <strong>AI学習エンジン</strong>
+            <span>苦手分析・理解度予測・最適化レコメンド</span>
           </div>
           <div class="lp-update-card">
-            <span class="lp-update-emoji">📲</span>
+            <i class="fas fa-mobile-screen lp-update-fa"></i>
             <strong>PWA × マルチOS</strong>
-            <span>インストール不要・iOS/Android/Win/Mac/iPad対応</span>
+            <span>インストール不要、iOS/Android/Win/Mac/iPad 対応</span>
           </div>
           <div class="lp-update-card">
-            <span class="lp-update-emoji">✨</span>
-            <strong>UI/UX刷新</strong>
+            <i class="fas fa-wand-magic-sparkles lp-update-fa"></i>
+            <strong>進化した UI/UX</strong>
             <span>高速化・ミニマルUI・学習導線改善</span>
           </div>
           <div class="lp-update-card">
-            <span class="lp-update-emoji">☁️</span>
-            <strong>デバイス同期</strong>
-            <span>複数デバイス間で進捗が自動同期</span>
+            <i class="fas fa-chart-line lp-update-fa"></i>
+            <strong>リアルタイム進捗分析</strong>
+            <span>正答率・解答時間・偏差を即時グラフ化</span>
+          </div>
+          <div class="lp-update-card">
+            <i class="fas fa-graduation-cap lp-update-fa"></i>
+            <strong>理解を深める学習体験</strong>
+            <span>詳細解説・関連条文・図解で本質理解</span>
+          </div>
+          <div class="lp-update-card">
+            <i class="fas fa-cloud lp-update-fa"></i>
+            <strong>デバイス間同期</strong>
+            <span>複数デバイス間で学習進捗が自動同期</span>
           </div>
         </div>
 
@@ -3584,6 +3648,19 @@ function renderLP() {
         <div class="lp-os-item"><i class="fas fa-tablet-screen-button"></i>iPad</div>
         <div class="lp-os-item"><i class="fab fa-windows"></i>Windows</div>
         <div class="lp-os-item"><i class="fab fa-apple"></i>Mac</div>
+      </div>
+
+      <div class="lp-qr-row">
+        <div class="lp-qr-card lp-qr-primary">
+          <img src="/lp-assets/qr-current.webp" alt="最新版QR" class="lp-qr-img" loading="lazy">
+          <div class="lp-qr-label">📱 最新版</div>
+          <div class="lp-qr-url">takken-boost.pages.dev</div>
+        </div>
+        <div class="lp-qr-card">
+          <img src="/lp-assets/qr-legacy.webp" alt="旧版QR" class="lp-qr-img" loading="lazy">
+          <div class="lp-qr-label">📦 旧バージョン</div>
+          <div class="lp-qr-url">takken-boost-v9.pages.dev</div>
+        </div>
       </div>
     </div>
   </section>
