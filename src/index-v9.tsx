@@ -3517,10 +3517,10 @@ function renderLP() {
       <p class="lp-hero-sub">AI × PWA × マルチOS対応<br>学習プラットフォーム</p>
       <p class="lp-hero-lead">702問完全収録。過去5年本試験モデル + 令和8年AI予測模試。<br>詳細解説とAI分析で、あなたの弱点を克服。</p>
       <div class="lp-hero-badges">
-        <span class="lp-badge">📚 702問収録</span>
-        <span class="lp-badge">🤖 AI予測模試</span>
-        <span class="lp-badge">🔊 音声学習</span>
-        <span class="lp-badge">📱 PWA対応</span>
+        <span class="lp-badge"><i class="fas fa-book"></i> 702問収録</span>
+        <span class="lp-badge"><i class="fas fa-robot"></i> AI予測模試</span>
+        <span class="lp-badge"><i class="fas fa-volume-high"></i> 音声学習</span>
+        <span class="lp-badge"><i class="fas fa-mobile-screen"></i> PWA対応</span>
       </div>
       <button class="lp-btn lp-btn-primary" onclick="document.body.classList.remove('lp-mode');nav('home')">
         <i class="fas fa-rocket"></i>無料で学習を始める
@@ -3652,13 +3652,13 @@ function renderLP() {
 
       <div class="lp-qr-row">
         <div class="lp-qr-card lp-qr-primary">
-          <img src="/lp-assets/qr-current.webp" alt="最新版QR" class="lp-qr-img" loading="lazy">
-          <div class="lp-qr-label">📱 最新版</div>
+          <img src="/lp-assets/qr-current.webp" alt="最新版QRコード" class="lp-qr-img" loading="lazy">
+          <div class="lp-qr-label"><i class="fas fa-mobile-screen"></i> 最新版</div>
           <div class="lp-qr-url">takken-boost.pages.dev</div>
         </div>
         <div class="lp-qr-card">
-          <img src="/lp-assets/qr-legacy.webp" alt="旧版QR" class="lp-qr-img" loading="lazy">
-          <div class="lp-qr-label">📦 旧バージョン</div>
+          <img src="/lp-assets/qr-legacy.webp" alt="旧版QRコード" class="lp-qr-img" loading="lazy">
+          <div class="lp-qr-label"><i class="fas fa-box-archive"></i> 旧バージョン</div>
           <div class="lp-qr-url">takken-boost-v9.pages.dev</div>
         </div>
       </div>
@@ -3676,11 +3676,11 @@ function renderLP() {
       </button>
       <div class="lp-url-row">
         <div class="lp-url-card lp-url-primary">
-          <div class="lp-url-label">📱 最新版はこちら</div>
+          <div class="lp-url-label"><i class="fas fa-mobile-screen"></i> 最新版はこちら</div>
           <div class="lp-url-value">takken-boost.pages.dev</div>
         </div>
         <div class="lp-url-card">
-          <div class="lp-url-label">📦 旧バージョン</div>
+          <div class="lp-url-label"><i class="fas fa-box-archive"></i> 旧バージョン</div>
           <div class="lp-url-value">takken-boost-v9.pages.dev</div>
         </div>
       </div>
@@ -3691,7 +3691,7 @@ function renderLP() {
   <footer class="lp-footer">
     <div class="lp-footer-inner">
       <div class="lp-footer-brand">
-        <strong style="color:#22d3ee">🚀 宅建BOOST</strong>
+        <strong style="color:#22d3ee"><i class="fas fa-rocket"></i> 宅建BOOST</strong>
         <span>合同会社My Agent works 運営</span>
       </div>
       <nav class="lp-footer-nav">
