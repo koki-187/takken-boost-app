@@ -34,41 +34,59 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 PRESETS = {
     "hero": (
-        "Cinematic dark hero background for a Japanese real estate exam study app. "
-        "Deep navy (#0a0e27) to black gradient. A glowing cyan-purple rocket launching upward "
-        "into a starry night sky, leaving a soft trail of light. Subtle constellations and "
-        "soft bokeh of cyan and magenta light particles. Empty negative space in the center "
-        "so headline text can be overlaid. Minimal, modern, futuristic. No text, no UI elements."
+        "Wide cinematic dark hero composition for a real estate exam study platform. "
+        "Background: deep navy blue (#0a0e27) night with a subtle glowing cyan digital "
+        "circuit / network grid pattern and city silhouette far in the distance. "
+        "Center-right: a 3D floating photoreal smartphone, tablet, and laptop arranged "
+        "diagonally, each screen displaying abstract dark UI mockups with cyan accents — "
+        "progress rings, bar charts, and question cards. Floating around the devices: "
+        "thin-line cyan icons (a house, a balance scale, a checkmark on document, an "
+        "AI brain, a book) connected by faint network lines. Left third: clean empty "
+        "negative space for headline text. No text or letters in the image. Color palette: "
+        "navy #0a0e27, cyan #22d3ee, soft white highlights. Premium, modern, futuristic."
     ),
     "features": (
-        "A flat-design illustration of multiple sleek dark-themed mobile devices (smartphone, "
-        "tablet) showing abstract study app screens — category icons, progress charts, "
-        "radar chart, question cards. Dark navy background (#0a0e27), accent colors cyan #22d3ee "
-        "and purple #a78bfa. Floating UI cards and subtle grid lines. Clean, modern, isometric-ish. "
-        "No real text, only abstract glyphs."
+        "Dark themed product showcase, top-down isometric. A photoreal laptop in the "
+        "center showing a dashboard UI (progress ring 72%, bar chart, list of categories). "
+        "To its left a smartphone showing a question card with multiple-choice options, "
+        "to its right a tablet showing flashcards. All on a deep navy (#0a0e27) background "
+        "with a subtle cyan digital grid. Behind the devices, large translucent floating "
+        "feature-icon cards with thin-line cyan icons (book, chart, calendar, AI brain, "
+        "trophy, bookmark). Glassmorphism, cyan #22d3ee accent glow. No real text, only "
+        "abstract glyph placeholders."
     ),
     "update": (
-        "Conceptual split illustration: left side shows old-style study (a single static "
-        "notebook, faded), right side shows futuristic AI-optimized learning (glowing data "
-        "viz, neural network nodes, multiple devices synced via cloud). Dark navy background, "
-        "cyan-purple accents. Connecting arrows of light from old to new."
+        "Split-screen conceptual illustration. Left half (faded, desaturated): old paper "
+        "notebooks, pencils, single small smartphone with simple UI — labeled visually as "
+        "'old way'. Right half (vivid, glowing): a luminous cyan AI brain icon at center "
+        "surrounded by floating devices (smartphone, tablet, laptop) showing optimized "
+        "study dashboards, with data nodes and connecting cyan lines between them. "
+        "Cyan #22d3ee accents, deep navy #0a0e27 background, subtle circuit-pattern texture. "
+        "An arrow of light connects left to right. Premium, futuristic, no text."
     ),
     "install": (
-        "Flat isometric illustration of multiple devices (iPhone, Android phone, iPad, "
-        "MacBook, Windows desktop) connected by glowing cyan lines to a soft cloud icon in "
-        "the center. Dark navy background, cyan #22d3ee and purple #a78bfa accents. Subtle "
-        "grid lines on the floor. No text. Minimal, clean."
+        "Hero illustration of PWA multi-OS support. Center: a soft glowing cyan cloud icon "
+        "with a small house symbol inside (the 宅建BOOST mark, but drawn as a simple "
+        "geometric house shape, no text). Radiating outward from the cloud: thin cyan lines "
+        "connecting to five floating device silhouettes arranged in an arc — iPhone, Android "
+        "phone, iPad, Windows laptop, MacBook. Each device shows a tiny abstract dashboard UI. "
+        "Background: deep navy #0a0e27 with subtle cyan circuit grid and soft star bokeh. "
+        "Glassmorphism cards. No real text, only abstract glyphs. Modern, premium, isometric."
     ),
     "logo": (
-        "App icon: rounded square gradient background (cyan #22d3ee to purple #a78bfa). "
-        "Centered white rocket silhouette with subtle book pages forming the rocket fins. "
-        "Glossy, modern, iOS-style icon. No text. Square 1024x1024 friendly composition."
+        "App icon, square 1024x1024, iOS-style rounded-corner glossy badge. Background: "
+        "deep navy to cyan gradient (#0a0e27 → #22d3ee). Centered: a clean geometric "
+        "white house silhouette (simple roof + walls, modern minimal style) with a small "
+        "subtle upward arrow or star above the roof suggesting growth. Soft cyan inner "
+        "glow around the house. No letters, no text, no characters. Premium, minimal, "
+        "Apple App Store icon aesthetic."
     ),
     "aibrain": (
-        "Stylized brain icon made of glowing neural network lines and nodes. "
-        "Purple-magenta gradient background. White line-art brain merging into a "
-        "circuit-like neural network. Glowing connection points. Minimal, modern, "
-        "iOS-style icon. No text."
+        "Circular icon, 1024x1024. Background: dark navy with a faint cyan radial glow. "
+        "Centered: a luminous cyan line-art human brain stylized as a neural network — "
+        "thin curved lines forming brain hemispheres with bright cyan nodes at neuron "
+        "intersections, faint connecting filaments. Soft cyan #22d3ee outer glow. "
+        "Glassmorphism feel. Minimal, futuristic, no text, no letters."
     ),
 }
 
