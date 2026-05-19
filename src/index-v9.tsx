@@ -1215,6 +1215,12 @@ body.lp-mode .nav-pill{background:#60a5fa}
 .lp-hero-sec::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,6,23,.35) 0%,rgba(2,6,23,.45) 35%,rgba(10,14,39,.75) 100%);z-index:1;pointer-events:none}
 .lp-hero-inner{text-align:center}
 .lp-brand-pill{display:block;max-width:560px;width:90%;height:auto;margin:0 auto 18px;filter:drop-shadow(0 8px 28px rgba(34,211,238,.35))}
+.lp-hero-subject{position:absolute;z-index:1;width:200px;height:auto;opacity:.92;pointer-events:none;filter:drop-shadow(0 10px 30px rgba(34,211,238,.35));animation:lpFloat 6s ease-in-out infinite}
+.lp-hero-subject-left{left:5%;top:18%;transform:rotate(-6deg)}
+.lp-hero-subject-right{right:5%;top:22%;transform:rotate(6deg);animation-delay:-3s}
+@keyframes lpFloat{0%,100%{translate:0 0}50%{translate:0 -14px}}
+@media(max-width:900px){.lp-hero-subject{width:140px;opacity:.7}.lp-hero-subject-left{left:2%;top:12%}.lp-hero-subject-right{right:2%;top:14%}}
+@media(max-width:600px){.lp-hero-subject{display:none}}
 .lp-hero-title{font-size:42px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:22px;letter-spacing:-1px}
 .lp-hero-title em{font-style:normal;color:#22d3ee;text-shadow:0 0 32px rgba(34,211,238,.6)}
 .lp-hero-sub{font-size:15px;color:#bfdbfe;margin-bottom:14px;line-height:1.6}
@@ -3510,6 +3516,8 @@ function renderLP() {
       <source media="(max-width:600px)" srcset="/lp-assets/hero-mobile.webp">
       <img src="/lp-assets/hero-desktop.webp" alt="" class="lp-bg-img" loading="eager">
     </picture>
+    <img src="/lp-assets/subject-biz-desktop.webp" alt="" class="lp-hero-subject lp-hero-subject-left" loading="eager">
+    <img src="/lp-assets/subject-law-desktop.webp" alt="" class="lp-hero-subject lp-hero-subject-right" loading="eager">
     <div class="lp-sec-inner lp-hero-inner">
       <h1 class="lp-hero-title">宅建学習を、<br><em>"AI時代"</em>へ。</h1>
       <picture>
