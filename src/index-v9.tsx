@@ -1209,10 +1209,10 @@ body.lp-mode .nav-pill{background:#60a5fa}
 .lp-qr-url{color:#cbd5e1;font-size:11px;font-family:'SF Mono',Consolas,monospace;word-break:break-all}
 .lp-sec{position:relative;padding:60px 20px;overflow:hidden}
 .lp-sec-inner{max-width:1100px;margin:0 auto;position:relative;z-index:2}
-.lp-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.18;filter:blur(2px) saturate(1.2)}
-.lp-bg-faint{opacity:.08}
-.lp-hero-sec{padding:80px 20px;min-height:80vh;display:flex;align-items:center;background:radial-gradient(ellipse at top,#1e1b4b 0%,#0a0e27 60%,#020617 100%)}
-.lp-hero-sec::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,14,39,.55) 0%,rgba(10,14,39,.85) 100%);z-index:1;pointer-events:none}
+.lp-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1}
+.lp-bg-faint{opacity:.55}
+.lp-hero-sec{padding:80px 20px;min-height:80vh;display:flex;align-items:center;background:#020617}
+.lp-hero-sec::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,6,23,.35) 0%,rgba(2,6,23,.45) 35%,rgba(10,14,39,.75) 100%);z-index:1;pointer-events:none}
 .lp-hero-inner{text-align:center}
 .lp-brand-pill{display:block;max-width:560px;width:90%;height:auto;margin:0 auto 18px;filter:drop-shadow(0 8px 28px rgba(34,211,238,.35))}
 .lp-hero-title{font-size:42px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:22px;letter-spacing:-1px}
@@ -3548,8 +3548,8 @@ function renderLP() {
       </div>
       <div class="lp-feat-hero">
         <picture>
-          <source media="(max-width:600px)" srcset="/lp-assets/features-mobile.webp">
-          <img src="/lp-assets/features-desktop.webp" alt="従来機能紹介" loading="lazy">
+          <source media="(max-width:600px)" srcset="/lp-assets/pdf-p2-900.webp">
+          <img src="/lp-assets/pdf-p2-1920.webp" alt="従来機能紹介" loading="lazy">
         </picture>
       </div>
     </div>
@@ -3557,11 +3557,15 @@ function renderLP() {
 
   <!-- === SECTION 3: UPDATE / VERSION UP === -->
   <section class="lp-sec lp-update-sec" id="update">
+    <picture>
+      <source media="(max-width:600px)" srcset="/lp-assets/pdf-p3-900.webp">
+      <img src="/lp-assets/pdf-p3-1920.webp" alt="" class="lp-bg-img lp-bg-faint" loading="lazy">
+    </picture>
     <div class="lp-sec-inner lp-2col lp-2col-reverse">
       <div class="lp-2col-img">
         <picture>
-          <source media="(max-width:600px)" srcset="/lp-assets/update-mobile.webp">
-          <img src="/lp-assets/update-desktop.webp" alt="アップデート紹介" loading="lazy">
+          <source media="(max-width:600px)" srcset="/lp-assets/pdf-p3-900.webp">
+          <img src="/lp-assets/pdf-p3-1920.webp" alt="アップデート紹介" loading="lazy">
         </picture>
       </div>
       <div class="lp-2col-text">
@@ -3618,8 +3622,8 @@ function renderLP() {
   <!-- === SECTION 4: INSTALL / PWA === -->
   <section class="lp-sec lp-install-sec" id="install">
     <picture>
-      <source media="(max-width:600px)" srcset="/lp-assets/install-mobile.webp">
-      <img src="/lp-assets/install-desktop.webp" alt="" class="lp-bg-img lp-bg-faint" loading="lazy">
+      <source media="(max-width:600px)" srcset="/lp-assets/pdf-p4-900.webp">
+      <img src="/lp-assets/pdf-p4-1920.webp" alt="" class="lp-bg-img lp-bg-faint" loading="lazy">
     </picture>
     <div class="lp-sec-inner">
       <div class="lp-sec-num">03</div>
