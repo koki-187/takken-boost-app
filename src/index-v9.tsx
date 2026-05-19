@@ -1175,8 +1175,9 @@ body.lp-mode .nav-pill{background:#60a5fa}
 /* TOP NAV */
 .lp-topnav{position:sticky;top:0;z-index:100;background:rgba(10,14,39,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(34,211,238,.18)}
 .lp-topnav-inner{max-width:1200px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.lp-topnav-brand{display:inline-flex;align-items:center;gap:8px;color:#fff;font-weight:900;font-size:17px;letter-spacing:.4px;text-decoration:none;white-space:nowrap}
-.lp-topnav-logo{width:30px;height:30px;border-radius:7px;box-shadow:0 2px 10px rgba(34,211,238,.4)}
+.lp-topnav-brand{display:inline-flex;align-items:center;gap:10px;color:#fff;font-weight:900;font-size:18px;letter-spacing:.4px;text-decoration:none;white-space:nowrap}
+.lp-topnav-logo{height:36px;width:auto;display:block;filter:drop-shadow(0 2px 8px rgba(34,211,238,.45))}
+.lp-topnav-name{background:linear-gradient(90deg,#fff 0%,#22d3ee 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .lp-topnav-links{display:flex;gap:18px}
 .lp-topnav-links a{color:#cbd5e1;text-decoration:none;font-size:13px;font-weight:600;transition:.15s}
 .lp-topnav-links a:hover{color:#22d3ee}
@@ -1276,7 +1277,10 @@ body.lp-mode .nav-pill{background:#60a5fa}
 @media(max-width:600px){.lp-cta-title{font-size:26px}}
 .lp-footer{background:#050719;padding:30px 20px;border-top:1px solid rgba(96,165,250,.2)}
 .lp-footer-inner{max-width:900px;margin:0 auto;text-align:center}
-.lp-footer-brand{margin-bottom:14px;font-size:14px}
+.lp-footer-brand{margin-bottom:14px;font-size:13px;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:6px}
+.lp-footer-brand-row{display:inline-flex;align-items:center;gap:10px}
+.lp-footer-logo{height:32px;width:auto;display:block;filter:drop-shadow(0 2px 8px rgba(34,211,238,.4))}
+.lp-footer-name{font-size:16px;font-weight:900;background:linear-gradient(90deg,#fff 0%,#22d3ee 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .lp-footer-brand span{font-size:11px;color:#94a3b8;margin-left:8px}
 .lp-footer-nav{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:11px;margin-bottom:10px}
 .lp-footer-nav a{color:#94a3b8;text-decoration:none;transition:.15s}
@@ -3484,9 +3488,9 @@ function renderLP() {
   <!-- === TOP NAV BAR === -->
   <header class="lp-topnav">
     <div class="lp-topnav-inner">
-      <a href="#hero" class="lp-topnav-brand" onclick="document.querySelector('#hero')?.scrollIntoView({behavior:'smooth'});return false">
+      <a href="#hero" class="lp-topnav-brand" onclick="document.querySelector('#hero')?.scrollIntoView({behavior:'smooth'});return false" aria-label="宅建BOOST">
         <img src="/lp-assets/logo-desktop.webp" alt="" class="lp-topnav-logo">
-        <span>宅建BOOST</span>
+        <span class="lp-topnav-name">宅建BOOST</span>
       </a>
       <nav class="lp-topnav-links">
         <a href="#features" onclick="document.querySelector('#features')?.scrollIntoView({behavior:'smooth'});return false">機能</a>
@@ -3689,7 +3693,10 @@ function renderLP() {
   <footer class="lp-footer">
     <div class="lp-footer-inner">
       <div class="lp-footer-brand">
-        <strong style="color:#22d3ee"><i class="fas fa-rocket"></i> 宅建BOOST</strong>
+        <span class="lp-footer-brand-row">
+          <img src="/lp-assets/logo-desktop.webp" alt="" class="lp-footer-logo">
+          <strong class="lp-footer-name">宅建BOOST</strong>
+        </span>
         <span>合同会社My Agent works 運営</span>
       </div>
       <nav class="lp-footer-nav">
