@@ -566,11 +566,14 @@ html{scroll-behavior:smooth}
   filter:drop-shadow(0 16px 48px rgba(124,58,237,.55));
 }
 .logo-3d-fallback{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:200px;height:200px;max-width:none;max-height:none;object-fit:contain;
   z-index:1;pointer-events:none;
-  filter:drop-shadow(0 8px 24px rgba(34,211,238,.55));
+  filter:drop-shadow(0 8px 32px rgba(34,211,238,.75)) drop-shadow(0 0 18px rgba(124,58,237,.45));
+  animation:logoFallbackPulse 4s ease-in-out infinite;
 }
-#logo-3d-container canvas{position:relative;z-index:2}
+@keyframes logoFallbackPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.06)}}
+#logo-3d-container canvas{position:relative;z-index:2;opacity:.0}
 .cube-glow{
   position:absolute;width:320px;height:320px;border-radius:50%;
   background:radial-gradient(circle,rgba(168,85,247,.45) 0%,rgba(124,58,237,.2) 40%,transparent 70%);
@@ -1605,16 +1608,16 @@ body.dark .reset-btn-sub{background:rgba(220,38,38,.15);color:#fca5a5}
     </a>
     <div class="header-actions">
       <button class="hbtn" onclick="cycleFontSize()" title="文字サイズ変更" aria-label="文字サイズ変更" id="fontSizeBtn">
-        <i class="fas fa-text-height"></i>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6M7 7v12M4 14h6"/><path d="M14 13l4-8 4 8M15 18h6"/></svg>
       </button>
       <button class="hbtn" onclick="nav('help')" title="使い方ガイド" aria-label="使い方ガイド">
-        <i class="fas fa-question-circle"></i>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/></svg>
       </button>
       <button class="hbtn" onclick="toggleDark()" title="ダークモード" id="themeBtn" aria-label="ダークモード切替">
-        <i class="fas fa-moon"></i>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" id="themeBtnSvg"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       </button>
       <button class="hbtn" onclick="showInstallBanner()" title="インストール" id="installHeaderBtn" aria-label="アプリインストール">
-        <i class="fas fa-download"></i>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14"/></svg>
       </button>
     </div>
   </div>
