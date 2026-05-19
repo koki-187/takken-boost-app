@@ -279,16 +279,21 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   display:flex;align-items:center;justify-content:space-between;
   height:56px;
 }
-.logo{color:#fff;font-size:20px;font-weight:900;letter-spacing:-0.5px;text-decoration:none}
-.logo span{font-size:10px;opacity:.7;margin-left:4px;font-weight:400}
+.logo{color:#fff;font-size:20px;font-weight:900;letter-spacing:-0.5px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.header-logo-img{height:34px;width:auto;display:block;filter:drop-shadow(0 2px 8px rgba(34,211,238,.5))}
+.header-logo-name{font-size:19px;font-weight:900;line-height:1;letter-spacing:.2px}
+.header-logo-sub{font-size:10px;opacity:.75;font-weight:500;margin-left:2px}
+@media(max-width:480px){.header-logo-sub{display:none}.header-logo-name{font-size:17px}.header-logo-img{height:30px}}
 .header-actions{display:flex;gap:8px}
 .hbtn{
-  background:rgba(255,255,255,.15);border:none;color:#fff;
-  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.18);color:#fff;
+  width:38px;height:38px;border-radius:50%;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  transition:.2s;font-size:15px;
+  transition:.2s;font-size:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
 }
-.hbtn:hover{background:rgba(255,255,255,.25)}
+.hbtn:hover{background:rgba(255,255,255,.38);transform:translateY(-1px)}
+.hbtn:active{transform:scale(.95)}
 
 /* ===== BOTTOM NAV ===== */
 #bottom-nav{
@@ -561,6 +566,12 @@ html{scroll-behavior:smooth}
   width:220px;height:220px;position:relative;z-index:3;
   filter:drop-shadow(0 16px 48px rgba(124,58,237,.55));
 }
+.logo-3d-fallback{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  z-index:1;pointer-events:none;
+  filter:drop-shadow(0 8px 24px rgba(34,211,238,.55));
+}
+#logo-3d-container canvas{position:relative;z-index:2}
 .cube-glow{
   position:absolute;width:320px;height:320px;border-radius:50%;
   background:radial-gradient(circle,rgba(168,85,247,.45) 0%,rgba(124,58,237,.2) 40%,transparent 70%);
@@ -1590,8 +1601,10 @@ body.dark .reset-btn-sub{background:rgba(220,38,38,.15);color:#fca5a5}
 <!-- ===== HEADER ===== -->
 <header id="app-header">
   <div class="header-inner">
-    <a class="logo" href="#" onclick="nav('home');return false">
-      宅建BOOST <span>合格アプリ</span>
+    <a class="logo" href="#" onclick="nav('home');return false" aria-label="宅建BOOST ホーム">
+      <img src="/lp-assets/logo-desktop.webp" alt="" class="header-logo-img">
+      <span class="header-logo-name">宅建BOOST</span>
+      <span class="header-logo-sub">合格アプリ</span>
     </a>
     <div class="header-actions">
       <button class="hbtn" onclick="cycleFontSize()" title="文字サイズ変更" aria-label="文字サイズ変更" id="fontSizeBtn">
@@ -1803,7 +1816,9 @@ async function renderHome() {
 <!-- ===== 3D CUBE MONUMENT (brand hero) ===== -->
 <div class="cube-hero fade-in-up" style="margin-bottom:14px">
   <div class="cube-glow"></div>
-  <div id="logo-3d-container"></div>
+  <div id="logo-3d-container">
+    <img src="/lp-assets/logo-desktop.webp" alt="宅建BOOST" class="logo-3d-fallback" loading="eager">
+  </div>
 </div>
 
 <!-- ===== HERO STATS CARD ===== -->
@@ -3334,7 +3349,8 @@ function initCubeLogo() {
   if (!container || typeof THREE === 'undefined') return;
   // Dispose previous instance
   if (_cube3D) { try { _cube3D.dispose(); } catch {} _cube3D = null; }
-  container.innerHTML = '';
+  // Remove any prior canvas (keep fallback img)
+  container.querySelectorAll('canvas').forEach(n => n.remove());
 
   // Guard against 0-size container (CSS not yet applied)
   let W = container.clientWidth, H = container.clientHeight;
