@@ -1213,9 +1213,7 @@ body.lp-mode .nav-pill{background:#60a5fa}
 .lp-hero-sec{padding:80px 20px;min-height:80vh;display:flex;align-items:center;background:radial-gradient(ellipse at top,#1e1b4b 0%,#0a0e27 60%,#020617 100%)}
 .lp-hero-sec::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,14,39,.55) 0%,rgba(10,14,39,.85) 100%);z-index:1;pointer-events:none}
 .lp-hero-inner{text-align:center}
-.lp-brand-row{display:inline-flex;align-items:center;gap:12px;margin:0 auto 22px;padding:8px 18px 8px 8px;background:rgba(255,255,255,.04);border:1px solid rgba(34,211,238,.25);border-radius:50px;backdrop-filter:blur(10px)}
-.lp-brand-logo{width:42px;height:42px;border-radius:10px;display:block;box-shadow:0 4px 16px rgba(34,211,238,.4)}
-.lp-brand-name{font-size:22px;font-weight:900;color:#fff;letter-spacing:.5px;line-height:1}
+.lp-brand-pill{display:block;max-width:560px;width:90%;height:auto;margin:0 auto 18px;filter:drop-shadow(0 8px 28px rgba(34,211,238,.35))}
 .lp-hero-title{font-size:42px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:22px;letter-spacing:-1px}
 .lp-hero-title em{font-style:normal;color:#22d3ee;text-shadow:0 0 32px rgba(34,211,238,.6)}
 .lp-hero-sub{font-size:15px;color:#bfdbfe;margin-bottom:14px;line-height:1.6}
@@ -3510,11 +3508,11 @@ function renderLP() {
     </picture>
     <div class="lp-sec-inner lp-hero-inner">
       <h1 class="lp-hero-title">宅建学習を、<br><em>"AI時代"</em>へ。</h1>
-      <div class="lp-brand-row">
-        <img src="/lp-assets/logo-desktop.webp" alt="宅建BOOST ロゴ" class="lp-brand-logo" loading="eager">
-        <span class="lp-brand-name">宅建BOOST</span>
-      </div>
-      <p class="lp-hero-sub">AI × PWA × マルチOS対応<br>学習プラットフォーム</p>
+      <picture>
+        <source media="(max-width:600px)" srcset="/lp-assets/brand-pill-mobile.webp">
+        <img src="/lp-assets/brand-pill-desktop.webp" alt="宅建BOOST AI × PWA × マルチOS対応" class="lp-brand-pill" loading="eager">
+      </picture>
+      <p class="lp-hero-sub">学習プラットフォーム</p>
       <p class="lp-hero-lead">702問完全収録。過去5年本試験モデル + 令和8年AI予測模試。<br>詳細解説とAI分析で、あなたの弱点を克服。</p>
       <div class="lp-hero-badges">
         <span class="lp-badge"><i class="fas fa-book"></i> 702問収録</span>
