@@ -4353,8 +4353,12 @@ function showExplanationFor(idx) {
 document.addEventListener('DOMContentLoaded', () => {
   applyFontSize();
   initDarkMode();
-  const _initPage = new URLSearchParams(location.search).get('page') || 'home';
-  nav(_initPage);
+  const _qp = new URLSearchParams(location.search).get('page');
+  const _path = location.pathname.replace(/^\\/+|\\/+$/g, '').split('/')[0];
+  const _hash = (location.hash || '').replace(/^#/, '').split('?')[0];
+  const _knownRoutes = ['home','study','exam','progress','review','category','question','past-exam','result','past-result','help','lp','flashcard'];
+  const _candidate = _qp || (_knownRoutes.includes(_path) ? _path : '') || (_knownRoutes.includes(_hash) ? _hash : '') || 'home';
+  nav(_candidate);
   // First-time onboarding
   if (!LS.get('onb_done', false)) {
     setTimeout(showOnboarding, 800);
