@@ -279,11 +279,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   display:flex;align-items:center;justify-content:space-between;
   height:56px;
 }
-.logo{color:#fff;font-size:20px;font-weight:900;letter-spacing:-0.5px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
-.header-logo-img{height:34px;width:auto;display:block;filter:drop-shadow(0 2px 8px rgba(34,211,238,.5))}
-.header-logo-name{font-size:19px;font-weight:900;line-height:1;letter-spacing:.2px}
-.header-logo-sub{font-size:10px;opacity:.75;font-weight:500;margin-left:2px}
-@media(max-width:480px){.header-logo-sub{display:none}.header-logo-name{font-size:17px}.header-logo-img{height:30px}}
+.logo{color:#fff;text-decoration:none;display:inline-flex;align-items:center}
+.header-brand-pill{height:46px;width:auto;display:block;filter:drop-shadow(0 2px 10px rgba(34,211,238,.55))}
+@media(max-width:600px){.header-brand-pill{height:38px}}
+@media(max-width:380px){.header-brand-pill{height:32px}}
 .header-actions{display:flex;gap:8px}
 .hbtn{
   background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.18);color:#fff;
@@ -1602,9 +1601,7 @@ body.dark .reset-btn-sub{background:rgba(220,38,38,.15);color:#fca5a5}
 <header id="app-header">
   <div class="header-inner">
     <a class="logo" href="#" onclick="nav('home');return false" aria-label="宅建BOOST ホーム">
-      <img src="/lp-assets/logo-desktop.webp" alt="" class="header-logo-img">
-      <span class="header-logo-name">宅建BOOST</span>
-      <span class="header-logo-sub">合格アプリ</span>
+      <img src="/lp-assets/brand-pill-desktop.webp" alt="宅建BOOST AI × PWA × マルチOS対応" class="header-brand-pill">
     </a>
     <div class="header-actions">
       <button class="hbtn" onclick="cycleFontSize()" title="文字サイズ変更" aria-label="文字サイズ変更" id="fontSizeBtn">
