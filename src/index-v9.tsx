@@ -565,15 +565,7 @@ html{scroll-behavior:smooth}
   width:220px;height:220px;position:relative;z-index:3;
   filter:drop-shadow(0 16px 48px rgba(124,58,237,.55));
 }
-.logo-3d-fallback{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:200px;height:200px;max-width:none;max-height:none;object-fit:contain;
-  z-index:1;pointer-events:none;
-  filter:drop-shadow(0 8px 32px rgba(34,211,238,.75)) drop-shadow(0 0 18px rgba(124,58,237,.45));
-  animation:logoFallbackPulse 4s ease-in-out infinite;
-}
-@keyframes logoFallbackPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.06)}}
-#logo-3d-container canvas{position:relative;z-index:2;opacity:.0}
+#logo-3d-container canvas{position:relative;z-index:2;opacity:1}
 .cube-glow{
   position:absolute;width:320px;height:320px;border-radius:50%;
   background:radial-gradient(circle,rgba(168,85,247,.45) 0%,rgba(124,58,237,.2) 40%,transparent 70%);
@@ -1816,9 +1808,7 @@ async function renderHome() {
 <!-- ===== 3D CUBE MONUMENT (brand hero) ===== -->
 <div class="cube-hero fade-in-up" style="margin-bottom:14px">
   <div class="cube-glow"></div>
-  <div id="logo-3d-container">
-    <img src="/lp-assets/logo-desktop.webp" alt="宅建BOOST" class="logo-3d-fallback" loading="eager">
-  </div>
+  <div id="logo-3d-container"></div>
 </div>
 
 <!-- ===== HERO STATS CARD ===== -->
@@ -3259,11 +3249,13 @@ function confirmResetData() {
 }
 
 // ===== DARK MODE =====
+const _SVG_MOON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+const _SVG_SUN = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
 function toggleDark() {
   const isDark = document.body.classList.toggle('dark');
   LS.setSync('dark', isDark);
-  document.getElementById('themeBtn').innerHTML = isDark
-    ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.innerHTML = isDark ? _SVG_SUN : _SVG_MOON;
 }
 
 function initDarkMode() {
@@ -3271,7 +3263,7 @@ function initDarkMode() {
   if (pref) {
     document.body.classList.add('dark');
     const btn = document.getElementById('themeBtn');
-    if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
+    if (btn) btn.innerHTML = _SVG_SUN;
   }
 }
 
